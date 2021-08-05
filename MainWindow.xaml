@@ -1,0 +1,121 @@
+﻿<Window x:Class="GraphicEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GraphicEditor"
+        mc:Ignorable="d"
+        Title="Редактор" Height="768" Width="1024">
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Grid.Column="0" Header="Панель управления" Width="Auto" Height="Auto">
+            <Grid Margin="3,10,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition MinHeight="100" Height="0.2*"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition MinHeight="100" Height="0.2*"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition MinHeight="150" Height="0.3*"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition MinHeight="150" Height="0.3*"/>
+                    <RowDefinition Height="0.1*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" >Файл</TextBlock>
+                <TextBlock Grid.Row="2" >Создать элемент</TextBlock>
+                <TextBlock Grid.Row="4">Трансформация</TextBlock>
+                <TextBlock Grid.Row="6">Стиль</TextBlock>
+                <Grid Grid.Row="1" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Column="0"  Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" >
+                        <Image Source="Icons/load.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="Icons/save.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Загрузить</Label>
+                    <Label Grid.Column="1" Grid.Row="1" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Сохранить</Label>
+                </Grid>
+                <Grid Grid.Row="3" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Column="0" Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="Icons/rectangle.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="Icons/line.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Прямоугольник</Label>
+                    <Label Grid.Column="1" Grid.Row="1" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Линия</Label>
+                </Grid>
+                <Grid Grid.Row="5" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Column="0" Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="Icons/move.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="Icons/rotation.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Grid.Column="0" Grid.Row=" 2" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="Icons/scale.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Перемещение</Label>
+                    <Label Grid.Column="1" Grid.Row="1" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Вращение</Label>
+                    <Label Grid.Column="1" Grid.Row="2" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Масштабирование</Label>
+                </Grid>
+                <Grid Grid.Row="7" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Column="0" Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="Icons/width.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="Icons/color.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Grid.Column="0" Grid.Row=" 2" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="Icons/fill.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Толщина линии</Label>
+                    <Label Grid.Column="1" Grid.Row="1" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Цвет линии</Label>
+                    <Label Grid.Column="1" Grid.Row="2" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Заливка</Label>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="1" Header="Рабочая область">
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                <Canvas  Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}" Height="4000" Width="4000"></Canvas>
+            </ScrollViewer>
+        </GroupBox>
+    </Grid>
+</Window>
