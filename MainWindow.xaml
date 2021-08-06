@@ -37,10 +37,10 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Column="0"  Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" >
+                    <Button x:Name="LoadBtn" Grid.Column="0"  Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress" >
                         <Image Source="Icons/load.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="SaveBtn" Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
                         <Image Source="Icons/save.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Загрузить</Label>
@@ -55,10 +55,10 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Column="0" Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="RectBtn" Grid.Column="0" Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
                         <Image Source="Icons/rectangle.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="LineBtn" Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
                         <Image Source="Icons/line.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Прямоугольник</Label>
@@ -74,13 +74,13 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Column="0" Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="MoveBtn" Grid.Column="0" Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
                         <Image Source="Icons/move.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="RotateBtn" Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
                         <Image Source="Icons/rotation.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button Grid.Column="0" Grid.Row=" 2" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="ScaleBtn" Grid.Column="0" Grid.Row=" 2" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
                         <Image Source="Icons/scale.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Перемещение</Label>
@@ -97,24 +97,25 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Column="0" Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="LineWidthBtn" Grid.Column="0" Grid.Row=" 0" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
                         <Image Source="Icons/width.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="ColorBtn" Grid.Column="0" Grid.Row=" 1" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
                         <Image Source="Icons/color.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button Grid.Column="0" Grid.Row=" 2" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="FillBtn" Grid.Column="0" Grid.Row=" 2" Height="50" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
                         <Image Source="Icons/fill.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Толщина линии</Label>
                     <Label Grid.Column="1" Grid.Row="1" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Цвет линии</Label>
                     <Label Grid.Column="1" Grid.Row="2" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Заливка</Label>
                 </Grid>
+                <TextBlock Grid.Row="8" x:Name="InfoConsole" Margin="0,0,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Column="1" Header="Рабочая область">
             <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-                <Canvas  Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}" Height="4000" Width="4000"></Canvas>
+                <Canvas x:Name="WorkPlace"  Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}" Height="4000" Width="4000" MouseRightButtonDown="WorkPlace_MouseRightButtonDown" MouseLeftButtonDown="WorkPlace_MouseLeftButtonDown" MouseMove="WorkPlace_MouseMove" MouseLeftButtonUp="WorkPlace_MouseLeftButtonUp"></Canvas>
             </ScrollViewer>
         </GroupBox>
     </Grid>

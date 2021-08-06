@@ -41,6 +41,9 @@ namespace GraphicEditor.Functionality
             DefineGizmoPoints();
             DefineOutline();
             polyline.StrokeThickness = 2;
+            _workPlace.Children.Add(polyline);
+            polyline.Stroke = Brushes.Black;
+            polyline.Visibility = Visibility.Visible;
         }
         public FigureObject()
         {
