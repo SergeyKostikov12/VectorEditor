@@ -69,10 +69,8 @@ namespace GraphicEditor.Functionality
             {
                 pivotPoint.X = Math.Min(firstPoint.X, secondPoint.X);
                 pivotPoint.Y = Math.Min(firstPoint.Y, secondPoint.Y);
-
                 size.Height = Math.Max(firstPoint.X, secondPoint.X) - pivotPoint.X;
                 size.Width = Math.Max(firstPoint.Y, secondPoint.Y) - pivotPoint.Y;
-
                 Point point1 = new Point(pivotPoint.X, pivotPoint.Y + size.Width);
                 Point point2 = new Point(point1.X + size.Height, point1.Y);
                 Point point3 = new Point(point2.X, point2.Y - size.Width);
