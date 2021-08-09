@@ -21,14 +21,13 @@ namespace GraphicEditor
     enum BtnPressed { None, Load, Save, Rect, Line, Move, Rotate, Scale, Width, Color, Fill }
     public partial class MainWindow : Window
     {
-        private CursorType cursorWorkPlace;
         private BtnPressed buttonPressedFlag;
         private bool isDraw = false;
         private bool isMoving = false;
         private bool isRotating = false;
-        private bool moveEnd = false;
+        private bool isScaling = false;
         private bool isFirstPoint = true;
-        private bool isPointSelect = false;
+        private bool isPointGet = false;
 
         private Rectangle shadowRect;
         private Polyline shadowLine;
@@ -77,6 +76,7 @@ namespace GraphicEditor
                         {
                             buttonPressedFlag = BtnPressed.Move;
                             SetCursor(CursorType.Hand);
+                            DrawGizmoForRotate();//-----------------------
                         }
                         else MessageBox.Show("Перемещать линию не получится!");
                     }
@@ -98,10 +98,22 @@ namespace GraphicEditor
                 case "ScaleBtn":
                     if (selectedPolylineName != null)
                     {
-                        buttonPressedFlag = BtnPressed.Scale;
-                        SetCursor(CursorType.Hand);
+                        if (selectedFigure.ShapeType == ShapeType.Rectangle)
+                        {
+                            buttonPressedFlag = BtnPressed.Scale;
+                            SetCursor(CursorType.Hand);
+                            DrawGizmoForRotate();//----------------------------
+                        }
+                        else MessageBox.Show("Линию вращать не получится!");
                     }
                     else MessageBox.Show("Сначала выделите объект!");
+                    break;
+                case "DeleteBtn":
+                    if (selectedPolylineName != null)
+                    {
+                        SetCursor(CursorType.Arrow);
+                        DeleteFigure();
+                    }
                     break;
                 case "LineWidthBtn":
                     if (selectedPolylineName != null) buttonPressedFlag = BtnPressed.Width;
@@ -117,35 +129,29 @@ namespace GraphicEditor
                     break;
             }
         }
-
-
-
-        private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
         {
-            if (buttonPressedFlag == BtnPressed.Rect)
+            currentMousePos = e.GetPosition(WorkPlace);
+            if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
-                SetCursor(CursorType.Arrow);
-                buttonPressedFlag = BtnPressed.None;
+                if (buttonPressedFlag == BtnPressed.Rect) isDraw = true;
+                if (buttonPressedFlag == BtnPressed.Move) isMoving = true;
+                if (buttonPressedFlag == BtnPressed.Rotate) isRotating = true;
+                if (buttonPressedFlag == BtnPressed.Scale) isScaling = true;
             }
-            else if (buttonPressedFlag == BtnPressed.Line)
-            {
-                SetCursor(CursorType.Arrow);
-                buttonPressedFlag = BtnPressed.None;
-                if (shadowLine.Points.Count > 1)
-                {
-                    shadowLine.Points.RemoveAt(shadowLine.Points.Count - 1);
-                    if (shadowLine.Points.Count > 1)
-                    {
-                        CreateNewFigure(shadowLine);
-                    }
-                }
-            }
+            else if (buttonPressedFlag == BtnPressed.Line) isDraw = true;
             else
             {
-                SetCursor(CursorType.Arrow);
-                buttonPressedFlag = BtnPressed.None;
-                DeselectAllPolylines();
+                isDraw = false;
+                isMoving = false;
+                isScaling = false;
             }
+            DrawShadow();
+            MoveFigure();
+            MovePoint();
+            RotateFigure();
+            ScaleFigure();
+            InfoConsole.Text = isDraw.ToString() + "\n" + currentMousePos + "\n" + selectedPolylineName;
         }
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -168,6 +174,10 @@ namespace GraphicEditor
             {
                 isRotating = true;
             }
+            else if (buttonPressedFlag == BtnPressed.Scale)
+            {
+                isScaling = true;
+            }
             else if (buttonPressedFlag == BtnPressed.None)
             {
                 if (selectedPolylineName == null)
@@ -179,46 +189,8 @@ namespace GraphicEditor
                 {
                     GetPointsAround();
                 }
-                //DeselectAllPolylines();
             }
         }
-
-        private void GetPointsAround()
-        {
-            Point pt = selectedFigure.GetPointNear(firstPoint);
-            if (pt.X != 9999 && pt.Y != 0) isPointSelect = true;
-        }
-
-        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
-        {
-            currentMousePos = e.GetPosition(WorkPlace);
-            if (Mouse.LeftButton == MouseButtonState.Pressed)
-            {
-                if (buttonPressedFlag == BtnPressed.Rect) isDraw = true;
-                if (buttonPressedFlag == BtnPressed.Move) isMoving = true;
-                if (buttonPressedFlag == BtnPressed.Rotate) isRotating = true;
-            }
-            else if (buttonPressedFlag == BtnPressed.Line) isDraw = true;
-            else
-            {
-                isDraw = false;
-                isMoving = false;
-            }
-            DrawShadow();
-            MoveFigure();
-            RotateFigure();
-            MovePoint();
-            InfoConsole.Text = isDraw.ToString() + "\n" + currentMousePos + "\n" + selectedPolylineName;
-        }
-
-        private void MovePoint()
-        {
-            if (isPointSelect)
-            {
-                tempPosition = selectedFigure.MovePointToNewPosition(tempPosition, currentMousePos);
-            }
-        }
-
         private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Point endPoint = e.GetPosition(WorkPlace);
@@ -235,77 +207,59 @@ namespace GraphicEditor
             {
                 isRotating = false;
             }
-            if (isPointSelect)
+            if (isPointGet)
             {
-                isPointSelect = false;
+                Point pt = selectedFigure.GetPointNear(endPoint);
+                if (pt.X != 9999 && pt.Y != 0)
+                {
+                    selectedFigure.CollapsePoints(pt);
+                }
+                isPointGet = false;
+            }
+        }
+        private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (buttonPressedFlag == BtnPressed.Rect)
+            {
+                SetCursor(CursorType.Arrow);
+                shadowRect.Visibility = Visibility.Hidden;
+                buttonPressedFlag = BtnPressed.None;
+                DeselectAllPolylines();
+            }
+            else if (buttonPressedFlag == BtnPressed.Line)
+            {
+                SetCursor(CursorType.Arrow);
+                buttonPressedFlag = BtnPressed.None;
+                if (shadowLine.Points.Count > 1)
+                {
+                    shadowLine.Points.RemoveAt(shadowLine.Points.Count - 1);
+                    if (shadowLine.Points.Count > 1)
+                    {
+                        CreateNewFigure(shadowLine);
+                    }
+                }
+            }
+            else
+            {
+                SetCursor(CursorType.Arrow);
+                buttonPressedFlag = BtnPressed.None;
+                DeselectAllPolylines();
             }
         }
 
-
-        private void RotateFigure()
-        {
-            if (isRotating)
-            {
-                if (selectedFigure != null)
-                {
-                    tempPosition = selectedFigure.RotateFigure(tempPosition, currentMousePos);
-                }
-            }
-        }
-        private void MoveFigure()
-        {
-            if (isMoving)
-            {
-                if (selectedFigure != null)
-                {
-                    tempPosition = selectedFigure.MoveFigure(tempPosition, currentMousePos);
-                }
-            }
-        }
-        private void DrawGizmoForRotate()
-        {
-            selectedFigure.DrawCenterGizmo(true);
-        }
-        private void DeselectPolyline(string name)
-        {
-            foreach (var figure in allFigures)
-            {
-                if (name == figure.Name) figure.DrawOutline(false, WorkPlace);
-            }
-        }
-        private void DeselectAllPolylines()
-        {
-            foreach (var figure in allFigures)
-            {
-                figure.DrawOutline(false, WorkPlace);
-                figure.DrawCenterGizmo(false);
-                selectedPolylineName = null;
-                selectedFigure = null;
-            }
-        }
-        private void SelectPolyline(string polylineName)
-        {
-            foreach (var figure in allFigures)
-            {
-                if (figure.Name == selectedPolylineName)
-                {
-                    figure.DrawOutline(true, WorkPlace);
-                }
-            }
-        }
         private string FindCollinearPoint()
         {
-            for (int i = 0; i < allFigures.Count; i++) //перебор на рабочем поле
+            for (int i = 0; i < allFigures.Count; i++)
             {
                 FigureObject figure = allFigures[i];
-                Point a = new Point();
-                Point b = new Point();
+                Point _1 = new Point();
+                Point _2 = new Point();
                 for (int j = 0; j < figure.Shape.Points.Count; j++)
                 {
-                    a = figure.Shape.Points[j];
-                    b = figure.Shape.Points[j + 1];
+                    _1 = figure.Shape.Points[j];
+                    _2 = figure.Shape.Points[j + 1];
 
-                    if (AreCollinear(a, b, firstPoint))
+                    if (AreCollinear(_1, _2, firstPoint))
                     {
                         selectedPolylineName = allFigures[i].Name;
                         selectedFigure = allFigures[i];
@@ -317,6 +271,22 @@ namespace GraphicEditor
             if (selectedPolylineName == null) selectedFigure = null;
             return null;
         }
+        private void AddPointToLineShadow(Point point)
+        {
+            if (!isFirstPoint)
+            {
+                shadowLine.Points[0] = point;
+                shadowLine.Points.Add(currentMousePos);
+                isFirstPoint = false;
+            }
+            else
+            {
+                int lastP = shadowLine.Points.Count - 1;
+                shadowLine.Points.RemoveAt(lastP);
+                shadowLine.Points.Add(point);
+                shadowLine.Points.Add(currentMousePos);
+            }
+        }
         private bool AreCollinear(Point A, Point B, Point C)
         {
             Vector CA = new Vector(A.X - C.X, A.Y - C.Y);
@@ -325,6 +295,83 @@ namespace GraphicEditor
             double angle = Math.Abs(Vector.AngleBetween(CA, CB));
             if (angle >= 175) return true;
             return false;
+        }
+        private void CheckValid()
+        {
+            List<int> tmpList = new List<int>();
+            for (int i = 0; i < allFigures.Count; i++)
+            {
+                if (allFigures[i].Name == null)
+                {
+                    tmpList.Add(i);
+                }
+            }
+            if (tmpList.Count != 0)
+            {
+                for (int i = 0; i < tmpList.Count; i++)
+                {
+                    int n = tmpList[i];
+                    allFigures.RemoveAt(n);
+                }
+            }
+        }
+        private void CreateNewFigure(Point endPoint)
+        {
+            int _1 = WorkPlace.Children.Count;
+            string name = "Figure_" + allFigures.Count + 1;
+            FigureObject figure = new FigureObject(name, ShapeType.Rectangle, firstPoint, endPoint, WorkPlace);
+            allFigures.Add(figure);
+        }
+        private void CreateNewFigure(Polyline polyline)
+        {
+            int _1 = WorkPlace.Children.Count;
+            string name = "Figure_" + allFigures.Count + 1;
+            FigureObject figure = new FigureObject(name, ShapeType.Line, polyline, WorkPlace);
+            allFigures.Add(figure);
+            shadowLine.Visibility = Visibility.Hidden;
+            shadowLine.Points.Clear();
+            shadowLine.Points.Add(currentMousePos);
+            isFirstPoint = true;
+        }
+        private void DrawLineShadow()
+        {
+            int n = shadowLine.Points.Count - 1;
+            shadowLine.Points[n] = new Point(currentMousePos.X, currentMousePos.Y);
+        }
+        private void DrawGizmoForRotate()
+        {
+            selectedFigure.DrawCenterGizmo(true);
+        }
+        private void DeleteFigure()
+        {
+            if (selectedFigure != null) selectedFigure.DeletePolyline();
+            DeselectAllPolylines();
+        }
+        private void DeselectAllPolylines()
+        {
+            CheckValid();
+            foreach (var figure in allFigures)
+            {
+                figure.DrawOutline(false);
+                figure.DrawCenterGizmo(false);
+            }
+            selectedPolylineName = null;
+            selectedFigure = null;
+            buttonPressedFlag = BtnPressed.None;
+        }
+        private void DrawRectangleShadow()
+        {
+            double xTop = Math.Max(firstPoint.X, currentMousePos.X);
+            double yTop = Math.Max(firstPoint.Y, currentMousePos.Y);
+
+            double xMin = Math.Min(firstPoint.X, currentMousePos.X);
+            double yMin = Math.Min(firstPoint.Y, currentMousePos.Y);
+
+            shadowRect.Height = yTop - yMin;
+            shadowRect.Width = xTop - xMin;
+
+            Canvas.SetLeft(shadowRect, xMin);
+            Canvas.SetTop(shadowRect, yMin);
         }
         private void DrawShadow()
         {
@@ -343,60 +390,80 @@ namespace GraphicEditor
                 }
                 else shadowLine.Visibility = Visibility.Hidden;
             }
+
         }
-        private void AddPointToLineShadow(Point point)
+        private void GetPointsAround()
         {
-            if (!isFirstPoint)
+            if (selectedFigure.Name != null)
             {
-                shadowLine.Points[0] = point;
-                shadowLine.Points.Add(currentMousePos);
-                isFirstPoint = false;
+                Point pt = selectedFigure.GetPointNear(firstPoint);
+                if (pt.X != 9999 && pt.Y != 0) isPointGet = true;
             }
-            else
+            else DeselectAllPolylines();
+        }
+        private void InitializeShadows()
+        {
+            Rectangle rectangle = new Rectangle
             {
-                int lastP = shadowLine.Points.Count - 1;
-                Point tmpPoint = shadowLine.Points[lastP];
-                shadowLine.Points.RemoveAt(lastP);
-                shadowLine.Points.Add(point);
-                shadowLine.Points.Add(currentMousePos);
+                Stroke = Brushes.Blue,
+                StrokeDashArray = new DoubleCollection() { 4, 4 },
+                StrokeThickness = 1,
+                Visibility = Visibility.Hidden
+            };
+            shadowRect = rectangle;
+            Polyline line = new Polyline
+            {
+                Stroke = Brushes.Blue,
+                StrokeDashArray = new DoubleCollection() { 4, 4 },
+                StrokeThickness = 1,
+                Visibility = Visibility.Hidden
+            };
+
+            shadowLine = line;
+            shadowLine.Points.Add(new Point(0, 0));
+
+            WorkPlace.Children.Add(shadowRect);
+            WorkPlace.Children.Add(shadowLine);
+        }
+        private void MoveFigure()
+        {
+            if (isMoving)
+            {
+                if (selectedFigure != null)
+                {
+                    tempPosition = selectedFigure.MoveFigure(tempPosition, currentMousePos);
+                }
             }
         }
-        private void DrawRectangleShadow()
+        private void MovePoint()
         {
-            double xTop = Math.Max(firstPoint.X, currentMousePos.X);
-            double yTop = Math.Max(firstPoint.Y, currentMousePos.Y);
-
-            double xMin = Math.Min(firstPoint.X, currentMousePos.X);
-            double yMin = Math.Min(firstPoint.Y, currentMousePos.Y);
-
-            shadowRect.Height = yTop - yMin;
-            shadowRect.Width = xTop - xMin;
-
-            Canvas.SetLeft(shadowRect, xMin);
-            Canvas.SetTop(shadowRect, yMin);
+            if (isPointGet)
+            {
+                if (selectedFigure != null)
+                {
+                    tempPosition = selectedFigure.MovePointToNewPosition(tempPosition, currentMousePos);
+                }
+            }
         }
-        private void DrawLineShadow()
+        private void RotateFigure()
         {
-            int n = shadowLine.Points.Count - 1;
-            shadowLine.Points[n] = new Point(currentMousePos.X, currentMousePos.Y);
+            if (isRotating)
+            {
+                if (selectedFigure != null)
+                {
+                    tempPosition = selectedFigure.RotateFigure(tempPosition, currentMousePos);
+                }
+            }
         }
-        private void CreateNewFigure(Point endPoint)
+        private void SelectPolyline(string polylineName)
         {
-            int n = WorkPlace.Children.Count;
-            string name = "Figure_" + allFigures.Count + 1;
-            FigureObject figure = new FigureObject(name, ShapeType.Rectangle, firstPoint, endPoint, WorkPlace);
-            allFigures.Add(figure);
-        }
-        private void CreateNewFigure(Polyline polyline)
-        {
-            int n = WorkPlace.Children.Count;
-            string name = "Figure_" + allFigures.Count + 1;
-            FigureObject figure = new FigureObject(name, ShapeType.Line, polyline, WorkPlace);
-            allFigures.Add(figure);
-            shadowLine.Visibility = Visibility.Hidden;
-            shadowLine.Points.Clear();
-            shadowLine.Points.Add(currentMousePos);
-            isFirstPoint = true;
+            foreach (var figure in allFigures)
+            {
+                if (figure.Name == polylineName)
+                {
+                    figure.DrawOutline(true);
+                }
+            }
         }
         private void SetCursor(CursorType cursorType)
         {
@@ -416,34 +483,15 @@ namespace GraphicEditor
                     break;
             }
         }
-        private void InitializeShadows()
+        private void ScaleFigure()
         {
-            Rectangle rectangle = new Rectangle();
-            rectangle.Stroke = Brushes.Blue;
-            rectangle.StrokeDashArray = new DoubleCollection() { 4, 4 };
-            rectangle.StrokeThickness = 1;
-            rectangle.Visibility = Visibility.Hidden;
-            shadowRect = rectangle;
-
-            Polyline line = new Polyline();
-            line.Stroke = Brushes.Blue;
-            line.StrokeDashArray = new DoubleCollection() { 4, 4 };
-            line.StrokeThickness = 1;
-            line.Visibility = Visibility.Hidden;
-            shadowLine = line;
-            shadowLine.Points.Add(new Point(0, 0));
-
-            WorkPlace.Children.Add(shadowRect);
-            WorkPlace.Children.Add(shadowLine);
-        }
-        private FigureObject GetFigureByName(string selectedPolylineName)
-        {
-            foreach (var figure in allFigures)
+            if (isScaling)
             {
-                if (figure.Name.Equals(selectedPolylineName)) return figure;
+                if (selectedFigure != null)
+                {
+                    tempPosition = selectedFigure.ScaleFigure(tempPosition, currentMousePos);
+                }
             }
-            return null;
         }
-
     }
 }
