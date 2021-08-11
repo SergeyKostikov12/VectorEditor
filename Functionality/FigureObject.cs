@@ -66,27 +66,26 @@ namespace GraphicEditor.Functionality
             polyline.Visibility = Visibility.Visible;
         }
 
-        public Point GetPointNear(Point position, out int number)
+        public int GetPointNear(Point position)
         {
             for (int i = 0; i < polyline.Points.Count; i++)
             {
-                Point delta = new Point(Math.Abs(position.X - polyline.Points[i].X), Math.Abs(position.Y - polyline.Points[i].Y));
+                Point delta = polyline.Points[i].AbsDeltaTo(position);
                 if (delta.X <= 5 && delta.Y <= 5)
                 {
-                    selectedPoint = i;
-                    number = i+1;
-                    return polyline.Points[i];
+                    int number = i+1;
+                    return number;
                 }
                 else continue;
             }
-            number = 0;
-            return new Point(9999, 0);
+            
+            return 0;
         }
         public Point MoveFigure(Point firstPoint, Point newPoint)
         {
             if (ShapeType == ShapeType.Rectangle)
             {
-                Point deltaPoint = new Point(newPoint.X - firstPoint.X, newPoint.Y - firstPoint.Y);
+                Point deltaPoint = firstPoint.DeltaTo(newPoint); //new Point(newPoint.X - firstPoint.X, newPoint.Y - firstPoint.Y);
 
                 Canvas.SetLeft(outline, outlinePivotPoint.X + deltaPoint.X);
                 Canvas.SetTop(outline, outlinePivotPoint.Y + deltaPoint.Y);
@@ -106,11 +105,12 @@ namespace GraphicEditor.Functionality
             else return firstPoint;
 
         }
-        public Point MovePointToNewPosition(Point fistPoint, Point position)
+        public Point MovePointToNewPosition(int pointNumber, Point fistPoint, Point position)
         {
-            Point deltaPoint = new Point(position.X - fistPoint.X, position.Y - fistPoint.Y);
-            polyline.Points[selectedPoint] = NewPointPosition(polyline.Points[selectedPoint], deltaPoint);
-            Rectangle rect = gizmos[selectedPoint];
+            Point deltaPoint = fistPoint.DeltaTo(position);
+
+            polyline.Points[pointNumber-1] = NewPointPosition(polyline.Points[pointNumber-1], deltaPoint);
+            Rectangle rect = gizmos[pointNumber-1];
             Point currentGizmoPos = GetGizmoPosition(rect);
             Point newPos = NewPointPosition(currentGizmoPos, deltaPoint);
             SetGizmoPointPosition(rect, newPos, true);
@@ -156,54 +156,68 @@ namespace GraphicEditor.Functionality
             }
             else return;
         }
-        public void CollapsePoints(Point point)
+        public void CollapsePoints(int pointNumber)
         {
-            for (int i = 0; i < polyline.Points.Count; i++)
+            Point pt = polyline.Points[pointNumber-1];
+
+            for (int i = 0; i<polyline.Points.Count; i++)
             {
-                Point delta = DeltaPoint(polyline.Points[i], point);
-                if (delta.X <= 5 && delta.Y <= 5)
+                if (i == pointNumber-1) continue;
+                else
                 {
-                    selectedPoint = i;
-
-                    if (i == 0)
+                    if (pt.Near(polyline.Points[i]))
                     {
-                        Point deltaNextPoint = DeltaPoint(polyline.Points[i], polyline.Points[i + 1]);
-                        if (deltaNextPoint.X <= 5 && deltaNextPoint.Y <= 5)
+                       if (Math.Abs((pointNumber-1) - i) <= 1)
                         {
-                            polyline.Points.RemoveAt(0);
-                            DeleteGizmo(0);
+                            polyline.Points.RemoveAt(pointNumber-1);
+                            DeleteGizmo(pointNumber-1);
                         }
                     }
-                    else if (i == polyline.Points.Count - 1)
-                    {
-                        Point deltaPreviosPoint = DeltaPoint(polyline.Points[i], polyline.Points[i - 1]);
-                        if (deltaPreviosPoint.X <= 5 && deltaPreviosPoint.Y <= 5)
-                        {
-                            polyline.Points.RemoveAt(polyline.Points.Count - 1);
-                            DeleteGizmo(polyline.Points.Count);
-                        }
-                    }
-                    else if (i != polyline.Points.Count - 1 && i != 0)
-                    {
-                        Point deltaNextPoint = DeltaPoint(polyline.Points[i], polyline.Points[i + 1]);
-                        Point deltaPreviosPoint = DeltaPoint(polyline.Points[i], polyline.Points[i - 1]);
-                        if (deltaNextPoint.X <= 5 && deltaNextPoint.Y <= 5)
-                        {
-                            polyline.Points.RemoveAt(i);
-                            DeleteGizmo(i);
-                        }
-                        else if (deltaPreviosPoint.X <= 5 && deltaPreviosPoint.Y <= 5)
-                        {
-                            polyline.Points.RemoveAt(i);
-                            DeleteGizmo(i);
-                        }
-                    }
-
-
-
                 }
-                else continue;
             }
+            //for (int i = 0; i < polyline.Points.Count; i++)
+            //{
+            //    Point delta = DeltaPoint(polyline.Points[i], point);
+            //    if (delta.X <= 5 && delta.Y <= 5)
+            //    {
+            //        selectedPoint = i;
+
+            //        if (i == 0)
+            //        {
+            //            Point deltaNextPoint = DeltaPoint(polyline.Points[i], polyline.Points[i + 1]);
+            //            if (deltaNextPoint.X <= 5 && deltaNextPoint.Y <= 5)
+            //            {
+            //                polyline.Points.RemoveAt(0);
+            //                DeleteGizmo(0);
+            //            }
+            //        }
+            //        else if (i == polyline.Points.Count - 1)
+            //        {
+            //            Point deltaPreviosPoint = DeltaPoint(polyline.Points[i], polyline.Points[i - 1]);
+            //            if (deltaPreviosPoint.X <= 5 && deltaPreviosPoint.Y <= 5)
+            //            {
+            //                polyline.Points.RemoveAt(polyline.Points.Count - 1);
+            //                DeleteGizmo(polyline.Points.Count);
+            //            }
+            //        }
+            //        else if (i != polyline.Points.Count - 1 && i != 0)
+            //        {
+            //            Point deltaNextPoint = DeltaPoint(polyline.Points[i], polyline.Points[i + 1]);
+            //            Point deltaPreviosPoint = DeltaPoint(polyline.Points[i], polyline.Points[i - 1]);
+            //            if (deltaNextPoint.X <= 5 && deltaNextPoint.Y <= 5)
+            //            {
+            //                polyline.Points.RemoveAt(i);
+            //                DeleteGizmo(i);
+            //            }
+            //            else if (deltaPreviosPoint.X <= 5 && deltaPreviosPoint.Y <= 5)
+            //            {
+            //                polyline.Points.RemoveAt(i);
+            //                DeleteGizmo(i);
+            //            }
+            //        }
+            //    }
+            //    else continue;
+            //}
             if (polyline.Points.Count == 1) DeletePolyline();
         }
         public void DeletePolyline()
@@ -415,6 +429,7 @@ namespace GraphicEditor.Functionality
                     {
                         canvas.Children.RemoveAt(i);
                         gizmos.RemoveAt(number);
+                        return;
                     }
                 }
                 catch
@@ -548,7 +563,7 @@ namespace GraphicEditor.Functionality
             }
             // polyline.Points.Insert
         }
-        private bool AreCollinear(Point point)
+        public bool AreCollinear(Point point)
         {
             for (int i = 0; i < polyline.Points.Count - 1; i++)
             {
@@ -565,8 +580,9 @@ namespace GraphicEditor.Functionality
         }
         private void AddPointToLine(Point point)
         {
-            polyline.Points.Insert(GetCollinearPosition(point), point);
-            gizmos.Insert(GetCollinearPosition(point), CreateGizmoPoint(point));
+            int n = GetCollinearPosition(point);
+            polyline.Points.Insert(n, point);
+            gizmos.Insert(n, CreateGizmoPoint(point));
         }
         private int GetCollinearPosition(Point point)
         {
@@ -587,7 +603,7 @@ namespace GraphicEditor.Functionality
         {
             Rectangle rect = new Rectangle
             {
-                Name = name + "Gizmo" + gizmos.Count.ToString(),
+                Name = name + "Gizmo" + (gizmos.Count+1).ToString(),
                 Height = 10,
                 Width = 10,
                 Fill = Brushes.Red,

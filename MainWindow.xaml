@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:GraphicEditor"
         mc:Ignorable="d"
         Title="Редактор" Height="768" Width="1024">
@@ -22,7 +23,7 @@
                     <RowDefinition MinHeight="150" Height="0.4*"/>
                     <RowDefinition Height="20"/>
                     <RowDefinition MinHeight="150" Height="0.3*"/>
-                    <RowDefinition Height="0.1*"/>
+                    <RowDefinition Height="0.2*" />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" >Файл</TextBlock>
                 <TextBlock Grid.Row="2" >Создать элемент</TextBlock>
@@ -116,7 +117,9 @@
                     <Label Grid.Column="1" Grid.Row="1" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Цвет линии</Label>
                     <Label Grid.Column="1" Grid.Row="2" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Заливка</Label>
                 </Grid>
-                <TextBlock Grid.Row="8" x:Name="InfoConsole" Margin="0,0,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                <Grid Grid.Row="8" Name="GridPanel">
+                    <Frame x:Name="PropertyPanel" Margin="0,0,0,0"></Frame>
+                </Grid>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Column="1" Header="Рабочая область">
@@ -126,3 +129,4 @@
         </GroupBox>
     </Grid>
 </Window>
+    
