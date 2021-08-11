@@ -27,7 +27,9 @@ namespace GraphicEditor
         private bool isRotating = false;
         private bool isScaling = false;
         private bool isFirstPoint = true;
-        private bool isPointGet = false;
+        private bool isLineSelect = false;
+        private bool isPointMove = false;
+        
 
         private Rectangle shadowRect;
         private Polyline shadowLine;
@@ -138,6 +140,7 @@ namespace GraphicEditor
                 if (buttonPressedFlag == BtnPressed.Move) isMoving = true;
                 if (buttonPressedFlag == BtnPressed.Rotate) isRotating = true;
                 if (buttonPressedFlag == BtnPressed.Scale) isScaling = true;
+                if (isLineSelect) isPointMove = true;
             }
             else if (buttonPressedFlag == BtnPressed.Line) isDraw = true;
             else
@@ -183,11 +186,27 @@ namespace GraphicEditor
                 if (selectedPolylineName == null)
                 {
                     string name = FindCollinearPoint();
-                    if (name != null) SelectPolyline(name);
+                    if (name != null)
+                    {
+                        SelectPolyline(name);
+                        isLineSelect = true;
+                    }
                 }
                 else if (selectedFigure.ShapeType == ShapeType.Line)
                 {
                     GetPointsAround();
+                }
+            }
+
+            if (e.ClickCount == 2)
+            {
+                if (selectedPolylineName != null && selectedFigure.ShapeType == ShapeType.Line)
+                {
+                    selectedFigure.AddPointFromDoubleClick(firstPoint);
+                    InfoConsole.Text += "\n" + selectedFigure.Shape.Points.ToString();
+                    //MessageBox.Show(e.GetPosition(WorkPlace).ToString());
+                    // Здесь даблклик
+
                 }
             }
         }
@@ -207,14 +226,14 @@ namespace GraphicEditor
             {
                 isRotating = false;
             }
-            if (isPointGet)
+            if (isLineSelect)
             {
-                Point pt = selectedFigure.GetPointNear(endPoint);
+                Point pt = selectedFigure.GetPointNear(endPoint, out int number);
                 if (pt.X != 9999 && pt.Y != 0)
                 {
                     selectedFigure.CollapsePoints(pt);
                 }
-                isPointGet = false;
+                isLineSelect = false;
             }
         }
         private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -287,10 +306,10 @@ namespace GraphicEditor
                 shadowLine.Points.Add(currentMousePos);
             }
         }
-        private bool AreCollinear(Point A, Point B, Point C)
+        private bool AreCollinear(Point A, Point B, Point C_center)
         {
-            Vector CA = new Vector(A.X - C.X, A.Y - C.Y);
-            Vector CB = new Vector(B.X - C.X, B.Y - C.Y);
+            Vector CA = new Vector(A.X - C_center.X, A.Y - C_center.Y);
+            Vector CB = new Vector(B.X - C_center.X, B.Y - C_center.Y);
 
             double angle = Math.Abs(Vector.AngleBetween(CA, CB));
             if (angle >= 175) return true;
@@ -396,8 +415,12 @@ namespace GraphicEditor
         {
             if (selectedFigure.Name != null)
             {
-                Point pt = selectedFigure.GetPointNear(firstPoint);
-                if (pt.X != 9999 && pt.Y != 0) isPointGet = true;
+                Point pt = selectedFigure.GetPointNear(firstPoint, out int number);
+                if (pt.X != 9999 && pt.Y != 0) isLineSelect = true;
+                if (number == 0)
+                {
+
+                }
             }
             else DeselectAllPolylines();
         }
@@ -437,9 +460,9 @@ namespace GraphicEditor
         }
         private void MovePoint()
         {
-            if (isPointGet)
+            if (isLineSelect)
             {
-                if (selectedFigure != null)
+                if (isPointMove)
                 {
                     tempPosition = selectedFigure.MovePointToNewPosition(tempPosition, currentMousePos);
                 }
@@ -493,5 +516,11 @@ namespace GraphicEditor
                 }
             }
         }
+
+        //private void eventsView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        //{
+        //    Details d = new Details((EventRecord)eventsView.SelectedItem);
+        //    d.ShowDialog();
+        //}
     }
 }

@@ -60,14 +60,13 @@ namespace GraphicEditor.Functionality
             canvas = _workPlace;
             SetNewShape(_shapeType, _polyline);
             DefineGizmoPoints();
-            DefineOutline();
             polyline.StrokeThickness = 2;
             _workPlace.Children.Add(polyline);
             polyline.Stroke = Brushes.Black;
             polyline.Visibility = Visibility.Visible;
         }
 
-        public Point GetPointNear(Point position)
+        public Point GetPointNear(Point position, out int number)
         {
             for (int i = 0; i < polyline.Points.Count; i++)
             {
@@ -75,10 +74,12 @@ namespace GraphicEditor.Functionality
                 if (delta.X <= 5 && delta.Y <= 5)
                 {
                     selectedPoint = i;
+                    number = i+1;
                     return polyline.Points[i];
                 }
                 else continue;
             }
+            number = 0;
             return new Point(9999, 0);
         }
         public Point MoveFigure(Point firstPoint, Point newPoint)
@@ -539,5 +540,65 @@ namespace GraphicEditor.Functionality
             Canvas.SetLeft(rect, centerGizmo.X);
             Canvas.SetTop(rect, centerGizmo.Y);
         }
+        public void AddPointFromDoubleClick(Point pt)
+        {
+            if(AreCollinear(pt))
+            {
+                AddPointToLine(pt);
+            }
+            // polyline.Points.Insert
+        }
+        private bool AreCollinear(Point point)
+        {
+            for (int i = 0; i < polyline.Points.Count - 1; i++)
+            {
+                Point A = polyline.Points[i];
+                Point B = polyline.Points[i + 1];
+
+                Vector CA = new Vector(A.X - point.X, A.Y - point.Y);
+                Vector CB = new Vector(B.X - point.X, B.Y - point.Y);
+
+                double angle = Math.Abs(Vector.AngleBetween(CA, CB));
+                if (angle >= 175) return true;
+            }
+                return false;
+        }
+        private void AddPointToLine(Point point)
+        {
+            polyline.Points.Insert(GetCollinearPosition(point), point);
+            gizmos.Insert(GetCollinearPosition(point), CreateGizmoPoint(point));
+        }
+        private int GetCollinearPosition(Point point)
+        {
+            for (int i = 0; i < polyline.Points.Count - 1; i++)
+            {
+                Point A = polyline.Points[i];
+                Point B = polyline.Points[i + 1];
+
+                Vector CA = new Vector(A.X - point.X, A.Y - point.Y);
+                Vector CB = new Vector(B.X - point.X, B.Y - point.Y);
+
+                double angle = Math.Abs(Vector.AngleBetween(CA, CB));
+                if (angle >= 175) return i+1;
+            }
+            return 0;
+        }
+        private Rectangle CreateGizmoPoint(Point position)
+        {
+            Rectangle rect = new Rectangle
+            {
+                Name = name + "Gizmo" + gizmos.Count.ToString(),
+                Height = 10,
+                Width = 10,
+                Fill = Brushes.Red,
+                Stroke = Brushes.Black,
+                StrokeThickness = 1,
+                Visibility = Visibility.Visible
+            };
+            canvas.Children.Add(rect);
+            Canvas.SetLeft(rect, position.X - 5);
+            Canvas.SetTop(rect, position.Y-5);
+            return rect;
+        }  /////////////////////////////////////////
     }
 }
