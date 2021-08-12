@@ -17,8 +17,8 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor
 {
+    public enum BtnPressed { None, Load, Save, Rect, Line, Move, Rotate, Scale, Width, Color, Fill }
     enum CursorType { Crosshair, Arrow, Hand }
-    enum BtnPressed { None, Load, Save, Rect, Line, Move, Rotate, Scale, Width, Color, Fill }
     public partial class MainWindow : Window
     {
         private BtnPressed buttonPressedFlag;
@@ -30,26 +30,27 @@ namespace GraphicEditor
         private bool isLineSelect = false;
         private bool isPointMove = false;
         private int pointNumber;
-
+        private ColoRPicker coloRPicker = new ColoRPicker();
+        private WidthPicker widthPicker = new WidthPicker();
 
         private Rectangle shadowRect;
         private Polyline shadowLine;
         private Point firstPoint;
         private Point currentMousePos;
         private Point tempPosition;
+        //private Brush lineColor;
+        //private Frame frame;
 
         private string selectedPolylineName;
         private FigureObject selectedFigure;
         private List<FigureObject> allFigures = new List<FigureObject>();
-        private ColoRPicker coloRPicker = new ColoRPicker();
+
+        //public Frame Frame { get => PropertyPanel; /*set => frame = value; */}
 
         public MainWindow()
         {
             InitializeComponent();
             InitializeShadows();
-
-            PropertyPanel.Content = coloRPicker;
-            coloRPicker.Visibility = Visibility.Hidden;
         }
 
         private void ButtonPress(object sender, RoutedEventArgs e)
@@ -59,10 +60,12 @@ namespace GraphicEditor
             switch (buttonName)
             {
                 case "LoadBtn":
+                    DeselectAllPolylines();
                     buttonPressedFlag = BtnPressed.Load;
 
                     break;
                 case "SaveBtn":
+                    DeselectAllPolylines();
                     buttonPressedFlag = BtnPressed.Save;
 
                     break;
@@ -86,6 +89,8 @@ namespace GraphicEditor
                             DrawGizmoForRotate();
                         }
                         else MessageBox.Show("Перемещать линию не получится!");
+                        coloRPicker.Visibility = Visibility.Hidden;
+                        widthPicker.Visibility = Visibility.Hidden;
                     }
                     else MessageBox.Show("Сначала выделите объект!");
                     break;
@@ -99,6 +104,8 @@ namespace GraphicEditor
                             DrawGizmoForRotate();
                         }
                         else MessageBox.Show("Линию не получится вращать!");
+                        coloRPicker.Visibility = Visibility.Hidden;
+                        widthPicker.Visibility = Visibility.Hidden;
                     }
                     else MessageBox.Show("Сначала выделите объект!");
                     break;
@@ -112,6 +119,8 @@ namespace GraphicEditor
                             DrawGizmoForRotate();
                         }
                         else MessageBox.Show("Линию вращать не получится!");
+                        coloRPicker.Visibility = Visibility.Hidden;
+                        widthPicker.Visibility = Visibility.Hidden;
                     }
                     else MessageBox.Show("Сначала выделите объект!");
                     break;
@@ -120,32 +129,60 @@ namespace GraphicEditor
                     {
                         SetCursor(CursorType.Arrow);
                         DeleteFigure();
+                        widthPicker.Visibility = Visibility.Hidden;
+                        coloRPicker.Visibility = Visibility.Hidden;
                     }
                     break;
                 case "LineWidthBtn":
-                    if (selectedPolylineName != null) buttonPressedFlag = BtnPressed.Width;
+                    if (selectedPolylineName != null)
+                    {
+                        coloRPicker.Visibility = Visibility.Hidden;
+                        PropertyPanel.Content = widthPicker;
+                        //buttonPressedFlag = BtnPressed.Width;
+                        SetWidth();
+                    }
                     else MessageBox.Show("Сначала выделите объект!");
                     break;
                 case "ColorBtn":
                     if (selectedPolylineName != null)
                     {
-                        buttonPressedFlag = BtnPressed.Color;
-                        coloRPicker.Visibility = Visibility.Visible;
-                        SetLineColor();
+                        widthPicker.Visibility = Visibility.Hidden;
+                        PropertyPanel.Content = coloRPicker;
+                        coloRPicker.BtnPressed = BtnPressed.Color;
+                        //buttonPressedFlag = BtnPressed.Color;
+                        SetStyle();
                     }
                     else MessageBox.Show("Сначала выделите объект!");
                     break;
                 case "FillBtn":
-                    if (selectedPolylineName != null) buttonPressedFlag = BtnPressed.Fill;
+                    if (selectedPolylineName != null)
+                    {
+                        if (selectedFigure.ShapeType == ShapeType.Rectangle)
+                        {
+                            PropertyPanel.Content = coloRPicker;
+                            coloRPicker.BtnPressed = BtnPressed.Fill;
+                            SetStyle();
+                        }
+                        else MessageBox.Show("Линию нельзя залить!");
+                        //buttonPressedFlag = BtnPressed.Fill;
+                    }
                     else MessageBox.Show("Сначала выделите объект!");
                     break;
             }
         }
 
-        private async void SetLineColor()
+        private void SetWidth()
         {
-            selectedFigure.SetLineColor();///////////////////////////ASYNC AWAIT
+            widthPicker.Figure = selectedFigure;
+            widthPicker.Visibility = Visibility.Visible;
         }
+
+        private void SetStyle()
+        {
+            coloRPicker.FigureObject = selectedFigure;
+            coloRPicker.Visibility = Visibility.Visible;
+        }
+
 
         private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
         {

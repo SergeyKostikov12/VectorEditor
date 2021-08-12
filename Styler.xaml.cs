@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GraphicEditor.Functionality;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,14 +19,17 @@ namespace GraphicEditor
     public partial class ColoRPicker : Page
     {
         private Brush brush;
+        FigureObject figureObject;
+        public BtnPressed BtnPressed;
 
         public Brush Brush { get => brush; set => brush = value; }
+        public FigureObject FigureObject { get => figureObject; set => figureObject = value; }
 
         public ColoRPicker()
         {
             InitializeComponent();
             FillTable();
-            
+            this.Visibility = Visibility.Hidden;
         }
 
         private void FillTable()
@@ -62,13 +66,23 @@ namespace GraphicEditor
             button.Background = color;
             button.Margin = new Thickness(0, 0, 0, 0);
             button.Click += Button_Click;
-           button.Height = 20;
+            button.Height = 20;
             return button;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Brush = (sender as Button).Background;
+            if (BtnPressed == BtnPressed.Color)
+            {
+                FigureObject.LineColor = (sender as Button).Background;
+                BtnPressed = BtnPressed.None;
+            }
+            else if(BtnPressed == BtnPressed.Fill)
+            {
+                FigureObject.Fill = (sender as Button).Background;
+                BtnPressed = BtnPressed.None;
+            }
+
             this.Visibility = Visibility.Hidden;
         }
 

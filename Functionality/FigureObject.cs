@@ -10,8 +10,8 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality
 {
-    enum ShapeType { Rectangle, Line }
-    class FigureObject
+    public enum ShapeType { Rectangle, Line }
+    public class FigureObject
     {
         private string name;
         private int selectedPoint;
@@ -27,6 +27,7 @@ namespace GraphicEditor.Functionality
         private Polyline polyline;
         private Brush fill;
         private Canvas canvas;
+        private Brush lineColor;
 
         public ShapeType ShapeType;
 
@@ -38,13 +39,32 @@ namespace GraphicEditor.Functionality
         public Rectangle Outline { get => outline; }
         public Size Size { get => size; }
         public Polyline Shape { get => polyline; }
-        public Brush Fill { get => fill; }
+        public Brush Fill
+        {
+            get => fill;
+            set
+            {
+                fill = value;
+                polyline.Fill = value;
+            }
+        }
+        public Brush LineColor
+        {
+            get => lineColor;
+            set
+            {
+                lineColor = value;
+                polyline.Stroke = lineColor;
+                GetGizmoColor(lineColor);
+            }
+        }
 
         public FigureObject(string _name, ShapeType _shapeType, Point _firstPoint, Point _secondPoint, Canvas _workPlace)
         {
             name = _name;
             ShapeType = _shapeType;
             canvas = _workPlace;
+            lineColor = Brushes.Black;
             SetNewShape(_shapeType, _firstPoint, _secondPoint);
             DefineGizmoPoints();
             DefineOutline();
@@ -58,6 +78,7 @@ namespace GraphicEditor.Functionality
             name = _name;
             ShapeType = _shapeType;
             canvas = _workPlace;
+            lineColor = Brushes.Black;
             SetNewShape(_shapeType, _polyline);
             DefineGizmoPoints();
             polyline.StrokeThickness = 2;
@@ -355,7 +376,7 @@ namespace GraphicEditor.Functionality
                     Name = name + "CenterGizmo",
                     Height = 10,
                     Width = 10,
-                    Fill = Brushes.Red,
+                    Fill = Brushes.Black,
                     Stroke = Brushes.Black,
                     StrokeThickness = 1,
                     Visibility = Visibility.Hidden
@@ -373,7 +394,7 @@ namespace GraphicEditor.Functionality
                         Name = name + "Gizmo" + i.ToString(),
                         Height = 10,
                         Width = 10,
-                        Fill = Brushes.Red,
+                        Fill = Brushes.Black,
                         Stroke = Brushes.Black,
                         StrokeThickness = 1,
                         Visibility = Visibility.Hidden
@@ -606,8 +627,8 @@ namespace GraphicEditor.Functionality
                 Name = name + "Gizmo" + (gizmos.Count+1).ToString(),
                 Height = 10,
                 Width = 10,
-                Fill = Brushes.Red,
-                Stroke = Brushes.Black,
+                Fill = lineColor,
+                Stroke = lineColor,
                 StrokeThickness = 1,
                 Visibility = Visibility.Visible
             };
@@ -616,5 +637,13 @@ namespace GraphicEditor.Functionality
             Canvas.SetTop(rect, position.Y-5);
             return rect;
         }  /////////////////////////////////////////
+        private void GetGizmoColor(Brush color)
+        {
+            foreach(var gizmo in gizmos)
+            {
+                gizmo.Fill = color;
+                gizmo.Stroke = color;
+            }
+        }
     }
 }
