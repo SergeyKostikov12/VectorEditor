@@ -1,6 +1,8 @@
 ﻿using GraphicEditor.Functionality;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Xml.Serialization;
 using System.Windows.Shapes;
 
 
@@ -30,7 +33,7 @@ namespace GraphicEditor
         private bool isLineSelect = false;
         private bool isPointMove = false;
         private int pointNumber;
-        private ColoRPicker coloRPicker = new ColoRPicker();
+        private ColorPicker coloRPicker = new ColorPicker();
         private WidthPicker widthPicker = new WidthPicker();
 
         private Rectangle shadowRect;
@@ -61,13 +64,13 @@ namespace GraphicEditor
             {
                 case "LoadBtn":
                     DeselectAllPolylines();
-                    buttonPressedFlag = BtnPressed.Load;
-
+                    //buttonPressedFlag = BtnPressed.Load;
+                    LoadWorkPlace();
                     break;
                 case "SaveBtn":
                     DeselectAllPolylines();
-                    buttonPressedFlag = BtnPressed.Save;
-
+                    //buttonPressedFlag = BtnPressed.Save;
+                    SaveWorkPlace();
                     break;
                 case "RectBtn":
                     DeselectAllPolylines();
@@ -171,19 +174,78 @@ namespace GraphicEditor
             }
         }
 
+
+
+        private void SaveWorkPlace()
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.FileName = "Document"; // Default file name
+            dlg.DefaultExt = ".vec"; // Default file extension
+            dlg.Filter = "Vector documents (.vec)|*.vec"; // Filter files by extension
+
+            // Show save file dialog box
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Process save file dialog box results
+            if (result == true)
+            {
+                // Save document
+                string filename = dlg.FileName;
+                // сохраняем текст в файл
+
+
+            }
+        }
+
+
+        private void LoadWorkPlace()
+        {
+            Stream myStream = null;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
+            openFileDialog.RestoreDirectory = true;
+            if (openFileDialog.ShowDialog() != null)
+            {
+                try
+                {
+                    if ((myStream = openFileDialog.OpenFile()) != null)
+                    {
+                        using (myStream)
+                        {
+                            SaveStreamToFile("c:\\" + System.IO.Path.GetFileName(openFileDialog.FileName), myStream);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+        public void SaveStreamToFile(string fileFullPath, Stream stream)
+        {
+            if (stream.Length == 0) return;
+
+            using (FileStream fileStream = System.IO.File.Create(fileFullPath, (int)stream.Length))
+            {
+                byte[] bytesInStream = new byte[stream.Length];
+                stream.Read(bytesInStream, 0, (int)bytesInStream.Length);
+                fileStream.Write(bytesInStream, 0, bytesInStream.Length);
+            }
+        }
+
+
+
         private void SetWidth()
         {
             widthPicker.Figure = selectedFigure;
             widthPicker.Visibility = Visibility.Visible;
         }
-
         private void SetStyle()
         {
             coloRPicker.FigureObject = selectedFigure;
             coloRPicker.Visibility = Visibility.Visible;
         }
-
-
         private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
         {
             currentMousePos = e.GetPosition(WorkPlace);
@@ -317,7 +379,6 @@ namespace GraphicEditor
                 DeselectAllPolylines();
             }
         }
-
         private string FindCollinearPoint()
         {
             for (int i = 0; i < allFigures.Count; i++)
@@ -346,15 +407,15 @@ namespace GraphicEditor
                 shadowLine.Points.Add(currentMousePos);
             }
         }
-        private bool AreCollinear(Point A, Point B, Point C_center)
-        {
-            Vector CA = new Vector(A.X - C_center.X, A.Y - C_center.Y);
-            Vector CB = new Vector(B.X - C_center.X, B.Y - C_center.Y);
+        //private bool AreCollinear(Point A, Point B, Point C_center)
+        //{
+        //    Vector CA = new Vector(A.X - C_center.X, A.Y - C_center.Y);
+        //    Vector CB = new Vector(B.X - C_center.X, B.Y - C_center.Y);
 
-            double angle = Math.Abs(Vector.AngleBetween(CA, CB));
-            if (angle >= 175) return true;
-            return false;
-        }
+        //    double angle = Math.Abs(Vector.AngleBetween(CA, CB));
+        //    if (angle >= 175) return true;
+        //    return false;
+        //}
         private void CheckValid()
         {
             List<int> tmpList = new List<int>();
@@ -418,6 +479,8 @@ namespace GraphicEditor
             selectedFigure = null;
             isLineSelect = false;
             buttonPressedFlag = BtnPressed.None;
+            coloRPicker.Visibility = Visibility.Hidden;
+            widthPicker.Visibility = Visibility.Hidden;
         }
         private void DrawRectangleShadow()
         {
@@ -560,11 +623,5 @@ namespace GraphicEditor
                 }
             }
         }
-
-        //private void eventsView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        //{
-        //    Details d = new Details((EventRecord)eventsView.SelectedItem);
-        //    d.ShowDialog();
-        //}
     }
 }

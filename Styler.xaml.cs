@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor
 {
-    public partial class ColoRPicker : Page
+    public partial class ColorPicker : Page
     {
         private Brush brush;
         FigureObject figureObject;
@@ -25,7 +25,7 @@ namespace GraphicEditor
         public Brush Brush { get => brush; set => brush = value; }
         public FigureObject FigureObject { get => figureObject; set => figureObject = value; }
 
-        public ColoRPicker()
+        public ColorPicker()
         {
             InitializeComponent();
             FillTable();

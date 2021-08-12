@@ -58,7 +58,7 @@
     <Compile Include="Styler.xaml.cs">
       <DependentUpon>Styler.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WidthPicker.cs">
+    <Compile Include="WidthPicker.xaml.cs">
       <DependentUpon>WidthPicker.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">

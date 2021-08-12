@@ -7,15 +7,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace GraphicEditor.Functionality
 {
     public enum ShapeType { Rectangle, Line }
+    [Serializable()]
     public class FigureObject
     {
         private string name;
-        private int selectedPoint;
-        private int strokeWidth;
+       // private readonly int selectedPoint;
         private Point pivotPoint;
         private Point centerPoint;
         private Point rotatePoint;
@@ -32,25 +34,15 @@ namespace GraphicEditor.Functionality
         public ShapeType ShapeType;
 
         public string Name { get => name; set => name = value; }
-        public int StrokeWidth { get => strokeWidth; set => strokeWidth = value; }
+        public double StrokeWidth  { get => polyline.StrokeThickness; set => polyline.StrokeThickness = value; }
         public Point FirstPoint { get => pivotPoint; }
         public Point CenterPoint { get => centerPoint; }
         public Point RotatePoint { get => rotatePoint; }
         public Rectangle Outline { get => outline; }
         public Size Size { get => size; }
         public Polyline Shape { get => polyline; }
-        public Brush Fill
-        {
-            get => fill;
-            set
-            {
-                fill = value;
-                polyline.Fill = value;
-            }
-        }
-        public Brush LineColor
-        {
-            get => lineColor;
+        public Brush Fill { get => fill; set { fill = value; polyline.Fill = value;}}
+        public Brush LineColor{get => lineColor;
             set
             {
                 lineColor = value;
@@ -196,49 +188,6 @@ namespace GraphicEditor.Functionality
                     }
                 }
             }
-            //for (int i = 0; i < polyline.Points.Count; i++)
-            //{
-            //    Point delta = DeltaPoint(polyline.Points[i], point);
-            //    if (delta.X <= 5 && delta.Y <= 5)
-            //    {
-            //        selectedPoint = i;
-
-            //        if (i == 0)
-            //        {
-            //            Point deltaNextPoint = DeltaPoint(polyline.Points[i], polyline.Points[i + 1]);
-            //            if (deltaNextPoint.X <= 5 && deltaNextPoint.Y <= 5)
-            //            {
-            //                polyline.Points.RemoveAt(0);
-            //                DeleteGizmo(0);
-            //            }
-            //        }
-            //        else if (i == polyline.Points.Count - 1)
-            //        {
-            //            Point deltaPreviosPoint = DeltaPoint(polyline.Points[i], polyline.Points[i - 1]);
-            //            if (deltaPreviosPoint.X <= 5 && deltaPreviosPoint.Y <= 5)
-            //            {
-            //                polyline.Points.RemoveAt(polyline.Points.Count - 1);
-            //                DeleteGizmo(polyline.Points.Count);
-            //            }
-            //        }
-            //        else if (i != polyline.Points.Count - 1 && i != 0)
-            //        {
-            //            Point deltaNextPoint = DeltaPoint(polyline.Points[i], polyline.Points[i + 1]);
-            //            Point deltaPreviosPoint = DeltaPoint(polyline.Points[i], polyline.Points[i - 1]);
-            //            if (deltaNextPoint.X <= 5 && deltaNextPoint.Y <= 5)
-            //            {
-            //                polyline.Points.RemoveAt(i);
-            //                DeleteGizmo(i);
-            //            }
-            //            else if (deltaPreviosPoint.X <= 5 && deltaPreviosPoint.Y <= 5)
-            //            {
-            //                polyline.Points.RemoveAt(i);
-            //                DeleteGizmo(i);
-            //            }
-            //        }
-            //    }
-            //    else continue;
-            //}
             if (polyline.Points.Count == 1) DeletePolyline();
         }
         public void DeletePolyline()
@@ -350,10 +299,6 @@ namespace GraphicEditor.Functionality
             }
             return "None";
         }
-        private Point DeltaPoint(Point first, Point second)
-        {
-            return new Point(Math.Abs(second.X - first.X), Math.Abs(second.Y - first.Y));
-        }
         private Point GetGizmoPosition(Rectangle gizmo)
         {
             Point point = new Point
@@ -426,9 +371,9 @@ namespace GraphicEditor.Functionality
             Rectangle rect = new Rectangle
             {
                 Name = name + "Outline",
+                StrokeThickness = 1,
                 Width = size.Height + 10,
                 Height = size.Width + 10,
-                StrokeThickness = 1,
                 Stroke = Brushes.Red,
                 StrokeDashArray = new DoubleCollection() { 5, 5 },
                 Visibility = Visibility.Hidden
@@ -563,6 +508,7 @@ namespace GraphicEditor.Functionality
             line.Points.Add(point3);
             line.Points.Add(pivotPoint);
             polyline = line;
+            polyline.StrokeEndLineCap = PenLineCap.Square;
             Canvas.SetTop(canvas, pivotPoint.Y);
             Canvas.SetLeft(canvas, pivotPoint.X);
         }
