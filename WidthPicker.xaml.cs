@@ -47,7 +47,7 @@ namespace GraphicEditor
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Figure.Shape.StrokeThickness = width;
+            Figure.Polyline.StrokeThickness = width;
             this.Visibility = Visibility.Hidden;
         }
     }

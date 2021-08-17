@@ -18,11 +18,11 @@ namespace GraphicEditor
 {
     public partial class ColorPicker : Page
     {
-        private Brush brush;
+        private SolidColorBrush brush;
         FigureObject figureObject;
         public BtnPressed BtnPressed;
 
-        public Brush Brush { get => brush; set => brush = value; }
+        public SolidColorBrush Brush { get => brush; set => brush = value; }
         public FigureObject FigureObject { get => figureObject; set => figureObject = value; }
 
         public ColorPicker()
@@ -74,12 +74,12 @@ namespace GraphicEditor
         {
             if (BtnPressed == BtnPressed.Color)
             {
-                FigureObject.LineColor = (sender as Button).Background;
+                FigureObject.LineColor = (SolidColorBrush)(sender as Button).Background;
                 BtnPressed = BtnPressed.None;
             }
             else if(BtnPressed == BtnPressed.Fill)
             {
-                FigureObject.Fill = (sender as Button).Background;
+                FigureObject.Fill = (SolidColorBrush)(sender as Button).Background;
                 BtnPressed = BtnPressed.None;
             }
 

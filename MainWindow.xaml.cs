@@ -46,7 +46,11 @@ namespace GraphicEditor
 
         private string selectedPolylineName;
         private FigureObject selectedFigure;
-        private List<FigureObject> allFigures = new List<FigureObject>();
+
+        public List<FigureObject> allFigures = new List<FigureObject>();
+
+        [XmlArray]
+        public SLFigure[] Figures;
 
         //public Frame Frame { get => PropertyPanel; /*set => frame = value; */}
 
@@ -192,11 +196,28 @@ namespace GraphicEditor
                 // Save document
                 string filename = dlg.FileName;
                 // сохраняем текст в файл
+                CreateSaveList(allFigures);
 
+                XmlSerializer formatter = new XmlSerializer(Figures.GetType());
+
+                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
+                {
+                    formatter.Serialize(fs, Figures);
+                }
 
             }
         }
 
+        private void CreateSaveList(List<FigureObject> list)
+        {
+            Figures = new SLFigure[list.Count];
+            for (int i = 0; i < list.Count; i++)
+            {
+                SLFigure sLFigure = new SLFigure();
+                sLFigure = sLFigure.CreateSLFigureFromFigureObject(allFigures[i]);
+                Figures[i] = sLFigure;
+            }
+        }
 
         private void LoadWorkPlace()
         {
@@ -226,12 +247,7 @@ namespace GraphicEditor
         {
             if (stream.Length == 0) return;
 
-            using (FileStream fileStream = System.IO.File.Create(fileFullPath, (int)stream.Length))
-            {
-                byte[] bytesInStream = new byte[stream.Length];
-                stream.Read(bytesInStream, 0, (int)bytesInStream.Length);
-                fileStream.Write(bytesInStream, 0, bytesInStream.Length);
-            }
+
         }
 
 
