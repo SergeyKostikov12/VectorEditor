@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 
 namespace GraphicEditor.Functionality
@@ -40,7 +35,7 @@ namespace GraphicEditor.Functionality
         public Rectangle Outline { get => outline; set => outline = value; }
         public Size Size { get => size; set => size = value; }
         public Polyline Polyline { get => polyline; set => polyline = value; }
-        public SolidColorBrush Fill { get => fill; set { fill = value; polyline.Fill = value; } }
+        public SolidColorBrush Fill { get => fill; set { fill = value; Polyline.Fill = value; } }
         public SolidColorBrush LineColor
         {
             get => lineColor;
@@ -59,54 +54,24 @@ namespace GraphicEditor.Functionality
 
         public FigureObject(SLFigure sLFigure, Canvas _workPlace)
         {
+            canvas = _workPlace;
+            polyline = ParseFromArray(sLFigure.Polyline);
             Name = sLFigure.Name;
-            CenterPoint = Point.Parse(sLFigure.CenterPoint);
-            RotatePoint = Point.Parse(sLFigure.RotatePoint);
+            CenterPoint = ParsePoint(sLFigure.CenterPoint);
+            RotatePoint = ParsePoint(sLFigure.RotatePoint);
             ShapeType = (ShapeType)sLFigure.ShapeTypeNumber;
-            if (ShapeType == ShapeType.Rectangle)
-            {
-                Outline.Name = sLFigure.Outline[0];
-                Outline.Width = Convert.ToDouble(sLFigure.Outline[1]);
-                Outline.Height = Convert.ToDouble(sLFigure.Outline[2]);
-                Outline.StrokeThickness = Convert.ToDouble(sLFigure.Outline[3]);
-                Outline.Visibility = GetVisibily(sLFigure.Outline[4]);
-                Canvas.SetLeft(Outline, Convert.ToDouble(sLFigure.Outline[5]));
-                Canvas.SetTop(Outline, Convert.ToDouble(sLFigure.Outline[6]));
-                Outline.StrokeDashArray = new DoubleCollection(Convert.ToInt32(sLFigure.Outline[7].Split(' ')));
-            }
-            Size = Size.Parse(sLFigure.Size);
-            Polyline = ParseFromArray(sLFigure.Polyline);
+            Size = ParseSize(sLFigure.Size);
             StrokeWidth = Convert.ToDouble(sLFigure.LineStrokeThinkness);
             polyline.Visibility = Visibility.Visible;
-            PivotPoint = Point.Parse(sLFigure.PivotPoint);
-            DefineGizmoPoints();
+            PivotPoint = ParsePoint(sLFigure.PivotPoint);
             DefineOutline();
+            DefineGizmoPoints();
             Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(sLFigure.FillColor));
-            LineColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(sLFigure.FillColor));
-            _workPlace.Children.Add(polyline);
-        }
-
-
-        private Polyline ParseFromArray(string[] polyline)
-        {
-            Polyline tmpLine = new Polyline();
-            for (int i = 0; i < polyline.Length; i++)
+            LineColor = new SolidColorBrush
             {
-                tmpLine.Points.Add(Point.Parse(polyline[i]));
-            }
-            return tmpLine;
-        }
-        private Visibility GetVisibily(string visibilityString)
-        {
-            switch (visibilityString)
-            {
-                case "Hidden":
-                    return Visibility.Hidden;
-                case "Visible":
-                    return Visibility.Visible;
-                default:
-                    return Visibility.Hidden;
-            }
+                Color = (Color)ColorConverter.ConvertFromString(sLFigure.LineColor)
+            };
+            canvas.Children.Add(polyline);
         }
         public FigureObject(string _name, ShapeType _shapeType, Point _firstPoint, Point _secondPoint, Canvas _workPlace)
         {
@@ -221,7 +186,6 @@ namespace GraphicEditor.Functionality
             RedrawOutLine();
             return newPoint;
         }
-
         public void AddLine(Point point)
         {
             if (ShapeType == ShapeType.Line)
@@ -325,7 +289,7 @@ namespace GraphicEditor.Functionality
             }
             else return;
         }
-        public void RemoveShape(string name) //Надо будет проверить!!!!!!!!!!!
+        public void RemoveShape(string name)
         {
             var par = (Canvas)polyline.Parent;
             par.Children.Remove(polyline);
@@ -335,6 +299,24 @@ namespace GraphicEditor.Functionality
         public void SetLineThickness(int value)
         {
             polyline.StrokeThickness = value;
+        }
+
+        private static Size ParseSize(string deserealizedString)
+        {
+            return Size.Parse(deserealizedString.Replace(',', '.').Replace(';', ','));
+        }
+        private static Point ParsePoint(string deserealizedString)
+        {
+            return Point.Parse(deserealizedString.Replace(',', '.').Replace(';', ','));
+        }
+        private Polyline ParseFromArray(string[] polyline)
+        {
+            Polyline tmpLine = new Polyline();
+            for (int i = 0; i < polyline.Length; i++)
+            {
+                tmpLine.Points.Add(ParsePoint(polyline[i]));
+            }
+            return tmpLine;
         }
         private int NumberByName(string name)
         {
@@ -642,7 +624,7 @@ namespace GraphicEditor.Functionality
             Canvas.SetLeft(rect, position.X - 5);
             Canvas.SetTop(rect, position.Y - 5);
             return rect;
-        }  /////////////////////////////////////////
+        }  
         private void GetGizmoColor(Brush color)
         {
             foreach (var gizmo in Gizmos)

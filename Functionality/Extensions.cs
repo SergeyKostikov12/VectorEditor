@@ -14,13 +14,25 @@ public static class Extensions
     }
     public static Point DeltaTo(this Point point, Point newPosition)
     {
-        Point absDelta = new Point(newPosition.X - point.X, newPosition.Y - point.Y);
-        return absDelta;
+        Point delta = new Point(newPosition.X - point.X, newPosition.Y - point.Y);
+        return delta;
     }
     public static bool Near(this Point pt, Point point)
     {
         Point delta = pt.AbsDeltaTo(point);
         if (delta.X <= 5 && delta.Y <= 5) return true;
         else return false;
+    }
+    public static Point ParseEx(string deserealizingString)
+    {
+        return Point.Parse(deserealizingString.Replace(',', '.').Replace(';', ','));
+    }
+    public static Point OffsetEx(this Point thisP, Point firstPoint, Point endPoint)
+    {
+        Point delta = firstPoint.DeltaTo(endPoint);
+        thisP.X += delta.X;
+        thisP.Y += delta.Y;
+
+        return thisP;
     }
 }

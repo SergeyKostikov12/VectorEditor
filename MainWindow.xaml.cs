@@ -3,25 +3,17 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Xml.Serialization;
 using System.Windows.Shapes;
-using System.Xml.Linq;
 
 namespace GraphicEditor
 {
-    public enum BtnPressed { None, Load, Save, Rect, Line, Move, Rotate, Scale, Width, Color, Fill }
-    enum CursorType { Crosshair, Arrow, Hand }
+    public enum BtnPressed { None, Rect, Line, Move, Rotate, Scale, Width, Color, Fill }
+    public enum CursorType { Crosshair, Arrow, Hand }
     public partial class MainWindow : Window
     {
         private BtnPressed buttonPressedFlag;
@@ -32,26 +24,22 @@ namespace GraphicEditor
         private bool isFirstPoint = true;
         private bool isLineSelect = false;
         private bool isPointMove = false;
+        private bool isWorkplaceMoved = false;
         private int pointNumber;
         private ColorPicker coloRPicker = new ColorPicker();
         private WidthPicker widthPicker = new WidthPicker();
-
         private Rectangle shadowRect;
         private Polyline shadowLine;
-        private Point firstPoint;
+        private Point firstPointLMB;
+        private Point firstPointRMB;
+        private Point scrollPoint = new Point(0, 0);
         private Point currentMousePos;
         private Point tempPosition;
-        //private Brush lineColor;
-        //private Frame frame;
-
         private string selectedPolylineName;
         private FigureObject selectedFigure;
 
         public List<FigureObject> allFigures = new List<FigureObject>();
-
         public FiguresList FiguresList;
-
-        //public Frame Frame { get => PropertyPanel; /*set => frame = value; */}
 
         public MainWindow()
         {
@@ -67,13 +55,12 @@ namespace GraphicEditor
             {
                 case "LoadBtn":
                     DeselectAllPolylines();
-                    //buttonPressedFlag = BtnPressed.Load;
-                    ClearCanvas();
+                    buttonPressedFlag = BtnPressed.None;
                     LoadWorkPlace();
                     break;
                 case "SaveBtn":
                     DeselectAllPolylines();
-                    //buttonPressedFlag = BtnPressed.Save;
+                    buttonPressedFlag = BtnPressed.None;
                     SaveWorkPlace();
                     break;
                 case "RectBtn":
@@ -145,7 +132,6 @@ namespace GraphicEditor
                     {
                         coloRPicker.Visibility = Visibility.Hidden;
                         PropertyPanel.Content = widthPicker;
-                        //buttonPressedFlag = BtnPressed.Width;
                         SetWidth();
                     }
                     else MessageBox.Show("Сначала выделите объект!");
@@ -156,7 +142,6 @@ namespace GraphicEditor
                         widthPicker.Visibility = Visibility.Hidden;
                         PropertyPanel.Content = coloRPicker;
                         coloRPicker.BtnPressed = BtnPressed.Color;
-                        //buttonPressedFlag = BtnPressed.Color;
                         SetStyle();
                     }
                     else MessageBox.Show("Сначала выделите объект!");
@@ -171,108 +156,10 @@ namespace GraphicEditor
                             SetStyle();
                         }
                         else MessageBox.Show("Линию нельзя залить!");
-                        //buttonPressedFlag = BtnPressed.Fill;
                     }
                     else MessageBox.Show("Сначала выделите объект!");
                     break;
             }
-        }
-
-
-
-        private void SaveWorkPlace()
-        {
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.FileName = "Document"; // Default file name
-            dlg.DefaultExt = ".vec"; // Default file extension
-            dlg.Filter = "Vector documents (.vec)|*.vec"; // Filter files by extension
-
-            // Show save file dialog box
-            Nullable<bool> result = dlg.ShowDialog();
-
-            // Process save file dialog box results
-            if (result == true)
-            {
-                // Save document
-                string filename = dlg.FileName;
-                // сохраняем текст в файл
-                CreateSaveList(allFigures);
-
-                XmlSerializer formatter = new XmlSerializer(FiguresList.GetType());
-
-                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
-                {
-                    formatter.Serialize(fs, FiguresList);
-                }
-                MessageBox.Show("Файл успешно сохранен!");
-            }
-        }
-
-        private void CreateSaveList(List<FigureObject> list)
-        {
-            FiguresList = new FiguresList();
-            List<SLFigure> tmp = new List<SLFigure>();
-            for (int i = 0; i < list.Count; i++)
-            {
-                SLFigure sLFigure = new SLFigure();
-                sLFigure = sLFigure.CreateSLFigureFromFigureObject(allFigures[i]);
-                tmp.Add(sLFigure);
-            }
-            FiguresList.Figures = tmp;
-        }
-
-        private void LoadWorkPlace()
-        {
-            Stream myStream = null;
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
-            openFileDialog.RestoreDirectory = true;
-            var xmlSerializer = new XmlSerializer(typeof(FiguresList));
-            if (openFileDialog.ShowDialog() != null)
-            {
-                try
-                {
-                    if ((myStream = openFileDialog.OpenFile()) != null)
-                    {
-                        using (myStream)
-                        {
-                            FiguresList sL = (FiguresList)xmlSerializer.Deserialize(myStream);
-                            FiguresList = sL;
-                        }
-                    }
-            CreateFiguresFromList();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            }
-        }
-        private void CreateFiguresFromList()
-        {
-            for (int i = 0; i<FiguresList.Figures.Count; i++)
-            {
-                FigureObject figureObject = new FigureObject(FiguresList.Figures[i], WorkPlace);
-                allFigures.Add(figureObject);
-            }
-        }
-
-        private void ClearCanvas()
-        {
-            WorkPlace.Children.Clear();
-            InitializeShadows();
-        }
-
-
-        private void SetWidth()
-        {
-            widthPicker.Figure = selectedFigure;
-            widthPicker.Visibility = Visibility.Visible;
-        }
-        private void SetStyle()
-        {
-            coloRPicker.FigureObject = selectedFigure;
-            coloRPicker.Visibility = Visibility.Visible;
         }
         private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
         {
@@ -294,16 +181,21 @@ namespace GraphicEditor
                 isScaling = false;
                 isPointMove = false;
             }
+            if (Mouse.RightButton == MouseButtonState.Pressed) isWorkplaceMoved = true;
+            else isWorkplaceMoved = false;
             DrawShadow();
             MoveFigure();
             MovePoint();
             RotateFigure();
             ScaleFigure();
+            MoveWorkPlace();
         }
+
+
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            firstPoint = e.GetPosition(WorkPlace);
-            tempPosition = firstPoint;
+            firstPointLMB = e.GetPosition(WorkPlace);
+            tempPosition = firstPointLMB;
             if (buttonPressedFlag == BtnPressed.Rect)
             {
                 isDraw = true;
@@ -311,7 +203,7 @@ namespace GraphicEditor
             else if (buttonPressedFlag == BtnPressed.Line)
             {
                 isDraw = true;
-                AddPointToLineShadow(firstPoint);
+                AddPointToLineShadow(firstPointLMB);
             }
             else if (buttonPressedFlag == BtnPressed.Move)
             {
@@ -346,7 +238,7 @@ namespace GraphicEditor
             {
                 if (selectedPolylineName != null && selectedFigure.ShapeType == ShapeType.Line)
                 {
-                    selectedFigure.AddPointFromDoubleClick(firstPoint);
+                    selectedFigure.AddPointFromDoubleClick(firstPointLMB);
                     isPointMove = false;
                 }
             }
@@ -380,6 +272,8 @@ namespace GraphicEditor
         }
         private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            firstPointRMB = e.GetPosition(WorkPlace);
+            tempPosition = e.GetPosition(WorkPlace);
             if (buttonPressedFlag == BtnPressed.Rect)
             {
                 SetCursor(CursorType.Arrow);
@@ -407,18 +301,12 @@ namespace GraphicEditor
                 DeselectAllPolylines();
             }
         }
-        private string FindCollinearPoint()
+        private void WorkPlace_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            for (int i = 0; i < allFigures.Count; i++)
-            {
-                FigureObject figure = allFigures[i];
-                if (figure.AreCollinear(firstPoint))
-                {
-                    return figure.Name;
-                }
-            }
-            return null;
+            isWorkplaceMoved = false;
         }
+
+
         private void AddPointToLineShadow(Point point)
         {
             if (!isFirstPoint)
@@ -435,15 +323,18 @@ namespace GraphicEditor
                 shadowLine.Points.Add(currentMousePos);
             }
         }
-        //private bool AreCollinear(Point A, Point B, Point C_center)
-        //{
-        //    Vector CA = new Vector(A.X - C_center.X, A.Y - C_center.Y);
-        //    Vector CB = new Vector(B.X - C_center.X, B.Y - C_center.Y);
-
-        //    double angle = Math.Abs(Vector.AngleBetween(CA, CB));
-        //    if (angle >= 175) return true;
-        //    return false;
-        //}
+        private string FindCollinearPoint()
+        {
+            for (int i = 0; i < allFigures.Count; i++)
+            {
+                FigureObject figure = allFigures[i];
+                if (figure.AreCollinear(firstPointLMB))
+                {
+                    return figure.Name;
+                }
+            }
+            return null;
+        }
         private void CheckValid()
         {
             List<int> tmpList = new List<int>();
@@ -463,11 +354,24 @@ namespace GraphicEditor
                 }
             }
         }
+        private void ClearCanvas()
+        {
+            WorkPlace.Children.Clear();
+            InitializeShadows();
+        }
+        private void CreateFiguresFromList()
+        {
+            for (int i = 0; i < FiguresList.Figures.Count; i++)
+            {
+                FigureObject figureObject = new FigureObject(FiguresList.Figures[i], WorkPlace);
+                allFigures.Add(figureObject);
+            }
+        }
         private void CreateNewFigure(Point endPoint)
         {
             int _1 = WorkPlace.Children.Count;
             string name = "Figure_" + allFigures.Count + 1;
-            FigureObject figure = new FigureObject(name, ShapeType.Rectangle, firstPoint, endPoint, WorkPlace);
+            FigureObject figure = new FigureObject(name, ShapeType.Rectangle, firstPointLMB, endPoint, WorkPlace);
             allFigures.Add(figure);
         }
         private void CreateNewFigure(Polyline polyline)
@@ -480,6 +384,18 @@ namespace GraphicEditor
             shadowLine.Points.Clear();
             shadowLine.Points.Add(currentMousePos);
             isFirstPoint = true;
+        }
+        private void CreateSaveList(List<FigureObject> list)
+        {
+            FiguresList = new FiguresList();
+            List<SLFigure> tmp = new List<SLFigure>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                SLFigure sLFigure = new SLFigure();
+                sLFigure = sLFigure.CreateSLFigureFromFigureObject(allFigures[i]);
+                tmp.Add(sLFigure);
+            }
+            FiguresList.Figures = tmp;
         }
         private void DrawLineShadow()
         {
@@ -512,11 +428,11 @@ namespace GraphicEditor
         }
         private void DrawRectangleShadow()
         {
-            double xTop = Math.Max(firstPoint.X, currentMousePos.X);
-            double yTop = Math.Max(firstPoint.Y, currentMousePos.Y);
+            double xTop = Math.Max(firstPointLMB.X, currentMousePos.X);
+            double yTop = Math.Max(firstPointLMB.Y, currentMousePos.Y);
 
-            double xMin = Math.Min(firstPoint.X, currentMousePos.X);
-            double yMin = Math.Min(firstPoint.Y, currentMousePos.Y);
+            double xMin = Math.Min(firstPointLMB.X, currentMousePos.X);
+            double yMin = Math.Min(firstPointLMB.Y, currentMousePos.Y);
 
             shadowRect.Height = yTop - yMin;
             shadowRect.Width = xTop - xMin;
@@ -547,7 +463,7 @@ namespace GraphicEditor
         {
             if (selectedFigure.Name != null)
             {
-                int n = selectedFigure.GetPointNear(firstPoint);
+                int n = selectedFigure.GetPointNear(firstPointLMB);
                 if (n != 0)
                 {
                     isPointMove = true;
@@ -581,6 +497,36 @@ namespace GraphicEditor
             WorkPlace.Children.Add(shadowRect);
             WorkPlace.Children.Add(shadowLine);
         }
+        private void LoadWorkPlace()
+        {
+            Stream myStream = null;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
+            openFileDialog.RestoreDirectory = true;
+            var xmlSerializer = new XmlSerializer(typeof(FiguresList));
+            Nullable<bool> result = openFileDialog.ShowDialog();
+            if (result == true)
+            {
+                try
+                {
+                    if ((myStream = openFileDialog.OpenFile()) != null)
+                    {
+                        using (myStream)
+                        {
+                            FiguresList sL = (FiguresList)xmlSerializer.Deserialize(myStream);
+                            FiguresList = sL;
+                        }
+                    }
+                    ClearCanvas();
+                    CreateFiguresFromList();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                WorkPlace.UpdateLayout();
+            }
+        }
         private void MoveFigure()
         {
             if (isMoving)
@@ -601,6 +547,17 @@ namespace GraphicEditor
                 }
             }
         }
+        private void MoveWorkPlace()
+        {
+            if (isWorkplaceMoved)
+            {
+                isWorkplaceMoved = false;
+                scrollPoint.X = Scroll.HorizontalOffset - firstPointRMB.DeltaTo(currentMousePos).X / 2;
+                scrollPoint.Y = Scroll.VerticalOffset - firstPointRMB.DeltaTo(currentMousePos).Y / 2;
+                Scroll.ScrollToHorizontalOffset(scrollPoint.X);
+                Scroll.ScrollToVerticalOffset(scrollPoint.Y);
+            }
+        }
         private void RotateFigure()
         {
             if (isRotating)
@@ -609,6 +566,29 @@ namespace GraphicEditor
                 {
                     tempPosition = selectedFigure.RotateFigure(tempPosition, currentMousePos);
                 }
+            }
+        }
+        private void SaveWorkPlace()
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.FileName = ""; // Default file name
+            dlg.DefaultExt = ".vec"; // Default file extension
+            dlg.Filter = "Vector documents (.vec)|*.vec"; // Filter files by extension
+            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
+            {
+                if (dlg.FileName.Length != 0)
+                {
+                    File.Delete(dlg.FileName);
+                }
+                string filename = dlg.FileName;
+                CreateSaveList(allFigures);
+                XmlSerializer formatter = new XmlSerializer(FiguresList.GetType());
+                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
+                {
+                    formatter.Serialize(fs, FiguresList);
+                }
+                MessageBox.Show("Файл успешно сохранен!");
             }
         }
         private void SelectPolyline(string polylineName)
@@ -641,6 +621,16 @@ namespace GraphicEditor
                     break;
             }
         }
+        private void SetStyle()
+        {
+            coloRPicker.FigureObject = selectedFigure;
+            coloRPicker.Visibility = Visibility.Visible;
+        }
+        private void SetWidth()
+        {
+            widthPicker.Figure = selectedFigure;
+            widthPicker.Visibility = Visibility.Visible;
+        }
         private void ScaleFigure()
         {
             if (isScaling)
@@ -651,5 +641,6 @@ namespace GraphicEditor
                 }
             }
         }
+
     }
 }

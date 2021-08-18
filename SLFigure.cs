@@ -1,9 +1,5 @@
 ﻿using GraphicEditor.Functionality;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -37,7 +33,32 @@ public class SLFigure
     {
 
     }
-
+    private string[] CreateStringFromRect(Rectangle rectangle)
+    {
+        if (rectangle != null)
+        {
+            string[] str = new string[8];
+            str[0] = rectangle.Name;
+            str[1] = rectangle.Width.ToString();
+            str[2] = rectangle.Height.ToString();
+            str[3] = rectangle.StrokeThickness.ToString();
+            str[4] = rectangle.Visibility.ToString();
+            str[5] = Canvas.GetLeft(rectangle).ToString();
+            str[6] = Canvas.GetTop(rectangle).ToString();
+            str[7] = rectangle.StrokeDashArray.ToString();
+            return str;
+        }
+        else return null;
+    }
+    private string[] CreatePoliline(Polyline polyline)
+    {
+        string[] array = new string[polyline.Points.Count];
+        for (int i = 0; i < polyline.Points.Count; i++)
+        {
+            array[i] = polyline.Points[i].ToString();
+        }
+        return array;
+    }
     public SLFigure CreateSLFigureFromFigureObject(FigureObject figureObject)
     {
         Name = figureObject.Name;
@@ -63,28 +84,5 @@ public class SLFigure
         }
 
         return this;
-    }
-
-    private string[] CreateStringFromRect(Rectangle rectangle)
-    {
-        string[] str = new string[8];
-        str[0] = rectangle.Name;
-        str[1] = rectangle.Width.ToString();
-        str[2] = rectangle.Height.ToString();
-        str[3] = rectangle.StrokeThickness.ToString();
-        str[4] = rectangle.Visibility.ToString();
-        str[5] = Canvas.GetLeft(rectangle).ToString();
-        str[6] = Canvas.GetTop(rectangle).ToString();
-        str[7] = rectangle.StrokeDashArray.ToString();
-        return str;
-    }
-    private string[] CreatePoliline(Polyline polyline)
-    {
-        string[] array = new string[polyline.Points.Count];
-        for (int i = 0; i < polyline.Points.Count; i++)
-        {
-            array[i] = polyline.Points[i].ToString();
-        }
-        return array;
     }
 }
