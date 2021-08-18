@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FiguresList.cs" />
     <Compile Include="SLFigure.cs" />
     <Compile Include="Styler.xaml.cs">
       <DependentUpon>Styler.xaml</DependentUpon>

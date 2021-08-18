@@ -17,7 +17,7 @@ namespace GraphicEditor.Functionality
     public class FigureObject
     {
         private string name;
-       // private readonly int selectedPoint;
+        // private readonly int selectedPoint;
         private Point pivotPoint;
         private Point centerPoint;
         private Point rotatePoint;
@@ -34,15 +34,16 @@ namespace GraphicEditor.Functionality
         public ShapeType ShapeType;
 
         public string Name { get => name; set => name = value; }
-        public double StrokeWidth  { get => polyline.StrokeThickness; set => polyline.StrokeThickness = value; }
+        public double StrokeWidth { get => polyline.StrokeThickness; set => polyline.StrokeThickness = value; }
         public Point CenterPoint { get => centerPoint; set => centerPoint = value; }
         public Point RotatePoint { get => rotatePoint; set => rotatePoint = value; }
         public Rectangle Outline { get => outline; set => outline = value; }
         public Size Size { get => size; set => size = value; }
         public Polyline Polyline { get => polyline; set => polyline = value; }
-        public SolidColorBrush Fill { get => fill; set { fill = value; polyline.Fill = value;}}
+        public SolidColorBrush Fill { get => fill; set { fill = value; polyline.Fill = value; } }
         public SolidColorBrush LineColor
-        {get => lineColor;
+        {
+            get => lineColor;
             set
             {
                 lineColor = value;
@@ -51,12 +52,62 @@ namespace GraphicEditor.Functionality
             }
         }
         public Point OutlinePivotPoint { get => outlinePivotPoint; set => outlinePivotPoint = value; }
+        public Point PivotPoint { get => pivotPoint; set => pivotPoint = value; }
         public Rectangle CenterGizmo { get => centerGizmo; set => centerGizmo = value; }
         [XmlArray("Gizmos"), XmlArrayItem(typeof(Rectangle), ElementName = "rect")]
         public List<Rectangle> Gizmos { get => gizmos; set => gizmos = value; }
-        public Point PivotPoint { get => pivotPoint; set => pivotPoint = value; }
 
-        public FigureObject() { }
+        public FigureObject(SLFigure sLFigure, Canvas _workPlace)
+        {
+            Name = sLFigure.Name;
+            CenterPoint = Point.Parse(sLFigure.CenterPoint);
+            RotatePoint = Point.Parse(sLFigure.RotatePoint);
+            ShapeType = (ShapeType)sLFigure.ShapeTypeNumber;
+            if (ShapeType == ShapeType.Rectangle)
+            {
+                Outline.Name = sLFigure.Outline[0];
+                Outline.Width = Convert.ToDouble(sLFigure.Outline[1]);
+                Outline.Height = Convert.ToDouble(sLFigure.Outline[2]);
+                Outline.StrokeThickness = Convert.ToDouble(sLFigure.Outline[3]);
+                Outline.Visibility = GetVisibily(sLFigure.Outline[4]);
+                Canvas.SetLeft(Outline, Convert.ToDouble(sLFigure.Outline[5]));
+                Canvas.SetTop(Outline, Convert.ToDouble(sLFigure.Outline[6]));
+                Outline.StrokeDashArray = new DoubleCollection(Convert.ToInt32(sLFigure.Outline[7].Split(' ')));
+            }
+            Size = Size.Parse(sLFigure.Size);
+            Polyline = ParseFromArray(sLFigure.Polyline);
+            StrokeWidth = Convert.ToDouble(sLFigure.LineStrokeThinkness);
+            polyline.Visibility = Visibility.Visible;
+            PivotPoint = Point.Parse(sLFigure.PivotPoint);
+            DefineGizmoPoints();
+            DefineOutline();
+            Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(sLFigure.FillColor));
+            LineColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(sLFigure.FillColor));
+            _workPlace.Children.Add(polyline);
+        }
+
+
+        private Polyline ParseFromArray(string[] polyline)
+        {
+            Polyline tmpLine = new Polyline();
+            for (int i = 0; i < polyline.Length; i++)
+            {
+                tmpLine.Points.Add(Point.Parse(polyline[i]));
+            }
+            return tmpLine;
+        }
+        private Visibility GetVisibily(string visibilityString)
+        {
+            switch (visibilityString)
+            {
+                case "Hidden":
+                    return Visibility.Hidden;
+                case "Visible":
+                    return Visibility.Visible;
+                default:
+                    return Visibility.Hidden;
+            }
+        }
         public FigureObject(string _name, ShapeType _shapeType, Point _firstPoint, Point _secondPoint, Canvas _workPlace)
         {
             name = _name;
@@ -96,12 +147,12 @@ namespace GraphicEditor.Functionality
                 Point delta = polyline.Points[i].AbsDeltaTo(position);
                 if (delta.X <= 5 && delta.Y <= 5)
                 {
-                    int number = i+1;
+                    int number = i + 1;
                     return number;
                 }
                 else continue;
             }
-            
+
             return 0;
         }
         public Point MoveFigure(Point firstPoint, Point newPoint)
@@ -132,8 +183,8 @@ namespace GraphicEditor.Functionality
         {
             Point deltaPoint = fistPoint.DeltaTo(position);
 
-            polyline.Points[pointNumber-1] = NewPointPosition(polyline.Points[pointNumber-1], deltaPoint);
-            Rectangle rect = Gizmos[pointNumber-1];
+            polyline.Points[pointNumber - 1] = NewPointPosition(polyline.Points[pointNumber - 1], deltaPoint);
+            Rectangle rect = Gizmos[pointNumber - 1];
             Point currentGizmoPos = GetGizmoPosition(rect);
             Point newPos = NewPointPosition(currentGizmoPos, deltaPoint);
             SetGizmoPointPosition(rect, newPos, true);
@@ -181,19 +232,19 @@ namespace GraphicEditor.Functionality
         }
         public void CollapsePoints(int pointNumber)
         {
-            Point pt = polyline.Points[pointNumber-1];
+            Point pt = polyline.Points[pointNumber - 1];
 
-            for (int i = 0; i<polyline.Points.Count; i++)
+            for (int i = 0; i < polyline.Points.Count; i++)
             {
-                if (i == pointNumber-1) continue;
+                if (i == pointNumber - 1) continue;
                 else
                 {
                     if (pt.Near(polyline.Points[i]))
                     {
-                       if (Math.Abs((pointNumber-1) - i) <= 1)
+                        if (Math.Abs((pointNumber - 1) - i) <= 1)
                         {
-                            polyline.Points.RemoveAt(pointNumber-1);
-                            DeleteGizmo(pointNumber-1);
+                            polyline.Points.RemoveAt(pointNumber - 1);
+                            DeleteGizmo(pointNumber - 1);
                         }
                     }
                 }
@@ -210,9 +261,9 @@ namespace GraphicEditor.Functionality
                 CenterGizmo = null;
                 canvas.Children.Remove(polyline);
                 canvas.Children.Remove(outline);
+                Fill = null;
                 polyline = null;
                 outline = null;
-                Fill = null;
             }
             else
             {
@@ -229,9 +280,9 @@ namespace GraphicEditor.Functionality
                 name = null;
                 CenterGizmo = null;
                 canvas.Children.Remove(polyline);
+                Fill = null;
                 polyline = null;
                 outline = null;
-                Fill = null;
             }
 
 
@@ -382,8 +433,8 @@ namespace GraphicEditor.Functionality
             {
                 Name = name + "Outline",
                 StrokeThickness = 1,
-                Width = size.Height + 10,
-                Height = size.Width + 10,
+                Width = Size.Height + 10,
+                Height = Size.Width + 10,
                 Stroke = Brushes.Red,
                 StrokeDashArray = new DoubleCollection() { 5, 5 },
                 Visibility = Visibility.Hidden
@@ -533,7 +584,7 @@ namespace GraphicEditor.Functionality
         }
         public void AddPointFromDoubleClick(Point pt)
         {
-            if(AreCollinear(pt))
+            if (AreCollinear(pt))
             {
                 AddPointToLine(pt);
             }
@@ -552,7 +603,7 @@ namespace GraphicEditor.Functionality
                 double angle = Math.Abs(Vector.AngleBetween(CA, CB));
                 if (angle >= 175) return true;
             }
-                return false;
+            return false;
         }
         private void AddPointToLine(Point point)
         {
@@ -571,7 +622,7 @@ namespace GraphicEditor.Functionality
                 Vector CB = new Vector(B.X - point.X, B.Y - point.Y);
 
                 double angle = Math.Abs(Vector.AngleBetween(CA, CB));
-                if (angle >= 175) return i+1;
+                if (angle >= 175) return i + 1;
             }
             return 0;
         }
@@ -579,7 +630,7 @@ namespace GraphicEditor.Functionality
         {
             Rectangle rect = new Rectangle
             {
-                Name = name + "Gizmo" + (Gizmos.Count+1).ToString(),
+                Name = name + "Gizmo" + (Gizmos.Count + 1).ToString(),
                 Height = 10,
                 Width = 10,
                 Fill = lineColor,
@@ -589,12 +640,12 @@ namespace GraphicEditor.Functionality
             };
             canvas.Children.Add(rect);
             Canvas.SetLeft(rect, position.X - 5);
-            Canvas.SetTop(rect, position.Y-5);
+            Canvas.SetTop(rect, position.Y - 5);
             return rect;
         }  /////////////////////////////////////////
         private void GetGizmoColor(Brush color)
         {
-            foreach(var gizmo in Gizmos)
+            foreach (var gizmo in Gizmos)
             {
                 gizmo.Fill = color;
                 gizmo.Stroke = color;

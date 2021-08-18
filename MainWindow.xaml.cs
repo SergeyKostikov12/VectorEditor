@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Xml.Serialization;
 using System.Windows.Shapes;
-
+using System.Xml.Linq;
 
 namespace GraphicEditor
 {
@@ -49,8 +49,7 @@ namespace GraphicEditor
 
         public List<FigureObject> allFigures = new List<FigureObject>();
 
-        [XmlArray]
-        public SLFigure[] Figures;
+        public FiguresList FiguresList;
 
         //public Frame Frame { get => PropertyPanel; /*set => frame = value; */}
 
@@ -69,6 +68,7 @@ namespace GraphicEditor
                 case "LoadBtn":
                     DeselectAllPolylines();
                     //buttonPressedFlag = BtnPressed.Load;
+                    ClearCanvas();
                     LoadWorkPlace();
                     break;
                 case "SaveBtn":
@@ -198,25 +198,27 @@ namespace GraphicEditor
                 // сохраняем текст в файл
                 CreateSaveList(allFigures);
 
-                XmlSerializer formatter = new XmlSerializer(Figures.GetType());
+                XmlSerializer formatter = new XmlSerializer(FiguresList.GetType());
 
                 using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
                 {
-                    formatter.Serialize(fs, Figures);
+                    formatter.Serialize(fs, FiguresList);
                 }
-
+                MessageBox.Show("Файл успешно сохранен!");
             }
         }
 
         private void CreateSaveList(List<FigureObject> list)
         {
-            Figures = new SLFigure[list.Count];
+            FiguresList = new FiguresList();
+            List<SLFigure> tmp = new List<SLFigure>();
             for (int i = 0; i < list.Count; i++)
             {
                 SLFigure sLFigure = new SLFigure();
                 sLFigure = sLFigure.CreateSLFigureFromFigureObject(allFigures[i]);
-                Figures[i] = sLFigure;
+                tmp.Add(sLFigure);
             }
+            FiguresList.Figures = tmp;
         }
 
         private void LoadWorkPlace()
@@ -225,6 +227,7 @@ namespace GraphicEditor
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
             openFileDialog.RestoreDirectory = true;
+            var xmlSerializer = new XmlSerializer(typeof(FiguresList));
             if (openFileDialog.ShowDialog() != null)
             {
                 try
@@ -233,9 +236,11 @@ namespace GraphicEditor
                     {
                         using (myStream)
                         {
-                            SaveStreamToFile("c:\\" + System.IO.Path.GetFileName(openFileDialog.FileName), myStream);
+                            FiguresList sL = (FiguresList)xmlSerializer.Deserialize(myStream);
+                            FiguresList = sL;
                         }
                     }
+            CreateFiguresFromList();
                 }
                 catch (Exception ex)
                 {
@@ -243,13 +248,20 @@ namespace GraphicEditor
                 }
             }
         }
-        public void SaveStreamToFile(string fileFullPath, Stream stream)
+        private void CreateFiguresFromList()
         {
-            if (stream.Length == 0) return;
-
-
+            for (int i = 0; i<FiguresList.Figures.Count; i++)
+            {
+                FigureObject figureObject = new FigureObject(FiguresList.Figures[i], WorkPlace);
+                allFigures.Add(figureObject);
+            }
         }
 
+        private void ClearCanvas()
+        {
+            WorkPlace.Children.Clear();
+            InitializeShadows();
+        }
 
 
         private void SetWidth()
