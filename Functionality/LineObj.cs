@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality
@@ -25,6 +26,31 @@ namespace GraphicEditor.Functionality
         public override void MoveFigure(Point position)
         {
 
+        }
+
+        protected override int GetStrokeWidth()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void SetStrokeWidth(int value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void ShowOutline()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void HideOutline()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void PlacingInWorkPlace(Canvas canvas)
+        {
+            throw new NotImplementedException();
         }
     }
 }

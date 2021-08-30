@@ -145,7 +145,7 @@ namespace GraphicEditor.Functionality
             }
             else return firstPoint;
 
-        }
+        }//-
         public Point MovePointToNewPosition(int pointNumber, Point fistPoint, Point position)
         {
             Point deltaPoint = fistPoint.DeltaTo(position);
@@ -156,7 +156,7 @@ namespace GraphicEditor.Functionality
             Point newPos = NewPointPosition(currentGizmoPos, deltaPoint);
             SetGizmoPointPosition(rect, newPos, true);
             return position;
-        }
+        }//-
         public Point RotateFigure(Point firstPoint, Point newPoint)
         {
             Vector CA = new Vector(centerPoint.X - firstPoint.X, centerPoint.Y - firstPoint.Y);
@@ -428,7 +428,7 @@ namespace GraphicEditor.Functionality
             OutlinePivotPoint = new Point(AnchorPoint.X - 5, AnchorPoint.Y - 5);
             Canvas.SetLeft(outline, AnchorPoint.X - 5);
             Canvas.SetTop(outline, AnchorPoint.Y - 5);
-        }
+        } //-
         private void DeleteGizmo(int number)
         {
             for (int i = 0; i < canvas.Children.Count; i++)

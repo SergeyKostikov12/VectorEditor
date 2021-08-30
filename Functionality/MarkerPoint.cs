@@ -21,7 +21,7 @@ public struct MarkerPoint
     public double Y { get => y; set => SetY(value); }
     public Point Point { get => point; set => SetPoint(value); }
 
-    public int MarkerSize { get => markerSize; set => SetMarkerSize(value); }
+    //public int MarkerSize { get => markerSize; set => SetMarkerSize(value); }
     public Rectangle Marker { get => marker; }
 
     public MarkerPoint(Point pt)
@@ -34,7 +34,7 @@ public struct MarkerPoint
         {
             Height = 10 + markerSize,
             Width = 10 + markerSize,
-            Fill = Brushes.Black,
+            Fill = Brushes.Blue,
             Stroke = Brushes.Black,
             StrokeThickness = 1,
             Visibility = Visibility.Hidden
@@ -58,7 +58,7 @@ public struct MarkerPoint
         x = point.X;
         y = point.Y;
     }
-    private void SetMarkerSize(int size)
+    public void SetMarkerSize(int size)
     {
         marker.Height -= markerSize;
         marker.Width -= markerSize;
@@ -68,7 +68,7 @@ public struct MarkerPoint
     }
     private void RefreshAnchorPoint()
     {
-        Point pt = new Point(X - MarkerSize / 2, Y - MarkerSize / 2);
+        Point pt = new Point(X - markerSize / 2 - marker.Width/2, Y - markerSize / 2 - marker.Height/2);
         Canvas.SetLeft(marker, pt.X);
         Canvas.SetTop(marker, pt.Y);
         anchorPoint = pt;

@@ -46,6 +46,7 @@ namespace GraphicEditor
             InitializeComponent();
             InitializeShadows();
 
+
         }
 
         private void ButtonPress(object sender, RoutedEventArgs e)
@@ -367,10 +368,14 @@ namespace GraphicEditor
         }
         private void CreateNewFigure(Point endPoint)
         {
-            int _1 = WorkPlace.Children.Count;
-            string name = "Figure_" + allFigures.Count + 1;
-            FigureObject figure = new FigureObject(name, FigureType.Rectangle, firstPointLMB, endPoint, WorkPlace);
-            allFigures.Add(figure);
+            FigureObj figure = new RectangleObj(firstPointLMB, endPoint);
+            figure.PlacingInWorkPlace(WorkPlace);
+            //figure.ShowOutline();
+
+            //int _1 = WorkPlace.Children.Count;
+            //string name = "Figure_" + allFigures.Count + 1;
+            //FigureObject figure = new FigureObject(name, FigureType.Rectangle, firstPointLMB, endPoint, WorkPlace);
+            //allFigures.Add(figure);
         }
         private void CreateNewFigure(Polyline polyline)
         {
