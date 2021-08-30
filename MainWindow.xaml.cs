@@ -45,6 +45,7 @@ namespace GraphicEditor
         {
             InitializeComponent();
             InitializeShadows();
+
         }
 
         private void ButtonPress(object sender, RoutedEventArgs e)
@@ -76,7 +77,7 @@ namespace GraphicEditor
                 case "MoveBtn":
                     if (selectedPolylineName != null)
                     {
-                        if (selectedFigure.ShapeType == ShapeType.Rectangle)
+                        if (selectedFigure.ShapeType == FigureType.Rectangle)
                         {
                             buttonPressedFlag = BtnPressed.Move;
                             SetCursor(CursorType.Hand);
@@ -91,7 +92,7 @@ namespace GraphicEditor
                 case "RotateBtn":
                     if (selectedPolylineName != null)
                     {
-                        if (selectedFigure.ShapeType == ShapeType.Rectangle)
+                        if (selectedFigure.ShapeType == FigureType.Rectangle)
                         {
                             buttonPressedFlag = BtnPressed.Rotate;
                             SetCursor(CursorType.Hand);
@@ -106,7 +107,7 @@ namespace GraphicEditor
                 case "ScaleBtn":
                     if (selectedPolylineName != null)
                     {
-                        if (selectedFigure.ShapeType == ShapeType.Rectangle)
+                        if (selectedFigure.ShapeType == FigureType.Rectangle)
                         {
                             buttonPressedFlag = BtnPressed.Scale;
                             SetCursor(CursorType.Hand);
@@ -149,7 +150,7 @@ namespace GraphicEditor
                 case "FillBtn":
                     if (selectedPolylineName != null)
                     {
-                        if (selectedFigure.ShapeType == ShapeType.Rectangle)
+                        if (selectedFigure.ShapeType == FigureType.Rectangle)
                         {
                             PropertyPanel.Content = coloRPicker;
                             coloRPicker.BtnPressed = BtnPressed.Fill;
@@ -190,8 +191,6 @@ namespace GraphicEditor
             ScaleFigure();
             MoveWorkPlace();
         }
-
-
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             firstPointLMB = e.GetPosition(WorkPlace);
@@ -225,7 +224,7 @@ namespace GraphicEditor
                     if (name != null)
                     {
                         SelectPolyline(name);
-                        if (selectedFigure.ShapeType == ShapeType.Line) isLineSelect = true;
+                        if (selectedFigure.ShapeType == FigureType.Line) isLineSelect = true;
                     }
                 }
                 else if (isLineSelect)
@@ -236,7 +235,7 @@ namespace GraphicEditor
 
             if (e.ClickCount == 2)
             {
-                if (selectedPolylineName != null && selectedFigure.ShapeType == ShapeType.Line)
+                if (selectedPolylineName != null && selectedFigure.ShapeType == FigureType.Line)
                 {
                     selectedFigure.AddPointFromDoubleClick(firstPointLMB);
                     isPointMove = false;
@@ -306,7 +305,6 @@ namespace GraphicEditor
             isWorkplaceMoved = false;
         }
 
-
         private void AddPointToLineShadow(Point point)
         {
             if (!isFirstPoint)
@@ -371,14 +369,14 @@ namespace GraphicEditor
         {
             int _1 = WorkPlace.Children.Count;
             string name = "Figure_" + allFigures.Count + 1;
-            FigureObject figure = new FigureObject(name, ShapeType.Rectangle, firstPointLMB, endPoint, WorkPlace);
+            FigureObject figure = new FigureObject(name, FigureType.Rectangle, firstPointLMB, endPoint, WorkPlace);
             allFigures.Add(figure);
         }
         private void CreateNewFigure(Polyline polyline)
         {
             int _1 = WorkPlace.Children.Count;
             string name = "Figure_" + allFigures.Count + 1;
-            FigureObject figure = new FigureObject(name, ShapeType.Line, polyline, WorkPlace);
+            FigureObject figure = new FigureObject(name, FigureType.Line, polyline, WorkPlace);
             allFigures.Add(figure);
             shadowLine.Visibility = Visibility.Hidden;
             shadowLine.Points.Clear();
@@ -641,6 +639,5 @@ namespace GraphicEditor
                 }
             }
         }
-
     }
 }

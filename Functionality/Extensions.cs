@@ -35,4 +35,9 @@ public static class Extensions
 
         return thisP;
     }
+    public static Point Move(this Point thisPoint, Point newPosition)
+    {
+        Point delta = thisPoint.DeltaTo(newPosition);
+        return new Point(thisPoint.X + delta.X, thisPoint.Y + delta.Y);
+    }
 }

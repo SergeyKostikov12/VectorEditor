@@ -6,27 +6,29 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml.Serialization;
 
+public enum FigureType { Rectangle, Line }
+
+
 namespace GraphicEditor.Functionality
 {
-    public enum ShapeType { Rectangle, Line }
     public class FigureObject
     {
-        private string name;
+        private string name;//-
         // private readonly int selectedPoint;
-        private Point pivotPoint;
-        private Point centerPoint;
-        private Point rotatePoint;
+        private Point anchorPoint;//-
+        private Point centerPoint;//-
+        private Point rotatePoint;//-
         private Point outlinePivotPoint;
-        private Size size;
-        private Rectangle centerGizmo;
-        private Rectangle outline;
-        private List<Rectangle> gizmos = new List<Rectangle>();
-        private Polyline polyline;
+        private Size size;//-
+        private Rectangle centerGizmo;//_
+        private Rectangle outline;//-
+        private List<Rectangle> gizmos = new List<Rectangle>();//-
+        private Polyline polyline;//--
         private SolidColorBrush fill;
         private Canvas canvas;
         private SolidColorBrush lineColor;
 
-        public ShapeType ShapeType;
+        public FigureType ShapeType;
 
         public string Name { get => name; set => name = value; }
         public double StrokeWidth { get => polyline.StrokeThickness; set => polyline.StrokeThickness = value; }
@@ -47,7 +49,7 @@ namespace GraphicEditor.Functionality
             }
         }
         public Point OutlinePivotPoint { get => outlinePivotPoint; set => outlinePivotPoint = value; }
-        public Point PivotPoint { get => pivotPoint; set => pivotPoint = value; }
+        public Point AnchorPoint { get => anchorPoint; set => anchorPoint = value; }
         public Rectangle CenterGizmo { get => centerGizmo; set => centerGizmo = value; }
         [XmlArray("Gizmos"), XmlArrayItem(typeof(Rectangle), ElementName = "rect")]
         public List<Rectangle> Gizmos { get => gizmos; set => gizmos = value; }
@@ -59,11 +61,11 @@ namespace GraphicEditor.Functionality
             Name = sLFigure.Name;
             CenterPoint = ParsePoint(sLFigure.CenterPoint);
             RotatePoint = ParsePoint(sLFigure.RotatePoint);
-            ShapeType = (ShapeType)sLFigure.ShapeTypeNumber;
+            ShapeType = (FigureType)sLFigure.ShapeTypeNumber;
             Size = ParseSize(sLFigure.Size);
             StrokeWidth = Convert.ToDouble(sLFigure.LineStrokeThinkness);
             polyline.Visibility = Visibility.Visible;
-            PivotPoint = ParsePoint(sLFigure.PivotPoint);
+            AnchorPoint = ParsePoint(sLFigure.PivotPoint);
             DefineOutline();
             DefineGizmoPoints();
             Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(sLFigure.FillColor));
@@ -73,7 +75,7 @@ namespace GraphicEditor.Functionality
             };
             canvas.Children.Add(polyline);
         }
-        public FigureObject(string _name, ShapeType _shapeType, Point _firstPoint, Point _secondPoint, Canvas _workPlace)
+        public FigureObject(string _name, FigureType _shapeType, Point _firstPoint, Point _secondPoint, Canvas _workPlace)
         {
             name = _name;
             ShapeType = _shapeType;
@@ -88,7 +90,7 @@ namespace GraphicEditor.Functionality
             polyline.Visibility = Visibility.Visible;
             Fill = new SolidColorBrush(Color.FromArgb(0, 255, 255, 255));
         }
-        public FigureObject(string _name, ShapeType _shapeType, Polyline _polyline, Canvas _workPlace)
+        public FigureObject(string _name, FigureType _shapeType, Polyline _polyline, Canvas _workPlace)
         {
             name = _name;
             ShapeType = _shapeType;
@@ -122,7 +124,7 @@ namespace GraphicEditor.Functionality
         }
         public Point MoveFigure(Point firstPoint, Point newPoint)
         {
-            if (ShapeType == ShapeType.Rectangle)
+            if (ShapeType == FigureType.Rectangle)
             {
                 Point deltaPoint = firstPoint.DeltaTo(newPoint); //new Point(newPoint.X - firstPoint.X, newPoint.Y - firstPoint.Y);
 
@@ -131,7 +133,7 @@ namespace GraphicEditor.Functionality
                 Canvas.SetLeft(CenterGizmo, centerPoint.X - 5 + deltaPoint.X);
                 Canvas.SetTop(CenterGizmo, centerPoint.Y - 5 + deltaPoint.Y);
                 centerPoint = NewPointPosition(centerPoint, deltaPoint);
-                PivotPoint = NewPointPosition(PivotPoint, deltaPoint);
+                AnchorPoint = NewPointPosition(AnchorPoint, deltaPoint);
                 OutlinePivotPoint = NewPointPosition(OutlinePivotPoint, deltaPoint);
 
                 for (int i = 0; i < polyline.Points.Count; i++)
@@ -188,7 +190,7 @@ namespace GraphicEditor.Functionality
         }
         public void AddLine(Point point)
         {
-            if (ShapeType == ShapeType.Line)
+            if (ShapeType == FigureType.Line)
             {
                 polyline.Points.Add(point);
             }
@@ -217,7 +219,7 @@ namespace GraphicEditor.Functionality
         }
         public void DeletePolyline()
         {
-            if (ShapeType == ShapeType.Rectangle)
+            if (ShapeType == FigureType.Rectangle)
             {
                 canvas.Children.RemoveAt(NumberByName(name + "CenterGizmo") - 1);
                 canvas.Children.RemoveAt(NumberByName(name + "Outline") - 1);
@@ -257,7 +259,7 @@ namespace GraphicEditor.Functionality
         }
         public void DrawCenterGizmo(bool value)
         {
-            if (ShapeType == ShapeType.Rectangle)
+            if (ShapeType == FigureType.Rectangle)
             {
                 if (value)
                 {
@@ -270,7 +272,7 @@ namespace GraphicEditor.Functionality
         {
             //isOutlineVisible = value;
 
-            if (ShapeType == ShapeType.Line)
+            if (ShapeType == FigureType.Line)
             {
                 DrawLineGizmos(value);
             }
@@ -282,7 +284,7 @@ namespace GraphicEditor.Functionality
         }
         public void FillRect(SolidColorBrush brush)
         {
-            if (ShapeType == ShapeType.Rectangle)
+            if (ShapeType == FigureType.Rectangle)
             {
                 Fill = brush;
                 polyline.Fill = fill;
@@ -354,9 +356,9 @@ namespace GraphicEditor.Functionality
         private Point NewPointPosition(Point target, Point newPosition) => target = new Point(target.X + newPosition.X, target.Y + newPosition.Y);
         private void DefineGizmoPoints()
         {
-            if (ShapeType == ShapeType.Rectangle)
+            if (ShapeType == FigureType.Rectangle)
             {
-                centerPoint = new Point(PivotPoint.X + size.Height / 2, PivotPoint.Y + size.Width / 2);
+                centerPoint = new Point(AnchorPoint.X + size.Height / 2, AnchorPoint.Y + size.Width / 2);
                 rotatePoint = new Point(centerPoint.X + 50, centerPoint.Y);
 
                 Rectangle rect = new Rectangle
@@ -404,8 +406,8 @@ namespace GraphicEditor.Functionality
                     if (x < xMin) xMin = x;
                     if (y < yMin) yMin = y;
                 }
-                PivotPoint = new Point(xMin, yMin);
-                centerPoint = new Point(PivotPoint.X + (xTop - xMin) / 2, PivotPoint.Y + (yTop - yMin) / 2);
+                AnchorPoint = new Point(xMin, yMin);
+                centerPoint = new Point(AnchorPoint.X + (xTop - xMin) / 2, AnchorPoint.Y + (yTop - yMin) / 2);
                 rotatePoint = new Point(centerPoint.X + 50, centerPoint.Y);
             }
         }
@@ -423,9 +425,9 @@ namespace GraphicEditor.Functionality
             };
             outline = rect;
             canvas.Children.Add(outline);
-            OutlinePivotPoint = new Point(PivotPoint.X - 5, PivotPoint.Y - 5);
-            Canvas.SetLeft(outline, PivotPoint.X - 5);
-            Canvas.SetTop(outline, PivotPoint.Y - 5);
+            OutlinePivotPoint = new Point(AnchorPoint.X - 5, AnchorPoint.Y - 5);
+            Canvas.SetLeft(outline, AnchorPoint.X - 5);
+            Canvas.SetTop(outline, AnchorPoint.Y - 5);
         }
         private void DeleteGizmo(int number)
         {
@@ -505,7 +507,7 @@ namespace GraphicEditor.Functionality
             Canvas.SetLeft(outline, xMin - 5);
             Canvas.SetTop(outline, yMin - 5);
         }
-        private void SetNewShape(ShapeType shapeType, Polyline _polyline)
+        private void SetNewShape(FigureType shapeType, Polyline _polyline)
         {
             polyline = new Polyline();
 
@@ -522,11 +524,11 @@ namespace GraphicEditor.Functionality
                 if (_polyline.Points[i].X < xMin) xMin = _polyline.Points[i].X;
                 if (_polyline.Points[i].Y < yMin) yMin = _polyline.Points[i].Y;
             }
-            PivotPoint = new Point(xMin, yMin);
+            AnchorPoint = new Point(xMin, yMin);
             size = new Size(yTop - yMin, xTop - xMin);
 
         }
-        private void SetNewShape(ShapeType shapeType, Point firstPoint, Point secondPoint)
+        private void SetNewShape(FigureType shapeType, Point firstPoint, Point secondPoint)
         {
             double xTop = Math.Max(firstPoint.X, secondPoint.X);
             double yTop = Math.Max(firstPoint.Y, secondPoint.Y);
@@ -534,7 +536,7 @@ namespace GraphicEditor.Functionality
             double xMin = Math.Min(firstPoint.X, secondPoint.X);
             double yMin = Math.Min(firstPoint.Y, secondPoint.Y);
 
-            PivotPoint = new Point(xMin, yMin);
+            AnchorPoint = new Point(xMin, yMin);
 
             size.Height = xTop - xMin;
             size.Width = yTop - yMin;
@@ -544,15 +546,15 @@ namespace GraphicEditor.Functionality
             Point point2 = new Point(xTop, yTop);
             Point point3 = new Point(xTop, yMin);
             Polyline line = new Polyline { Name = name };
-            line.Points.Add(PivotPoint);
+            line.Points.Add(AnchorPoint);
             line.Points.Add(point1);
             line.Points.Add(point2);
             line.Points.Add(point3);
-            line.Points.Add(PivotPoint);
+            line.Points.Add(AnchorPoint);
             polyline = line;
             polyline.StrokeEndLineCap = PenLineCap.Square;
-            Canvas.SetTop(canvas, PivotPoint.Y);
-            Canvas.SetLeft(canvas, PivotPoint.X);
+            Canvas.SetTop(canvas, AnchorPoint.Y);
+            Canvas.SetLeft(canvas, AnchorPoint.X);
         }
         private void SetGizmoPointPosition(Rectangle rect, Point centerGizmo)
         {
@@ -624,7 +626,7 @@ namespace GraphicEditor.Functionality
             Canvas.SetLeft(rect, position.X - 5);
             Canvas.SetTop(rect, position.Y - 5);
             return rect;
-        }  
+        }
         private void GetGizmoColor(Brush color)
         {
             foreach (var gizmo in Gizmos)

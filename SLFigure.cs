@@ -26,7 +26,7 @@ public class SLFigure
     [XmlIgnore] public Rectangle OutlineRectangle;
     [XmlIgnore] public SolidColorBrush FillBrush;
     [XmlIgnore] public SolidColorBrush LineColorBrush;
-    [XmlIgnore] public ShapeType _ShapeType;
+    [XmlIgnore] public FigureType _ShapeType;
 
 
     public SLFigure()
@@ -63,7 +63,7 @@ public class SLFigure
     {
         Name = figureObject.Name;
         ShapeTypeNumber = ((int)figureObject.ShapeType);
-        PivotPoint = figureObject.PivotPoint.ToString();
+        PivotPoint = figureObject.AnchorPoint.ToString();
         CenterPoint = figureObject.CenterPoint.ToString();
         RotatePoint = figureObject.RotatePoint.ToString();
         OutlinePivotPoint = figureObject.OutlinePivotPoint.ToString();
