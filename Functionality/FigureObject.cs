@@ -6,7 +6,6 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml.Serialization;
 
-public enum FigureType { Rectangle, Line }
 
 
 namespace GraphicEditor.Functionality

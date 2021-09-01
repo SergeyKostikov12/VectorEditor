@@ -24,7 +24,6 @@ namespace GraphicEditor.Functionality
         public MarkerPoint ScalePoint { get => scaleMarker; set => scaleMarker = value; }
         public Rectangle Rectangle { get => rectangle; private set => rectangle = value; }
         public Rectangle OutlineRectangle { get => outlineRectangle; private set => outlineRectangle = value; }
-        public SolidColorBrush Fill { get; }
 
         public RectangleObj(Point firstPoint, Point secondPoint)
         {
@@ -35,11 +34,6 @@ namespace GraphicEditor.Functionality
             PlaceRectangle();
             PlaceOutlineRectangle();
         }
-
-
-
-
-
 
         public override void MoveFigure(Point newPosition)
         {
@@ -78,6 +72,14 @@ namespace GraphicEditor.Functionality
         protected override void SetStrokeWidth(int value)
         {
             Rectangle.StrokeThickness = value;
+        }
+        protected override SolidColorBrush GetFill()
+        {
+            return (SolidColorBrush)Rectangle.Fill;
+        }
+        protected override void SetFill(SolidColorBrush brush)
+        {
+            Rectangle.Fill = brush;
         }
 
         private void PlaceOutlineRectangle()

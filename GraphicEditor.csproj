@@ -51,10 +51,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>B344D2C86EEBDB0D6C120C2F5010070F2D9EE56C</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>2C2D99409EA0CDACC311C66EDE89C41142BA5CFC</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>GraphicEditor_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>GraphicEditor_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -86,7 +86,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Functionality\Click.cs" />
+    <Compile Include="Functionality\ClickProcess.cs" />
+    <Compile Include="Functionality\Enums.cs" />
     <Compile Include="Functionality\FigureObj.cs" />
     <Compile Include="FiguresList.cs" />
     <Compile Include="Functionality\LineObj.cs" />
@@ -141,6 +142,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="GraphicEditor_1_TemporaryKey.pfx" />
+    <None Include="GraphicEditor_2_TemporaryKey.pfx" />
     <None Include="GraphicEditor_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

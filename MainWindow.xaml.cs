@@ -12,11 +12,13 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor
 {
-    public enum BtnPressed { None, Rect, Line, Move, Rotate, Scale, Width, Color, Fill }
+    public enum ButtonPressed { None, Rect, Line, Move, Rotate, Scale, Width, Color, Fill }
     public enum CursorType { Crosshair, Arrow, Hand }
+    public enum FigureType { Rectangle, Line }
+
     public partial class MainWindow : Window
     {
-        private BtnPressed buttonPressedFlag;
+        private ButtonPressed buttonPressedFlag;
         private bool isDraw = false;
         private bool isMoving = false;
         private bool isRotating = false;
@@ -57,22 +59,22 @@ namespace GraphicEditor
             {
                 case "LoadBtn":
                     DeselectAllPolylines();
-                    buttonPressedFlag = BtnPressed.None;
+                    buttonPressedFlag = ButtonPressed.None;
                     LoadWorkPlace();
                     break;
                 case "SaveBtn":
                     DeselectAllPolylines();
-                    buttonPressedFlag = BtnPressed.None;
+                    buttonPressedFlag = ButtonPressed.None;
                     SaveWorkPlace();
                     break;
                 case "RectBtn":
                     DeselectAllPolylines();
-                    buttonPressedFlag = BtnPressed.Rect;
+                    buttonPressedFlag = ButtonPressed.Rect;
                     SetCursor(CursorType.Crosshair);
                     break;
                 case "LineBtn":
                     DeselectAllPolylines();
-                    buttonPressedFlag = BtnPressed.Line;
+                    buttonPressedFlag = ButtonPressed.Line;
                     SetCursor(CursorType.Crosshair);
                     break;
                 case "MoveBtn":
@@ -80,7 +82,7 @@ namespace GraphicEditor
                     {
                         if (selectedFigure.ShapeType == FigureType.Rectangle)
                         {
-                            buttonPressedFlag = BtnPressed.Move;
+                            buttonPressedFlag = ButtonPressed.Move;
                             SetCursor(CursorType.Hand);
                             DrawGizmoForRotate();
                         }
@@ -95,7 +97,7 @@ namespace GraphicEditor
                     {
                         if (selectedFigure.ShapeType == FigureType.Rectangle)
                         {
-                            buttonPressedFlag = BtnPressed.Rotate;
+                            buttonPressedFlag = ButtonPressed.Rotate;
                             SetCursor(CursorType.Hand);
                             DrawGizmoForRotate();
                         }
@@ -110,7 +112,7 @@ namespace GraphicEditor
                     {
                         if (selectedFigure.ShapeType == FigureType.Rectangle)
                         {
-                            buttonPressedFlag = BtnPressed.Scale;
+                            buttonPressedFlag = ButtonPressed.Scale;
                             SetCursor(CursorType.Hand);
                             DrawGizmoForRotate();
                         }
@@ -143,7 +145,7 @@ namespace GraphicEditor
                     {
                         widthPicker.Visibility = Visibility.Hidden;
                         PropertyPanel.Content = coloRPicker;
-                        coloRPicker.BtnPressed = BtnPressed.Color;
+                        coloRPicker.BtnPressed = ButtonPressed.Color;
                         SetStyle();
                     }
                     else MessageBox.Show("Сначала выделите объект!");
@@ -154,7 +156,7 @@ namespace GraphicEditor
                         if (selectedFigure.ShapeType == FigureType.Rectangle)
                         {
                             PropertyPanel.Content = coloRPicker;
-                            coloRPicker.BtnPressed = BtnPressed.Fill;
+                            coloRPicker.BtnPressed = ButtonPressed.Fill;
                             SetStyle();
                         }
                         else MessageBox.Show("Линию нельзя залить!");
@@ -169,13 +171,13 @@ namespace GraphicEditor
 
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
-                if (buttonPressedFlag == BtnPressed.Rect) isDraw = true;
-                if (buttonPressedFlag == BtnPressed.Move) isMoving = true;
-                if (buttonPressedFlag == BtnPressed.Rotate) isRotating = true;
-                if (buttonPressedFlag == BtnPressed.Scale) isScaling = true;
+                if (buttonPressedFlag == ButtonPressed.Rect) isDraw = true;
+                if (buttonPressedFlag == ButtonPressed.Move) isMoving = true;
+                if (buttonPressedFlag == ButtonPressed.Rotate) isRotating = true;
+                if (buttonPressedFlag == ButtonPressed.Scale) isScaling = true;
                 if (isLineSelect) isPointMove = true;
             }
-            else if (buttonPressedFlag == BtnPressed.Line) isDraw = true;
+            else if (buttonPressedFlag == ButtonPressed.Line) isDraw = true;
             else
             {
                 isDraw = false;
@@ -196,28 +198,28 @@ namespace GraphicEditor
         {
             firstPointLMB = e.GetPosition(WorkPlace);
             tempPosition = firstPointLMB;
-            if (buttonPressedFlag == BtnPressed.Rect)
+            if (buttonPressedFlag == ButtonPressed.Rect)
             {
                 isDraw = true;
             }
-            else if (buttonPressedFlag == BtnPressed.Line)
+            else if (buttonPressedFlag == ButtonPressed.Line)
             {
                 isDraw = true;
                 AddPointToLineShadow(firstPointLMB);
             }
-            else if (buttonPressedFlag == BtnPressed.Move)
+            else if (buttonPressedFlag == ButtonPressed.Move)
             {
                 isMoving = true;
             }
-            else if (buttonPressedFlag == BtnPressed.Rotate)
+            else if (buttonPressedFlag == ButtonPressed.Rotate)
             {
                 isRotating = true;
             }
-            else if (buttonPressedFlag == BtnPressed.Scale)
+            else if (buttonPressedFlag == ButtonPressed.Scale)
             {
                 isScaling = true;
             }
-            else if (buttonPressedFlag == BtnPressed.None)
+            else if (buttonPressedFlag == ButtonPressed.None)
             {
                 if (selectedPolylineName == null)
                 {
@@ -246,16 +248,16 @@ namespace GraphicEditor
         private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Point endPoint = e.GetPosition(WorkPlace);
-            if (buttonPressedFlag == BtnPressed.Rect && isDraw)
+            if (buttonPressedFlag == ButtonPressed.Rect && isDraw)
             {
                 isDraw = false;
                 CreateNewFigure(endPoint);
             }
-            if (buttonPressedFlag == BtnPressed.Move && isMoving)
+            if (buttonPressedFlag == ButtonPressed.Move && isMoving)
             {
                 isMoving = false;
             }
-            if (buttonPressedFlag == BtnPressed.Rotate && isRotating)
+            if (buttonPressedFlag == ButtonPressed.Rotate && isRotating)
             {
                 isRotating = false;
             }
@@ -274,17 +276,17 @@ namespace GraphicEditor
         {
             firstPointRMB = e.GetPosition(WorkPlace);
             tempPosition = e.GetPosition(WorkPlace);
-            if (buttonPressedFlag == BtnPressed.Rect)
+            if (buttonPressedFlag == ButtonPressed.Rect)
             {
                 SetCursor(CursorType.Arrow);
                 shadowRect.Visibility = Visibility.Hidden;
-                buttonPressedFlag = BtnPressed.None;
+                buttonPressedFlag = ButtonPressed.None;
                 DeselectAllPolylines();
             }
-            else if (buttonPressedFlag == BtnPressed.Line)
+            else if (buttonPressedFlag == ButtonPressed.Line)
             {
                 SetCursor(CursorType.Arrow);
-                buttonPressedFlag = BtnPressed.None;
+                buttonPressedFlag = ButtonPressed.None;
                 if (shadowLine.Points.Count > 1)
                 {
                     shadowLine.Points.RemoveAt(shadowLine.Points.Count - 1);
@@ -297,7 +299,7 @@ namespace GraphicEditor
             else
             {
                 SetCursor(CursorType.Arrow);
-                buttonPressedFlag = BtnPressed.None;
+                buttonPressedFlag = ButtonPressed.None;
                 DeselectAllPolylines();
             }
         }
@@ -379,14 +381,17 @@ namespace GraphicEditor
         }
         private void CreateNewFigure(Polyline polyline)
         {
-            int _1 = WorkPlace.Children.Count;
-            string name = "Figure_" + allFigures.Count + 1;
-            FigureObject figure = new FigureObject(name, FigureType.Line, polyline, WorkPlace);
-            allFigures.Add(figure);
-            shadowLine.Visibility = Visibility.Hidden;
-            shadowLine.Points.Clear();
-            shadowLine.Points.Add(currentMousePos);
-            isFirstPoint = true;
+            FigureObj figure = new LineObj(polyline);
+            figure.PlacingInWorkPlace(WorkPlace);
+
+            //int _1 = WorkPlace.Children.Count;
+            //string name = "Figure_" + allFigures.Count + 1;
+            //FigureObject figure = new FigureObject(name, FigureType.Line, polyline, WorkPlace);
+            //allFigures.Add(figure);
+            //shadowLine.Visibility = Visibility.Hidden;
+            //shadowLine.Points.Clear();
+            //shadowLine.Points.Add(currentMousePos);
+            //isFirstPoint = true;
         }
         private void CreateSaveList(List<FigureObject> list)
         {
@@ -425,7 +430,7 @@ namespace GraphicEditor
             selectedPolylineName = null;
             selectedFigure = null;
             isLineSelect = false;
-            buttonPressedFlag = BtnPressed.None;
+            buttonPressedFlag = ButtonPressed.None;
             coloRPicker.Visibility = Visibility.Hidden;
             widthPicker.Visibility = Visibility.Hidden;
         }
@@ -445,13 +450,13 @@ namespace GraphicEditor
         }
         private void DrawShadow()
         {
-            if (buttonPressedFlag == BtnPressed.Rect)
+            if (buttonPressedFlag == ButtonPressed.Rect)
             {
                 if (isDraw) shadowRect.Visibility = Visibility.Visible;
                 else shadowRect.Visibility = Visibility.Hidden;
                 DrawRectangleShadow();
             }
-            else if (buttonPressedFlag == BtnPressed.Line)
+            else if (buttonPressedFlag == ButtonPressed.Line)
             {
                 if (isDraw)
                 {

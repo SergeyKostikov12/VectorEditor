@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
+public enum FigureType { Rectangle, Line }
+
+
+
 namespace GraphicEditor.Functionality
 {
-    public class Click
-    {
-    }
 }

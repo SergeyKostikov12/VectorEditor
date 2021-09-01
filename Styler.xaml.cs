@@ -10,7 +10,7 @@ namespace GraphicEditor
     {
         private SolidColorBrush brush;
         FigureObject figureObject;
-        public BtnPressed BtnPressed;
+        public ButtonPressed BtnPressed;
 
         public SolidColorBrush Brush { get => brush; set => brush = value; }
         public FigureObject FigureObject { get => figureObject; set => figureObject = value; }
@@ -60,15 +60,15 @@ namespace GraphicEditor
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (BtnPressed == BtnPressed.Color)
+            if (BtnPressed == ButtonPressed.Color)
             {
                 FigureObject.LineColor = (SolidColorBrush)(sender as Button).Background;
-                BtnPressed = BtnPressed.None;
+                BtnPressed = ButtonPressed.None;
             }
-            else if(BtnPressed == BtnPressed.Fill)
+            else if(BtnPressed == ButtonPressed.Fill)
             {
                 FigureObject.Fill = (SolidColorBrush)(sender as Button).Background;
-                BtnPressed = BtnPressed.None;
+                BtnPressed = ButtonPressed.None;
             }
 
             this.Visibility = Visibility.Hidden;
