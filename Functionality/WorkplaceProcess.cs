@@ -1,91 +1,116 @@
-﻿using GraphicEditor.Functionality;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
+using System.Xml.Serialization;
 
-namespace GraphicEditor
+namespace GraphicEditor.Functionality
 {
     public class WorkplaceProcess
     {
-        private Canvas workPlace;
-        
-        private FigureObj selectedFigure;
-        private Point lMB_ClickPosition;
-        private Point rMB_ClickPosition;
+        public List<FigureObj> allFigures = new List<FigureObj>();
+        public FiguresList FiguresList;
 
-        public Canvas WorkPlace { get => workPlace; set => workPlace = value; }
-
-        public FigureObj SelectedFigure { get => selectedFigure; set => selectedFigure = value; }
-        public Point LMB_ClickPosition { get => lMB_ClickPosition; set => lMB_ClickPosition = value; }
-        public Point RMB_ClickPosition { get => rMB_ClickPosition; set => rMB_ClickPosition = value; }
-
-        public WorkplaceProcess(Canvas workPlace)
+        private Canvas workplace;
+        public WorkplaceProcess(Canvas _worklace)
         {
-            WorkPlace = workPlace;
-        }
-
-
-
-
-        internal void DeselectFigure()
-        {
-            throw new NotImplementedException();
+            workplace = _worklace;
         }
 
         internal void LoadWorkplace()
         {
-            throw new NotImplementedException();
+            Stream myStream = null;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
+            openFileDialog.RestoreDirectory = true;
+            var xmlSerializer = new XmlSerializer(typeof(FiguresList));
+            Nullable<bool> result = openFileDialog.ShowDialog();
+            if (result == true)
+            {
+                try
+                {
+                    if ((myStream = openFileDialog.OpenFile()) != null)
+                    {
+                        using (myStream)
+                        {
+                            FiguresList sL = (FiguresList)xmlSerializer.Deserialize(myStream);
+                            FiguresList = sL;
+                        }
+                    }
+                    ClearCanvas();
+                    CreateFiguresFromList();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                workplace.UpdateLayout();
+            }
         }
-
         internal void SaveWorkplace()
         {
-            throw new NotImplementedException();
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.FileName = ""; // Default file name
+            dlg.DefaultExt = ".vec"; // Default file extension
+            dlg.Filter = "Vector documents (.vec)|*.vec"; // Filter files by extension
+            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
+            {
+                if (dlg.FileName.Length != 0)
+                {
+                    File.Delete(dlg.FileName);
+                }
+                string filename = dlg.FileName;
+                CreateSaveList(allFigures);
+                XmlSerializer formatter = new XmlSerializer(FiguresList.GetType());
+                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
+                {
+                    formatter.Serialize(fs, FiguresList);
+                }
+                MessageBox.Show("Файл успешно сохранен!");
+            }
+        }
+        internal void MovingWorkPlace(Point rMB_firstPoint, Point currentMousePos)
+        {
+            if (isWorkplaceMoved)
+            {
+                isWorkplaceMoved = false;
+                scrollPoint.X = Scroll.HorizontalOffset - firstPointRMB.DeltaTo(currentMousePos).X / 2;
+                scrollPoint.Y = Scroll.VerticalOffset - firstPointRMB.DeltaTo(currentMousePos).Y / 2;
+                Scroll.ScrollToHorizontalOffset(scrollPoint.X);
+                Scroll.ScrollToVerticalOffset(scrollPoint.Y);
+            }
         }
 
-        internal void ExecuteOneClick(Point point)
+        private void CreateFiguresFromList()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < FiguresList.Figures.Count; i++)
+            {
+                FigureObject figureObject = new FigureObject(FiguresList.Figures[i], workplace);
+                allFigures.Add(figureObject);
+            }
         }
-
-        internal void ExecuteDoubleClick(Point point)
+        private void ClearCanvas()
         {
-            throw new NotImplementedException();
+            workplace.Children.Clear();
+            //InitializeShadows();
         }
-
-        internal void Drag(Point point)
+        private void CreateSaveList(List<FigureObject> list)
         {
-            throw new NotImplementedException();
-        }
-
-        internal void MovingWorkPlace(Point currentMousePos)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void DeleteFigure()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void MoveRect(Point currentMousePos)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void RotateRect(Point currentMousePos)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void ScaleRect(Point currentMousePos)
-        {
-            throw new NotImplementedException();
+            FiguresList = new FiguresList();
+            List<SLFigure> tmp = new List<SLFigure>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                SLFigure sLFigure = new SLFigure();
+                sLFigure = sLFigure.CreateSLFigureFromFigureObject(allFigures[i]);
+                tmp.Add(sLFigure);
+            }
+            FiguresList.Figures = tmp;
         }
     }
 }

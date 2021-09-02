@@ -33,5 +33,11 @@ namespace GraphicEditor.Functionality
         protected abstract void SetStrokeWidth(int value);
         protected abstract SolidColorBrush GetFill();
         protected abstract void SetFill(SolidColorBrush brush);
+
+        public virtual void DeletePolyline()
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

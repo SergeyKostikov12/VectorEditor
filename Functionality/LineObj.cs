@@ -65,7 +65,10 @@ namespace GraphicEditor.Functionality
             Polyline.Points.Add(point);
             LineMarkers.Add(CreateNewMarkerPoint(point));
         }
+        public override void DeletePolyline()
+        {
 
+        }
         protected override int GetStrokeWidth()
         {
             return (int)Polyline.StrokeThickness;

@@ -20,5 +20,10 @@ namespace GraphicEditor.Functionality
         public Actions Action;
         public ButtonPressed ButtonPressed;
         public ClickCondition ClickCondition;
+
+        internal void ResetCondition()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
