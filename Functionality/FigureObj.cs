@@ -16,7 +16,7 @@ namespace GraphicEditor.Functionality
         public Point AnchorPoint { get; set; }
         public int StrokeWidth { get => GetStrokeWidth(); set => SetStrokeWidth(value); }
         public SolidColorBrush Fill { get => GetFill(); set => SetFill(value); }
-        public SolidColorBrush LineColor { get; }
+        public SolidColorBrush LineColor { get; set; }
 
 
         public abstract void MoveFigure(Point position);

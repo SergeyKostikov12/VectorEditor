@@ -12,15 +12,15 @@ namespace GraphicEditor.Functionality
 {
     class LineObj : FigureObj
     {
-        private List<MarkerPoint> linePoints;
+        private List<MarkerPoint> lineMarkers;
         private Polyline polyline;
 
-        public List<MarkerPoint> LinePoints { get => linePoints; private set => linePoints = value; }
+        public List<MarkerPoint> LineMarkers { get => lineMarkers; private set => lineMarkers = value; }
         public Polyline Polyline { get => polyline; private set => polyline = value; }
 
         public LineObj(Point firstPoint, Point secondPoint)
         {
-            LinePoints = new List<MarkerPoint>();
+            LineMarkers = new List<MarkerPoint>();
             Polyline = new Polyline();
             Polyline.Points.Add(firstPoint);
             Polyline.Points.Add(secondPoint);
@@ -30,35 +30,23 @@ namespace GraphicEditor.Functionality
 
         public LineObj(Polyline polyline)
         {
-            LinePoints = new List<MarkerPoint>();
+            LineMarkers = new List<MarkerPoint>();
             Polyline = new Polyline();
             DefinePolyline(polyline);
             DefineMarkerPoints();
         }
 
-        private void DefinePolyline(Polyline polyline)
-        {
-            foreach (var point in polyline.Points)
-            {
-                Polyline.Points.Add(point);
-            }
-        }
 
-        private void DefineMarkerPoints()
-        {
-            foreach (var point in Polyline.Points)
-            {
-                linePoints.Add(new MarkerPoint(point));
-            }
-        }
 
         public override void MoveFigure(Point position)
         {
-
         }
         public override void ShowOutline()
         {
-            throw new NotImplementedException();
+            foreach (var marker in LineMarkers)
+            {
+                marker.Show();
+            }
         }
         public override void HideOutline()
         {
@@ -67,16 +55,15 @@ namespace GraphicEditor.Functionality
         public override void PlacingInWorkPlace(Canvas canvas)
         {
             canvas.Children.Add(Polyline);
-            foreach (var marker in LinePoints)
+            foreach (var marker in LineMarkers)
             {
                 canvas.Children.Add(marker.Marker);
             }
         }
-
         public override void AddPoint(Point point)
         {
             Polyline.Points.Add(point);
-            LinePoints.Add(CreateNewMarkerPoint(point));
+            LineMarkers.Add(CreateNewMarkerPoint(point));
         }
 
         protected override int GetStrokeWidth()
@@ -100,9 +87,9 @@ namespace GraphicEditor.Functionality
 
         private void RefreshMarkerPoints()
         {
-            for (int i = 0; i<LinePoints.Count; i++)
+            for (int i = 0; i<LineMarkers.Count; i++)
             {
-                LinePoints[i].SetMarkerSize(StrokeWidth);
+                LineMarkers[i].SetMarkerSize(StrokeWidth);
             }
         }
         private MarkerPoint CreateNewMarkerPoint(Point point)
@@ -110,6 +97,23 @@ namespace GraphicEditor.Functionality
             MarkerPoint markerPoint = new MarkerPoint(point);
             markerPoint.SetMarkerSize(StrokeWidth);
             return markerPoint;
+        }
+        private void DefinePolyline(Polyline polyline)
+        {
+            foreach (var point in polyline.Points)
+            {
+                Polyline.Points.Add(point);
+            }
+        }
+        private void DefineMarkerPoints()
+        {
+            foreach (var point in Polyline.Points)
+            {
+                lineMarkers.Add(new MarkerPoint(point));
+            }
+            Polyline.StrokeThickness = StrokeWidth;
+            Polyline.Visibility = Visibility.Visible;
+            Polyline.Stroke = Brushes.Black;
         }
     }
 }

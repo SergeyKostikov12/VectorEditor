@@ -12,33 +12,28 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor
 {
-    public enum ButtonPressed { None, Rect, Line, Move, Rotate, Scale, Width, Color, Fill }
     public enum CursorType { Crosshair, Arrow, Hand }
     public enum FigureType { Rectangle, Line }
 
     public partial class MainWindow : Window
     {
-        private ButtonPressed buttonPressedFlag;
-        private bool isDraw = false;
-        private bool isMoving = false;
-        private bool isRotating = false;
-        private bool isScaling = false;
-        private bool isFirstPoint = true;
-        private bool isLineSelect = false;
-        private bool isPointMove = false;
-        private bool isWorkplaceMoved = false;
-        private int pointNumber;
-        private ColorPicker coloRPicker = new ColorPicker();
-        private WidthPicker widthPicker = new WidthPicker();
-        private Rectangle shadowRect;
-        private Polyline shadowLine;
-        private Point firstPointLMB;
-        private Point firstPointRMB;
+        public WorkplaceProcess Process;
+        public WorkplaceCondition Condition;
+        public WorkplaceShadow Shadow;
+        public ColorPicker ColoRPicker = new ColorPicker();
+        public WidthPicker WidthPicker = new WidthPicker();
+
+        //private int pointNumber;
+        //private Rectangle shadowRect;
+        //private Polyline shadowLine;
+        private Point LMB_ClickPosition;
+        //private Point firstPointRMB;
         private Point scrollPoint = new Point(0, 0);
         private Point currentMousePos;
-        private Point tempPosition;
-        private string selectedPolylineName;
-        private FigureObject selectedFigure;
+        //private Point tempPosition;
+        //private string selectedPolylineName;
+        //private FigureObject selectedFigure;
+
 
         public List<FigureObject> allFigures = new List<FigureObject>();
         public FiguresList FiguresList;
@@ -46,231 +41,167 @@ namespace GraphicEditor
         public MainWindow()
         {
             InitializeComponent();
-            InitializeShadows();
+            InitializeWorkplaceProcessors();
+        }
 
-
+        private void InitializeWorkplaceProcessors()
+        {
+            Process = new WorkplaceProcess(WorkPlace);
+            Condition = new WorkplaceCondition();
+            Shadow = new WorkplaceShadow(WorkPlace);
         }
 
         private void ButtonPress(object sender, RoutedEventArgs e)
         {
             Button btn = (Button)sender;
             string buttonName = btn.Name;
-            switch (buttonName)
-            {
-                case "LoadBtn":
-                    DeselectAllPolylines();
-                    buttonPressedFlag = ButtonPressed.None;
-                    LoadWorkPlace();
-                    break;
-                case "SaveBtn":
-                    DeselectAllPolylines();
-                    buttonPressedFlag = ButtonPressed.None;
-                    SaveWorkPlace();
-                    break;
-                case "RectBtn":
-                    DeselectAllPolylines();
-                    buttonPressedFlag = ButtonPressed.Rect;
-                    SetCursor(CursorType.Crosshair);
-                    break;
-                case "LineBtn":
-                    DeselectAllPolylines();
-                    buttonPressedFlag = ButtonPressed.Line;
-                    SetCursor(CursorType.Crosshair);
-                    break;
-                case "MoveBtn":
-                    if (selectedPolylineName != null)
-                    {
-                        if (selectedFigure.ShapeType == FigureType.Rectangle)
-                        {
-                            buttonPressedFlag = ButtonPressed.Move;
-                            SetCursor(CursorType.Hand);
-                            DrawGizmoForRotate();
-                        }
-                        else MessageBox.Show("Перемещать линию не получится!");
-                        coloRPicker.Visibility = Visibility.Hidden;
-                        widthPicker.Visibility = Visibility.Hidden;
-                    }
-                    else MessageBox.Show("Сначала выделите объект!");
-                    break;
-                case "RotateBtn":
-                    if (selectedPolylineName != null)
-                    {
-                        if (selectedFigure.ShapeType == FigureType.Rectangle)
-                        {
-                            buttonPressedFlag = ButtonPressed.Rotate;
-                            SetCursor(CursorType.Hand);
-                            DrawGizmoForRotate();
-                        }
-                        else MessageBox.Show("Линию не получится вращать!");
-                        coloRPicker.Visibility = Visibility.Hidden;
-                        widthPicker.Visibility = Visibility.Hidden;
-                    }
-                    else MessageBox.Show("Сначала выделите объект!");
-                    break;
-                case "ScaleBtn":
-                    if (selectedPolylineName != null)
-                    {
-                        if (selectedFigure.ShapeType == FigureType.Rectangle)
-                        {
-                            buttonPressedFlag = ButtonPressed.Scale;
-                            SetCursor(CursorType.Hand);
-                            DrawGizmoForRotate();
-                        }
-                        else MessageBox.Show("Линию вращать не получится!");
-                        coloRPicker.Visibility = Visibility.Hidden;
-                        widthPicker.Visibility = Visibility.Hidden;
-                    }
-                    else MessageBox.Show("Сначала выделите объект!");
-                    break;
-                case "DeleteBtn":
-                    if (selectedPolylineName != null)
-                    {
-                        SetCursor(CursorType.Arrow);
-                        DeleteFigure();
-                        widthPicker.Visibility = Visibility.Hidden;
-                        coloRPicker.Visibility = Visibility.Hidden;
-                    }
-                    break;
-                case "LineWidthBtn":
-                    if (selectedPolylineName != null)
-                    {
-                        coloRPicker.Visibility = Visibility.Hidden;
-                        PropertyPanel.Content = widthPicker;
-                        SetWidth();
-                    }
-                    else MessageBox.Show("Сначала выделите объект!");
-                    break;
-                case "ColorBtn":
-                    if (selectedPolylineName != null)
-                    {
-                        widthPicker.Visibility = Visibility.Hidden;
-                        PropertyPanel.Content = coloRPicker;
-                        coloRPicker.BtnPressed = ButtonPressed.Color;
-                        SetStyle();
-                    }
-                    else MessageBox.Show("Сначала выделите объект!");
-                    break;
-                case "FillBtn":
-                    if (selectedPolylineName != null)
-                    {
-                        if (selectedFigure.ShapeType == FigureType.Rectangle)
-                        {
-                            PropertyPanel.Content = coloRPicker;
-                            coloRPicker.BtnPressed = ButtonPressed.Fill;
-                            SetStyle();
-                        }
-                        else MessageBox.Show("Линию нельзя залить!");
-                    }
-                    else MessageBox.Show("Сначала выделите объект!");
-                    break;
-            }
-        }
-        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
-        {
-            currentMousePos = e.GetPosition(WorkPlace);
 
-            if (Mouse.LeftButton == MouseButtonState.Pressed)
+            if (buttonName == "LoadBtn")
             {
-                if (buttonPressedFlag == ButtonPressed.Rect) isDraw = true;
-                if (buttonPressedFlag == ButtonPressed.Move) isMoving = true;
-                if (buttonPressedFlag == ButtonPressed.Rotate) isRotating = true;
-                if (buttonPressedFlag == ButtonPressed.Scale) isScaling = true;
-                if (isLineSelect) isPointMove = true;
+                Condition.ButtonPressed = ButtonPressed.Load;
+                Process.DeselectFigure();
+                Process.LoadWorkplace();
+                //DeselectAllPolylines();
+                //Condition.buttonPressedFlag = ButtonPressed.None;
+                //LoadWorkPlace();
             }
-            else if (buttonPressedFlag == ButtonPressed.Line) isDraw = true;
-            else
+            else if (buttonName == "SaveBtn")
             {
-                isDraw = false;
-                isMoving = false;
-                isScaling = false;
-                isPointMove = false;
+                Condition.ButtonPressed = ButtonPressed.Save;
+                Process.DeselectFigure();
+                Process.SaveWorkplace();
+                //DeselectAllPolylines();
+                //Condition.buttonPressedFlag = ButtonPressed.None;
+                //SaveWorkPlace();
             }
-            if (Mouse.RightButton == MouseButtonState.Pressed) isWorkplaceMoved = true;
-            else isWorkplaceMoved = false;
-            DrawShadow();
-            MoveFigure();
-            MovePoint();
-            RotateFigure();
-            ScaleFigure();
-            MoveWorkPlace();
+            else if (buttonName == "RectBtn")
+            {
+                Condition.ButtonPressed = ButtonPressed.Rect;
+                Process.DeselectFigure();
+                SetCursor(CursorType.Crosshair);
+                //DeselectAllPolylines();
+                //Condition.buttonPressedFlag = ButtonPressed.Rect;
+            }
+            else if (buttonName == "LineBtn")
+            {
+                Condition.ButtonPressed = ButtonPressed.Line;
+                DeselectAllPolylines();
+                SetCursor(CursorType.Crosshair);
+                //Condition.buttonPressedFlag = ButtonPressed.Line;
+            }
+            else if (buttonName == "DeleteBtn")
+            {
+                Process.DeleteFigure();
+                SetCursor(CursorType.Arrow);
+
+                //if (selectedPolylineName != null)
+                //{
+                //    DeleteFigure();
+                //    widthPicker.Visibility = Visibility.Hidden;
+                //    coloRPicker.Visibility = Visibility.Hidden;
+                //}
+            }
+            else if (buttonName == "LineWidthBtn")
+            {
+
+                if (Process.SelectedFigure != null)
+                {
+                    ColoRPicker.Visibility = Visibility.Hidden;
+                    PropertyPanel.Content = WidthPicker;
+                    SetWidth();
+                }
+            }
+            else if (buttonName == "ColorBtn")
+            {
+                if (Process.SelectedFigure != null)
+                {
+                    PropertyPanel.Content = ColoRPicker;
+                    WidthPicker.Visibility = Visibility.Hidden;
+                    ColoRPicker.BtnPressed = ButtonPressed.Color;
+                    SetStyle();
+                }
+            }
+            else if (buttonName == "FillBtn")
+            {
+                if (Process.SelectedFigure != null)
+                {
+                    PropertyPanel.Content = ColoRPicker;
+                    ColoRPicker.BtnPressed = ButtonPressed.Fill;
+                    SetStyle();
+                }
+                else MessageBox.Show("Сначала выделите объект!");
+            }
+
         }
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            firstPointLMB = e.GetPosition(WorkPlace);
-            tempPosition = firstPointLMB;
-            if (buttonPressedFlag == ButtonPressed.Rect)
+            LMB_ClickPosition = e.GetPosition(WorkPlace);
+            Process.LMB_ClickPosition = LMB_ClickPosition;
+            //tempPosition = LMB_Position;
+
+            if(Condition.ButtonPressed == ButtonPressed.Rect)
             {
-                isDraw = true;
+                Shadow.DrawRectShadow(LMB_ClickPosition);
             }
-            else if (buttonPressedFlag == ButtonPressed.Line)
+            else if(Condition.ButtonPressed == ButtonPressed.Line)
             {
-                isDraw = true;
-                AddPointToLineShadow(firstPointLMB);
+                Condition.Action = Actions.DrawPolyline;
+                Shadow.DrawLineShadow(LMB_ClickPosition);
+                Shadow.FirstPoint = LMB_ClickPosition;
             }
-            else if (buttonPressedFlag == ButtonPressed.Move)
-            {
-                isMoving = true;
-            }
-            else if (buttonPressedFlag == ButtonPressed.Rotate)
-            {
-                isRotating = true;
-            }
-            else if (buttonPressedFlag == ButtonPressed.Scale)
-            {
-                isScaling = true;
-            }
-            else if (buttonPressedFlag == ButtonPressed.None)
-            {
-                if (selectedPolylineName == null)
-                {
-                    string name = FindCollinearPoint();
-                    if (name != null)
-                    {
-                        SelectPolyline(name);
-                        if (selectedFigure.ShapeType == FigureType.Line) isLineSelect = true;
-                    }
-                }
-                else if (isLineSelect)
-                {
-                    GetPointsAround();
-                }
-            }
+
 
             if (e.ClickCount == 2)
             {
-                if (selectedPolylineName != null && selectedFigure.ShapeType == FigureType.Line)
-                {
-                    selectedFigure.AddPointFromDoubleClick(firstPointLMB);
-                    isPointMove = false;
-                }
+                Process.ExecuteDoubleClick(LMB_ClickPosition);
             }
-        }
-        private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            Point endPoint = e.GetPosition(WorkPlace);
-            if (buttonPressedFlag == ButtonPressed.Rect && isDraw)
-            {
-                isDraw = false;
-                CreateNewFigure(endPoint);
-            }
-            if (buttonPressedFlag == ButtonPressed.Move && isMoving)
-            {
-                isMoving = false;
-            }
-            if (buttonPressedFlag == ButtonPressed.Rotate && isRotating)
-            {
-                isRotating = false;
-            }
-            if (isPointMove)
-            {
-                isPointMove = false;
-                int n = selectedFigure.GetPointNear(endPoint);
-                if (n != 0)
-                {
-                    if (pointNumber != 0) selectedFigure.CollapsePoints(pointNumber);
-                }
-                pointNumber = 0;
-            }
+
+            //if (buttonPressedFlag == ButtonPressed.Rect)
+            //{
+            //    isDraw = true;
+            //}
+            //else if (buttonPressedFlag == ButtonPressed.Line)
+            //{
+            //    isDraw = true;
+            //    AddPointToLineShadow(LMB_ClickPosition);
+            //}
+            //else if (buttonPressedFlag == ButtonPressed.Move)
+            //{
+            //    isMoving = true;
+            //}
+            //else if (buttonPressedFlag == ButtonPressed.Rotate)
+            //{
+            //    isRotating = true;
+            //}
+            //else if (buttonPressedFlag == ButtonPressed.Scale)
+            //{
+            //    isScaling = true;
+            //}
+            //else if (buttonPressedFlag == ButtonPressed.None)
+            //{
+            //    if (selectedPolylineName == null)
+            //    {
+            //        string name = FindCollinearPoint();
+            //        if (name != null)
+            //        {
+            //            SelectPolyline(name);
+            //            if (selectedFigure.ShapeType == FigureType.Line) isLineSelect = true;
+            //        }
+            //    }
+            //    else if (isLineSelect)
+            //    {
+            //        GetPointsAround();
+            //    }
+            //}
+
+            //if (e.ClickCount == 2)
+            //{
+            //    if (selectedPolylineName != null && selectedFigure.ShapeType == FigureType.Line)
+            //    {
+            //        selectedFigure.AddPointFromDoubleClick(LMB_ClickPosition);
+            //        isPointMove = false;
+            //    }
+            //}
         }
         private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -303,10 +234,113 @@ namespace GraphicEditor
                 DeselectAllPolylines();
             }
         }
+        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
+        {
+            currentMousePos = e.GetPosition(WorkPlace);
+            if (Mouse.LeftButton == MouseButtonState.Pressed)
+            {
+                if(Condition.ButtonPressed == ButtonPressed.Rect)
+                {
+                    Condition.Action = Actions.DrawRect;
+                }
+                else if(Condition.ButtonPressed == ButtonPressed.Line)
+                {
+                    if(Condition.Action == Actions.DrawPolyline)
+                    {
+                        Condition.Action = Actions.DrawLine;
+                    }
+                    else if(Condition.Action == Actions.DrawLine)
+                    {
+                        Shadow.SetSecondPoint(currentMousePos);
+                    }
+                }
+                else if(Condition.Action == Actions.MoveRect)
+                {
+                    Process.MoveRect(currentMousePos);
+                }
+                else if(Condition.Action == Actions.RotateRect)
+                {
+                    Process.RotateRect(currentMousePos);
+                }
+                else if(Condition.Action == Actions.ScaleRect)
+                {
+                    Process.ScaleRect(currentMousePos);
+                }
+                
+
+                Process.Drag(currentMousePos);
+
+                //if (buttonPressedFlag == ButtonPressed.Rect) isDraw = true;
+                //if (buttonPressedFlag == ButtonPressed.Move) isMoving = true;
+                //if (buttonPressedFlag == ButtonPressed.Rotate) isRotating = true;
+                //if (buttonPressedFlag == ButtonPressed.Scale) isScaling = true;
+                //if (isLineSelect) isPointMove = true;
+            }
+            //else if (buttonPressedFlag == ButtonPressed.Line) isDraw = true;
+            //else
+            //{
+            //    isDraw = false;
+            //    isMoving = false;
+            //    isScaling = false;
+            //    isPointMove = false;
+            //}
+            if (Mouse.RightButton == MouseButtonState.Pressed)
+            {
+                Process.MovingWorkPlace(currentMousePos);
+                //isWorkplaceMoved = true;
+            }
+            //else isWorkplaceMoved = false;
+
+
+
+            DrawShadow();
+            //MoveFigure();
+            //MovePoint();
+            //RotateFigure();
+            //ScaleFigure();
+            //MoveWorkPlace();
+        }
+        private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) //TODO: Связать отпускание кнопки мыши с Процессами
+        {
+            Point endPoint = e.GetPosition(WorkPlace);
+
+
+
+            if (buttonPressedFlag == ButtonPressed.Rect && isDraw)
+            {
+                isDraw = false;
+                CreateNewFigure(endPoint);
+            }
+            if (buttonPressedFlag == ButtonPressed.Move && isMoving)
+            {
+                isMoving = false;
+            }
+            if (buttonPressedFlag == ButtonPressed.Rotate && isRotating)
+            {
+                isRotating = false;
+            }
+            if (isPointMove)
+            {
+                isPointMove = false;
+                int n = selectedFigure.GetPointNear(endPoint);
+                if (n != 0)
+                {
+                    if (pointNumber != 0) selectedFigure.CollapsePoints(pointNumber);
+                }
+                pointNumber = 0;
+            }
+        }
         private void WorkPlace_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             isWorkplaceMoved = false;
         }
+
+
+
+
+
+
+
 
         private void AddPointToLineShadow(Point point)
         {
@@ -329,36 +363,17 @@ namespace GraphicEditor
             for (int i = 0; i < allFigures.Count; i++)
             {
                 FigureObject figure = allFigures[i];
-                if (figure.AreCollinear(firstPointLMB))
+                if (figure.AreCollinear(LMB_ClickPosition))
                 {
                     return figure.Name;
                 }
             }
             return null;
         }
-        private void CheckValid()
-        {
-            List<int> tmpList = new List<int>();
-            for (int i = 0; i < allFigures.Count; i++)
-            {
-                if (allFigures[i].Name == null)
-                {
-                    tmpList.Add(i);
-                }
-            }
-            if (tmpList.Count != 0)
-            {
-                for (int i = 0; i < tmpList.Count; i++)
-                {
-                    int n = tmpList[i];
-                    allFigures.RemoveAt(n);
-                }
-            }
-        }
         private void ClearCanvas()
         {
             WorkPlace.Children.Clear();
-            InitializeShadows();
+            //InitializeShadows();
         }
         private void CreateFiguresFromList()
         {
@@ -370,7 +385,7 @@ namespace GraphicEditor
         }
         private void CreateNewFigure(Point endPoint)
         {
-            FigureObj figure = new RectangleObj(firstPointLMB, endPoint);
+            FigureObj figure = new RectangleObj(LMB_ClickPosition, endPoint);
             figure.PlacingInWorkPlace(WorkPlace);
             //figure.ShowOutline();
 
@@ -383,15 +398,16 @@ namespace GraphicEditor
         {
             FigureObj figure = new LineObj(polyline);
             figure.PlacingInWorkPlace(WorkPlace);
+            //figure.ShowOutline();
 
             //int _1 = WorkPlace.Children.Count;
             //string name = "Figure_" + allFigures.Count + 1;
             //FigureObject figure = new FigureObject(name, FigureType.Line, polyline, WorkPlace);
             //allFigures.Add(figure);
-            //shadowLine.Visibility = Visibility.Hidden;
-            //shadowLine.Points.Clear();
-            //shadowLine.Points.Add(currentMousePos);
-            //isFirstPoint = true;
+            shadowLine.Visibility = Visibility.Hidden;
+            shadowLine.Points.Clear();
+            shadowLine.Points.Add(currentMousePos);
+            isFirstPoint = true;
         }
         private void CreateSaveList(List<FigureObject> list)
         {
@@ -431,16 +447,35 @@ namespace GraphicEditor
             selectedFigure = null;
             isLineSelect = false;
             buttonPressedFlag = ButtonPressed.None;
-            coloRPicker.Visibility = Visibility.Hidden;
-            widthPicker.Visibility = Visibility.Hidden;
+            ColoRPicker.Visibility = Visibility.Hidden;
+            WidthPicker.Visibility = Visibility.Hidden;
+        }
+        private void CheckValid()
+        {
+            List<int> tmpList = new List<int>();
+            for (int i = 0; i < allFigures.Count; i++)
+            {
+                if (allFigures[i].Name == null)
+                {
+                    tmpList.Add(i);
+                }
+            }
+            if (tmpList.Count != 0)
+            {
+                for (int i = 0; i < tmpList.Count; i++)
+                {
+                    int n = tmpList[i];
+                    allFigures.RemoveAt(n);
+                }
+            }
         }
         private void DrawRectangleShadow()
         {
-            double xTop = Math.Max(firstPointLMB.X, currentMousePos.X);
-            double yTop = Math.Max(firstPointLMB.Y, currentMousePos.Y);
+            double xTop = Math.Max(LMB_ClickPosition.X, currentMousePos.X);
+            double yTop = Math.Max(LMB_ClickPosition.Y, currentMousePos.Y);
 
-            double xMin = Math.Min(firstPointLMB.X, currentMousePos.X);
-            double yMin = Math.Min(firstPointLMB.Y, currentMousePos.Y);
+            double xMin = Math.Min(LMB_ClickPosition.X, currentMousePos.X);
+            double yMin = Math.Min(LMB_ClickPosition.Y, currentMousePos.Y);
 
             shadowRect.Height = yTop - yMin;
             shadowRect.Width = xTop - xMin;
@@ -471,7 +506,7 @@ namespace GraphicEditor
         {
             if (selectedFigure.Name != null)
             {
-                int n = selectedFigure.GetPointNear(firstPointLMB);
+                int n = selectedFigure.GetPointNear(LMB_ClickPosition);
                 if (n != 0)
                 {
                     isPointMove = true;
@@ -481,30 +516,7 @@ namespace GraphicEditor
             }
             else DeselectAllPolylines();
         }
-        private void InitializeShadows()
-        {
-            Rectangle rectangle = new Rectangle
-            {
-                Stroke = Brushes.Blue,
-                StrokeDashArray = new DoubleCollection() { 4, 4 },
-                StrokeThickness = 1,
-                Visibility = Visibility.Hidden
-            };
-            shadowRect = rectangle;
-            Polyline line = new Polyline
-            {
-                Stroke = Brushes.Blue,
-                StrokeDashArray = new DoubleCollection() { 4, 4 },
-                StrokeThickness = 1,
-                Visibility = Visibility.Hidden
-            };
 
-            shadowLine = line;
-            shadowLine.Points.Add(new Point(0, 0));
-
-            WorkPlace.Children.Add(shadowRect);
-            WorkPlace.Children.Add(shadowLine);
-        }
         private void LoadWorkPlace()
         {
             Stream myStream = null;
@@ -629,15 +641,10 @@ namespace GraphicEditor
                     break;
             }
         }
-        private void SetStyle()
-        {
-            coloRPicker.FigureObject = selectedFigure;
-            coloRPicker.Visibility = Visibility.Visible;
-        }
         private void SetWidth()
         {
-            widthPicker.Figure = selectedFigure;
-            widthPicker.Visibility = Visibility.Visible;
+            WidthPicker.Figure = Process.SelectedFigure;
+            WidthPicker.Visibility = Visibility.Visible;
         }
         private void ScaleFigure()
         {
@@ -648,6 +655,15 @@ namespace GraphicEditor
                     tempPosition = selectedFigure.ScaleFigure(tempPosition, currentMousePos);
                 }
             }
+        }
+
+
+
+
+        private void SetStyle()
+        {
+            ColoRPicker.Figure = Process.SelectedFigure;
+            ColoRPicker.Visibility = Visibility.Visible;
         }
     }
 }
