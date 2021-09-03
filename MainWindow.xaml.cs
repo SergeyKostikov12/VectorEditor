@@ -22,11 +22,10 @@ namespace GraphicEditor
         public WidthPicker WidthPicker = new WidthPicker();
 
         private Point LMB_ClickPosition;
-        private Point scrollPoint = new Point(0, 0);
         private Point currentMousePos;
 
 
-       
+
         private Point RMB_firstPoint;
 
         public MainWindow()
@@ -108,34 +107,31 @@ namespace GraphicEditor
             }
 
         }
-        private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)///////////////////////////LMB_DOWN
         {
-            Point clickPosition = e.GetPosition(WorkPlace);
+            LMB_ClickPosition = e.GetPosition(WorkPlace);
             Process.LMB_ClickPosition = LMB_ClickPosition;
+            Condition.MouseDown = true;
 
             if (Condition.ButtonPressed == ButtonPressed.Rect)
             {
                 Condition.Action = Actions.DrawRect;
-                Shadow.StartDrawRectShadow(clickPosition);
+                Shadow.StartDrawRectShadow(LMB_ClickPosition);
+                Process.LMB_ClickPosition = LMB_ClickPosition;
             }
             else if (Condition.ButtonPressed == ButtonPressed.Line)
             {
-                if (Condition.Action == Actions.DrawPolyline)
+                Condition.Action = Actions.DrawLine;
+                if (Shadow.ShadowLine.Points.Count == 0)
                 {
-                    Shadow.AddPoint(clickPosition);
+                    Shadow.DrawLineShadow();
+                    Shadow.SetLIneFirstPoint(LMB_ClickPosition);
+                    Shadow.SetLineSecondPoint(LMB_ClickPosition);
                 }
-                else
-                {
-                    Condition.Action = Actions.DrawPolyline;
-                    Shadow.DrawLineShadow(clickPosition);
-                    Shadow.AddPoint(clickPosition);
-                    Shadow.FirstPoint = clickPosition;
-                }
-
             }
             else if (Condition.ButtonPressed == ButtonPressed.None)
             {
-                Condition.Action = Process.DetermindAction(clickPosition);
+                Condition.Action = Process.DetermindAction(LMB_ClickPosition);
             }
 
             if (e.ClickCount == 2)
@@ -143,13 +139,19 @@ namespace GraphicEditor
                 Process.ExecuteDoubleClick(LMB_ClickPosition);
             }
         }
-        private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)/////////////////////////RMB_DOWN
         {
             RMB_firstPoint = e.GetPosition(WorkPlace);
+            SetCursor(CursorType.Arrow);
+            if (Condition.Action == Actions.DrawLine)
+            {
+                Shadow.RemoveLastPoint();
+                Process.CreatePolyline(Shadow.ShadowLine);
+                Shadow.Clear();
+            }
             Condition.ResetCondition();
-
         }
-        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
+        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)//////////////////////////////////////MOVE
         {
             Point currentMousePos = e.GetPosition(WorkPlace);
             if (Mouse.LeftButton == MouseButtonState.Pressed)
@@ -158,18 +160,13 @@ namespace GraphicEditor
                 {
                     Shadow.DrawRectShadow(currentMousePos);
                 }
-                else if (Condition.ButtonPressed == ButtonPressed.Line)
+                else if (Condition.Action == Actions.DrawLine)
                 {
-                    if (Condition.Action == Actions.DrawPolyline && Shadow.LineType != WorkplaceShadow.LineTypes.Polyline)
+                    if (AlllowDistance(currentMousePos))
                     {
-                        Condition.Action = Actions.DrawLine;
-                        Shadow.LineType = WorkplaceShadow.LineTypes.Line;
+                        Condition.MouseDrag = true;
                     }
-
-                     if (Condition.Action == Actions.DrawLine)
-                    {
-                        Shadow.SetLineSecondPoint(currentMousePos);
-                    }
+                    Shadow.DrawLastPointShadowtLine(currentMousePos);
                 }
                 else if (Condition.Action == Actions.MoveRect)
                 {
@@ -187,44 +184,63 @@ namespace GraphicEditor
                 {
                     Process.MovePoint(currentMousePos);
                 }
-                Process.Drag(currentMousePos);
+                //Process.Drag(currentMousePos);
             }
-            else
+
+            if (Condition.Action == Actions.DrawLine)
             {
-                if(Condition.Action == Actions.DrawPolyline)
-                {
-                    Shadow.DrawLastShadowtLine(currentMousePos);
-                }
+                Shadow.DrawLastPointShadowtLine(currentMousePos);
             }
+
 
             if (Mouse.RightButton == MouseButtonState.Pressed)
             {
-                WorkplaceProcess.MovingWorkPlace(RMB_firstPoint ,currentMousePos);
+                WorkplaceProcess.MovingWorkPlace(Scroll, RMB_firstPoint, currentMousePos);
             }
         }
-        private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+
+        private bool AlllowDistance(Point currentMousePos)
+        {
+            Point delta = LMB_ClickPosition.AbsDeltaTo(currentMousePos);
+            if (delta.X > 5 || delta.Y > 5)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)///////////////LMB_UP
         {
             Point endPoint = e.GetPosition(WorkPlace);
+            Condition.MouseUp = true;
 
             if (Condition.Action == Actions.DrawRect)
             {
                 Condition.Action = Actions.None;
                 Process.CreateRect(endPoint);
+                Shadow.Clear();
             }
             else if (Condition.Action == Actions.DrawLine)
             {
-                Condition.Action = Actions.None;
-                Process.CreateLine(endPoint);
+                if (Condition.IsDrawLine())
+                {
+                    if (Shadow.ShadowLine.Points.Count <= 2)
+                    {
+                        Condition.Action = Actions.None;
+                        Process.CreateLine(LMB_ClickPosition, endPoint);
+                        Shadow.Clear();
+                    }
+                        Condition.ResetMouseState();
+                }
+                else
+                {
+                    Shadow.AddPoint(endPoint);
+                }
             }
-            else if(Condition.Action == Actions.DrawPolyline)
-            {
-                Shadow.LineType = WorkplaceShadow.LineTypes.Polyline;
-            }
-            
         }
         private void WorkPlace_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            
+
         }
 
         private void SetCursor(CursorType cursorType)

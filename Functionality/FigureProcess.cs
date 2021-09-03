@@ -33,7 +33,7 @@ namespace GraphicEditor
 
         internal void DeselectFigure()
         {
-            throw new NotImplementedException();
+            SelectedFigure = null;
         }
 
         internal void ExecuteDoubleClick(Point point)
@@ -43,7 +43,7 @@ namespace GraphicEditor
 
         internal void Drag(Point point)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
 
@@ -81,34 +81,36 @@ namespace GraphicEditor
 
         internal void ScaleRect(Point currentMousePos) // TODO: Увеличение от "Точки увеличения"
         {
-            if (isScaling)
-            {
-                if (selectedFigure != null)
-                {
-                    tempPosition = selectedFigure.ScaleFigure(tempPosition, currentMousePos);
-                }
-            }
+            //if (isScaling)
+            //{
+            //    if (selectedFigure != null)
+            //    {
+            //        tempPosition = selectedFigure.ScaleFigure(tempPosition, currentMousePos);
+            //    }
+            //}
         }
 
         internal void CreateRect(Point endPoint)
         {
-            throw new NotImplementedException();
+            FigureObj figure = new RectangleObj(LMB_ClickPosition, endPoint);
+            figure.PlacingInWorkPlace(workPlace);
         }
 
-        internal void CreateLine(Point endPoint)
+        internal void CreateLine(Point firstPoint,Point endPoint)
         {
-            throw new NotImplementedException();
+            FigureObj figure = new LineObj(firstPoint, endPoint);
+            figure.PlacingInWorkPlace(workPlace);
         }
 
         internal void MovePoint(Point currentMousePos)
         {
-            if (isLineSelect)
-            {
-                if (pointNumber != 0)
-                {
-                    tempPosition = selectedFigure.MovePointToNewPosition(pointNumber, tempPosition, currentMousePos);
-                }
-            }
+            //if (isLineSelect)
+            //{
+            //    if (pointNumber != 0)
+            //    {
+            //        tempPosition = selectedFigure.MovePointToNewPosition(pointNumber, tempPosition, currentMousePos);
+            //    }
+            //}
         }
 
         internal Actions DetermindAction(Point clickPosition)
@@ -122,15 +124,21 @@ namespace GraphicEditor
         }
         private string FindCollinearPoint()
         {
-            for (int i = 0; i < allFigures.Count; i++)
-            {
-                FigureObject figure = allFigures[i];
-                if (figure.AreCollinear(LMB_ClickPosition))
-                {
-                    return figure.Name;
-                }
-            }
+            //for (int i = 0; i < allFigures.Count; i++)
+            //{
+            //    FigureObject figure = allFigures[i];
+            //    if (figure.AreCollinear(LMB_ClickPosition))
+            //    {
+            //        return figure.Name;
+            //    }
+            //}
             return null;
+        }
+
+        internal void CreatePolyline(Polyline shadowLine)
+        {
+            FigureObj figure = new LineObj(shadowLine);
+            figure.PlacingInWorkPlace(workPlace);
         }
     }
 }

@@ -17,6 +17,8 @@ namespace GraphicEditor.Functionality
         public FiguresList FiguresList;
 
         private Canvas workplace;
+        private Point scrollPoint = new Point(0, 0);
+
         public WorkplaceProcess(Canvas _worklace)
         {
             workplace = _worklace;
@@ -30,6 +32,7 @@ namespace GraphicEditor.Functionality
             openFileDialog.RestoreDirectory = true;
             var xmlSerializer = new XmlSerializer(typeof(FiguresList));
             Nullable<bool> result = openFileDialog.ShowDialog();
+
             if (result == true)
             {
                 try
@@ -75,24 +78,20 @@ namespace GraphicEditor.Functionality
                 MessageBox.Show("Файл успешно сохранен!");
             }
         }
-        internal void MovingWorkPlace(Point rMB_firstPoint, Point currentMousePos)
+        internal void MovingWorkPlace(ScrollViewer Scroll,Point rMB_firstPoint, Point currentMousePos)
         {
-            if (isWorkplaceMoved)
-            {
-                isWorkplaceMoved = false;
-                scrollPoint.X = Scroll.HorizontalOffset - firstPointRMB.DeltaTo(currentMousePos).X / 2;
-                scrollPoint.Y = Scroll.VerticalOffset - firstPointRMB.DeltaTo(currentMousePos).Y / 2;
+                scrollPoint.X = Scroll.HorizontalOffset - rMB_firstPoint.DeltaTo(currentMousePos).X / 2;
+                scrollPoint.Y = Scroll.VerticalOffset - rMB_firstPoint.DeltaTo(currentMousePos).Y / 2;
                 Scroll.ScrollToHorizontalOffset(scrollPoint.X);
                 Scroll.ScrollToVerticalOffset(scrollPoint.Y);
-            }
         }
 
         private void CreateFiguresFromList()
         {
             for (int i = 0; i < FiguresList.Figures.Count; i++)
             {
-                FigureObject figureObject = new FigureObject(FiguresList.Figures[i], workplace);
-                allFigures.Add(figureObject);
+                //FigureObj figureObject = new FigureObj(FiguresList.Figures[i], workplace);
+                //allFigures.Add(figureObject);
             }
         }
         private void ClearCanvas()
@@ -100,7 +99,7 @@ namespace GraphicEditor.Functionality
             workplace.Children.Clear();
             //InitializeShadows();
         }
-        private void CreateSaveList(List<FigureObject> list)
+        private void CreateSaveList(List<FigureObj> list)
         {
             FiguresList = new FiguresList();
             List<SLFigure> tmp = new List<SLFigure>();

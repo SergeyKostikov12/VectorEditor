@@ -12,24 +12,29 @@ namespace GraphicEditor.Functionality
 {
     public class WorkplaceShadow
     {
-        public enum LineTypes { Line, Polyline}
+        public enum LineTypes { Line, Polyline }
 
         public LineTypes LineType;
         private Rectangle shadowRect;
         private Polyline shadowLine;
         private Canvas workplace;
         private Point firstPoint;
-        private bool isFirstPoint = false;
-
-        public Point FirstPoint
+        public bool FirstPointIsDefined
         {
-            get => firstPoint;
-            set
+            get
             {
-                firstPoint = value;
-                isFirstPoint = true;
+                if (ShadowLine.Points.Count == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
+
+        public Point FirstPoint { get => firstPoint; set => firstPoint = value; }
 
 
         public Rectangle ShadowRect { get => shadowRect; set => shadowRect = value; }
@@ -37,8 +42,8 @@ namespace GraphicEditor.Functionality
 
         public WorkplaceShadow(Canvas _workplace)
         {
-            InitializeShadows();
             workplace = _workplace;
+            InitializeShadows();
         }
         private void InitializeShadows()
         {
@@ -59,34 +64,49 @@ namespace GraphicEditor.Functionality
             };
 
             ShadowLine = line;
-            ShadowLine.Points.Add(new Point(0, 0));
+            //ShadowLine.Points.Add(new Point(0, 0));
 
             workplace.Children.Add(ShadowRect);
             workplace.Children.Add(ShadowLine);
         }
 
-        internal void StartDrawRectShadow(Point lMB_ClickPosition)
+        internal void StartDrawRectShadow(Point LMB_ClickPosition)
         {
-            throw new NotImplementedException();
+            firstPoint = LMB_ClickPosition;
+            shadowRect.Visibility = Visibility.Visible;
         }
 
-        internal void DrawLineShadow(Point lMB_ClickPosition)
+        internal void DrawLineShadow()
         {
-            throw new NotImplementedException();
+            shadowLine.Visibility = Visibility.Visible;
         }
 
-        internal void SetLineSecondPoint(Point currentMousePos)
+        internal void SetLIneFirstPoint(Point _firstPoint)
         {
-            throw new NotImplementedException();
+            FirstPoint = _firstPoint;
+            shadowLine.Points.Add(firstPoint);
+            shadowLine.Points[0] = firstPoint;
+            shadowLine.UpdateLayout();
+        }
+        internal void SetLineSecondPoint(Point point)
+        {
+            if (shadowLine.Points.Count < 2)
+            {
+                shadowLine.Points.Add(point);
+            }
+        }
+        internal void DrawLineSecondPoint(Point currentMousePos)
+        {
+            shadowLine.Points[1] = currentMousePos;
         }
 
         internal void DrawRectShadow(Point currentMousePos) //TODO: 
         {
-            double xTop = Math.Max(LMB_ClickPosition.X, currentMousePos.X);
-            double yTop = Math.Max(LMB_ClickPosition.Y, currentMousePos.Y);
+            double xTop = Math.Max(firstPoint.X, currentMousePos.X);
+            double yTop = Math.Max(firstPoint.Y, currentMousePos.Y);
 
-            double xMin = Math.Min(LMB_ClickPosition.X, currentMousePos.X);
-            double yMin = Math.Min(LMB_ClickPosition.Y, currentMousePos.Y);
+            double xMin = Math.Min(firstPoint.X, currentMousePos.X);
+            double yMin = Math.Min(firstPoint.Y, currentMousePos.Y);
 
             shadowRect.Height = yTop - yMin;
             shadowRect.Width = xTop - xMin;
@@ -95,7 +115,7 @@ namespace GraphicEditor.Functionality
             Canvas.SetTop(shadowRect, yMin);
         }
 
-        internal void DrawLastShadowtLine(Point currentMousePos)
+        internal void DrawLastPointShadowtLine(Point currentMousePos)
         {
             int n = shadowLine.Points.Count - 1;
             shadowLine.Points[n] = new Point(currentMousePos.X, currentMousePos.Y);
@@ -103,7 +123,19 @@ namespace GraphicEditor.Functionality
 
         internal void AddPoint(Point clickPosition)
         {
-            throw new NotImplementedException();
+            shadowLine.Points.Add(clickPosition);
+        }
+
+        internal void Clear()
+        {
+            shadowLine.Points.Clear();
+            shadowLine.Visibility = Visibility.Hidden;
+            shadowRect.Visibility = Visibility.Hidden;
+        }
+
+        internal void RemoveLastPoint()
+        {
+            shadowLine.Points.RemoveAt(shadowLine.Points.Count - 1);
         }
     }
 }

@@ -59,29 +59,29 @@ public class SLFigure
         }
         return array;
     }
-    public SLFigure CreateSLFigureFromFigureObject(FigureObject figureObject)
+    public SLFigure CreateSLFigureFromFigureObject(FigureObj figureObject)
     {
-        Name = figureObject.Name;
-        ShapeTypeNumber = ((int)figureObject.ShapeType);
-        PivotPoint = figureObject.AnchorPoint.ToString();
-        CenterPoint = figureObject.CenterPoint.ToString();
-        RotatePoint = figureObject.RotatePoint.ToString();
-        OutlinePivotPoint = figureObject.OutlinePivotPoint.ToString();
-        Size = figureObject.Size.ToString();
-        FillColor = figureObject.Fill.Color.ToString();
-        LineColor = figureObject.LineColor.Color.ToString();
-        LineStrokeThinkness = figureObject.StrokeWidth.ToString();
-        CenterGizmoRectangle = figureObject.CenterGizmo;
-        CenterGizmo = CreateStringFromRect(CenterGizmoRectangle);
-        OutlineRectangle = figureObject.Outline;
-        Outline = CreateStringFromRect(OutlineRectangle);
-        Polyline = CreatePoliline(figureObject.Polyline);
+        //Name = figureObject.Name;
+        //ShapeTypeNumber = ((int)figureObject.ShapeType);
+        //PivotPoint = figureObject.AnchorPoint.ToString();
+        //CenterPoint = figureObject.CenterPoint.ToString();
+        //RotatePoint = figureObject.RotatePoint.ToString();
+        //OutlinePivotPoint = figureObject.OutlinePivotPoint.ToString();
+        //Size = figureObject.Size.ToString();
+        //FillColor = figureObject.Fill.Color.ToString();
+        //LineColor = figureObject.LineColor.Color.ToString();
+        //LineStrokeThinkness = figureObject.StrokeWidth.ToString();
+        //CenterGizmoRectangle = figureObject.CenterGizmo;
+        //CenterGizmo = CreateStringFromRect(CenterGizmoRectangle);
+        //OutlineRectangle = figureObject.Outline;
+        //Outline = CreateStringFromRect(OutlineRectangle);
+        //Polyline = CreatePoliline(figureObject.Polyline);
 
-        GizmosRectagles = new string[figureObject.Gizmos.Count][];
-        for (int i = 0; i < figureObject.Gizmos.Count; i++)
-        {
-            GizmosRectagles[i] = CreateStringFromRect(figureObject.Gizmos[i]);
-        }
+        //GizmosRectagles = new string[figureObject.Gizmos.Count][];
+        //for (int i = 0; i < figureObject.Gizmos.Count; i++)
+        //{
+        //    GizmosRectagles[i] = CreateStringFromRect(figureObject.Gizmos[i]);
+        //}
 
         return this;
     }
