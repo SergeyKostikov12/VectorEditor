@@ -8,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-public struct MarkerPoint
+public class MarkerPoint
 {
     private double x;
     private double y;
@@ -21,7 +21,6 @@ public struct MarkerPoint
     public double Y { get => y; set => SetY(value); }
     public Point Point { get => point; set => SetPoint(value); }
 
-    //public int MarkerSize { get => markerSize; set => SetMarkerSize(value); }
     public Rectangle Marker { get => marker; }
 
     public MarkerPoint(Point pt)
@@ -42,6 +41,20 @@ public struct MarkerPoint
         anchorPoint = new Point();
         RefreshAnchorPoint();
     }
+    public void Show()
+    {
+        marker.Visibility = Visibility.Visible;
+    }
+    public void Hide()
+    {
+        marker.Visibility = Visibility.Hidden;
+    }
+    public void Move(Point newPosition)
+    {
+        SetPoint(newPosition);
+        RefreshAnchorPoint();
+    }
+
     private void SetX(double xValue)
     {
         point.X = xValue;
@@ -72,20 +85,5 @@ public struct MarkerPoint
         Canvas.SetLeft(marker, pt.X);
         Canvas.SetTop(marker, pt.Y);
         anchorPoint = pt;
-    }
-
-    public void Show()
-    {
-        marker.Visibility = Visibility.Visible;
-    }
-    public void Hide()
-    {
-        marker.Visibility = Visibility.Hidden;
-    }
-    public void Move(Point newPosition)
-    {
-        Point pt = Point.Move(newPosition);
-        Point = pt;
-        RefreshAnchorPoint();
     }
 }

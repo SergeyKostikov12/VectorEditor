@@ -10,7 +10,7 @@ namespace GraphicEditor
     [Serializable]
     public class FiguresList
     {
-        [XmlArray("Figures"), XmlArrayItem(ElementName = "Figure", Type = typeof(SLFigure))] 
-        public List<SLFigure> Figures { get; set; }
+        [XmlArray("Figures"), XmlArrayItem(ElementName = "Figure", Type = typeof(SLFigure))]
+        public List<SLFigure> Figures = new List<SLFigure>();
     }
 }

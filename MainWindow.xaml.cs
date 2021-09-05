@@ -22,7 +22,7 @@ namespace GraphicEditor
         public WidthPicker WidthPicker = new WidthPicker();
 
         private Point LMB_ClickPosition;
-        private Point currentMousePos;
+        //private Point currentMousePos;
 
 
 
@@ -37,7 +37,7 @@ namespace GraphicEditor
         private void InitializeProcessors()
         {
             WorkplaceProcess = new WorkplaceProcess(WorkPlace);
-            Process = new FigureProcess(WorkPlace, Condition);
+            Process = new FigureProcess(WorkPlace, Condition, WorkplaceProcess);
             Condition = new WorkplaceCondition();
             Shadow = new WorkplaceShadow(WorkPlace);
         }
@@ -50,25 +50,25 @@ namespace GraphicEditor
             if (buttonName == "LoadBtn")
             {
                 Condition.ButtonPressed = ButtonPressed.Load;
-                Process.DeselectFigure();
+                WorkplaceProcess.DeselectFigure();
                 WorkplaceProcess.LoadWorkplace();
             }
             else if (buttonName == "SaveBtn")
             {
                 Condition.ButtonPressed = ButtonPressed.Save;
-                Process.DeselectFigure();
+                WorkplaceProcess.DeselectFigure();
                 WorkplaceProcess.SaveWorkplace();
             }
             else if (buttonName == "RectBtn")
             {
                 Condition.ButtonPressed = ButtonPressed.Rect;
-                Process.DeselectFigure();
+                WorkplaceProcess.DeselectFigure();
                 SetCursor(CursorType.Crosshair);
             }
             else if (buttonName == "LineBtn")
             {
                 Condition.ButtonPressed = ButtonPressed.Line;
-                Process.DeselectFigure();
+                WorkplaceProcess.DeselectFigure();
                 SetCursor(CursorType.Crosshair);
             }
             else if (buttonName == "DeleteBtn")
@@ -105,6 +105,10 @@ namespace GraphicEditor
                 }
                 else MessageBox.Show("Сначала выделите объект!");
             }
+            else if(buttonName == "MoveBtn")
+            {
+                WorkplaceProcess.ClearCanvas();
+            }
 
         }
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)///////////////////////////LMB_DOWN
@@ -131,7 +135,7 @@ namespace GraphicEditor
             }
             else if (Condition.ButtonPressed == ButtonPressed.None)
             {
-                Condition.Action = Process.DetermindAction(LMB_ClickPosition);
+                Condition.Action = WorkplaceProcess.DetermindAction(LMB_ClickPosition);
             }
 
             if (e.ClickCount == 2)
@@ -143,6 +147,7 @@ namespace GraphicEditor
         {
             RMB_firstPoint = e.GetPosition(WorkPlace);
             SetCursor(CursorType.Arrow);
+            WorkplaceProcess.DeselectFigure();
             if (Condition.Action == Actions.DrawLine)
             {
                 Shadow.RemoveLastPoint();
@@ -168,23 +173,11 @@ namespace GraphicEditor
                     }
                     Shadow.DrawLastPointShadowtLine(currentMousePos);
                 }
-                else if (Condition.Action == Actions.MoveRect)
-                {
-                    Process.MoveRect(currentMousePos);
-                }
-                else if (Condition.Action == Actions.RotateRect)
-                {
-                    Process.RotateRect(currentMousePos);
-                }
-                else if (Condition.Action == Actions.ScaleRect)
-                {
-                    Process.ScaleRect(currentMousePos);
-                }
                 else if (Condition.Action == Actions.MovePoint)
                 {
-                    Process.MovePoint(currentMousePos);
+                    Process.Drag(currentMousePos);
                 }
-                //Process.Drag(currentMousePos);
+
             }
 
             if (Condition.Action == Actions.DrawLine)
@@ -230,15 +223,20 @@ namespace GraphicEditor
                         Process.CreateLine(LMB_ClickPosition, endPoint);
                         Shadow.Clear();
                     }
-                        Condition.ResetMouseState();
+                    Condition.ResetMouseState();
                 }
                 else
                 {
                     Shadow.AddPoint(endPoint);
                 }
             }
+            else if (Condition.Action == Actions.MovePoint)
+            {
+                Process.ExecuteRelize(endPoint);
+            }
+
         }
-        private void WorkPlace_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private void WorkPlace_MouseRightButtonUp(object sender, MouseButtonEventArgs e) ///////////////RMB_UP
         {
 
         }

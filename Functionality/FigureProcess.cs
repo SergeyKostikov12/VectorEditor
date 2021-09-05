@@ -14,131 +14,110 @@ namespace GraphicEditor
     public class FigureProcess
     {
         private Canvas workPlace;
-        
-        private FigureObj selectedFigure;
+        private WorkplaceProcess workplaceProcess;
+
+        public FigureObj selectedFigure;
         private Point lMB_ClickPosition;
         private Point rMB_ClickPosition;
 
-        public FigureObj SelectedFigure { get => selectedFigure; set => selectedFigure = value; }
+        public FigureObj SelectedFigure
+        {
+            get
+            {
+                return selectedFigure = workplaceProcess.SelectedFigure;
+            }
+        }
         public Point LMB_ClickPosition { get => lMB_ClickPosition; set => lMB_ClickPosition = value; }
         public Point RMB_ClickPosition { get => rMB_ClickPosition; set => rMB_ClickPosition = value; }
 
-        public FigureProcess(Canvas _workPlace, WorkplaceCondition condition)
+        public FigureProcess(Canvas _workPlace, WorkplaceCondition _condition, WorkplaceProcess _workplaceProcess)
         {
             workPlace = _workPlace;
+            workplaceProcess = _workplaceProcess;
         }
 
 
 
 
-        internal void DeselectFigure()
-        {
-            SelectedFigure = null;
-        }
+
 
         internal void ExecuteDoubleClick(Point point)
         {
-            throw new NotImplementedException();
+            if (SelectedFigure != null)
+            {
+                SelectedFigure.ExecuteDoubleClick(point);
+            }
         }
-
-        internal void Drag(Point point)
-        {
-            //throw new NotImplementedException();
-        }
-
 
         internal void DeleteFigure() // TODO: Сделать удаление из Workplace
         {
-            if (selectedFigure != null) selectedFigure.DeletePolyline();
-            DeselectFigure();
+            if (SelectedFigure != null)
+            {
+                selectedFigure.DeleteFigureFromWorkplace(workPlace);
+                workplaceProcess.AllFigures.Remove(SelectedFigure);
+                workplaceProcess.DeselectFigure();
+            }
+            else MessageBox.Show("Сначала выделите объект!");
+        }
+
+        public void Drag(Point position)
+        {
+            if (SelectedFigure != null)
+            {
+                SelectedFigure.MoveMarker(position);
+            }
         }
 
         internal void MoveRect(Point currentMousePos) // TODO: Перемещение от "Точки перемещения"
         {
-
-
-            //if (isMoving)
-            //{
-            //    if (selectedFigure != null)
-            //    {
-            //        tempPosition = selectedFigure.MoveFigure(tempPosition, currentMousePos);
-            //    }
-            //}
         }
 
         internal void RotateRect(Point currentMousePos) // TODO: Вращение от "Точки вращения"
         {
-
-
-            //if (isRotating)
-            //{
-            //    if (selectedFigure != null)
-            //    {
-            //        tempPosition = selectedFigure.RotateFigure(tempPosition, currentMousePos);
-            //    }
-            //}
         }
 
         internal void ScaleRect(Point currentMousePos) // TODO: Увеличение от "Точки увеличения"
         {
-            //if (isScaling)
-            //{
-            //    if (selectedFigure != null)
-            //    {
-            //        tempPosition = selectedFigure.ScaleFigure(tempPosition, currentMousePos);
-            //    }
-            //}
+        }
+        internal void MovePoint(Point currentMousePos)
+        {
         }
 
         internal void CreateRect(Point endPoint)
         {
             FigureObj figure = new RectangleObj(LMB_ClickPosition, endPoint);
             figure.PlacingInWorkPlace(workPlace);
+            workplaceProcess.AllFigures.Add(figure);
         }
 
-        internal void CreateLine(Point firstPoint,Point endPoint)
+        internal void CreateLine(Point firstPoint, Point endPoint)
         {
             FigureObj figure = new LineObj(firstPoint, endPoint);
             figure.PlacingInWorkPlace(workPlace);
+            workplaceProcess.AllFigures.Add(figure);
+        }
+        internal void CreatePolyline(Polyline shadowLine)
+        {
+            shadowLine.Points.RemoveAt(0);
+            FigureObj figure = new LineObj(shadowLine);
+            figure.PlacingInWorkPlace(workPlace);
+            workplaceProcess.AllFigures.Add(figure);
         }
 
-        internal void MovePoint(Point currentMousePos)
-        {
-            //if (isLineSelect)
-            //{
-            //    if (pointNumber != 0)
-            //    {
-            //        tempPosition = selectedFigure.MovePointToNewPosition(pointNumber, tempPosition, currentMousePos);
-            //    }
-            //}
-        }
 
-        internal Actions DetermindAction(Point clickPosition)
-        {
-            throw new NotImplementedException();
-        }
+
 
         internal void AddPoint(Point clickPosition)
         {
             throw new NotImplementedException();
         }
-        private string FindCollinearPoint()
-        {
-            //for (int i = 0; i < allFigures.Count; i++)
-            //{
-            //    FigureObject figure = allFigures[i];
-            //    if (figure.AreCollinear(LMB_ClickPosition))
-            //    {
-            //        return figure.Name;
-            //    }
-            //}
-            return null;
-        }
 
-        internal void CreatePolyline(Polyline shadowLine)
+        internal void ExecuteRelize(Point endPoint)
         {
-            FigureObj figure = new LineObj(shadowLine);
-            figure.PlacingInWorkPlace(workPlace);
+            if (selectedFigure != null)
+            {
+                selectedFigure.ExecuteRelize(endPoint);
+            }
         }
     }
 }

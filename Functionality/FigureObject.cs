@@ -55,24 +55,24 @@ namespace GraphicEditor.Functionality
 
         public FigureObject(SLFigure sLFigure, Canvas _workPlace)
         {
-            canvas = _workPlace;
-            polyline = ParseFromArray(sLFigure.Polyline);
-            Name = sLFigure.Name;
-            CenterPoint = ParsePoint(sLFigure.CenterPoint);
-            RotatePoint = ParsePoint(sLFigure.RotatePoint);
-            ShapeType = (FigureType)sLFigure.ShapeTypeNumber;
-            Size = ParseSize(sLFigure.Size);
-            StrokeWidth = Convert.ToDouble(sLFigure.LineStrokeThinkness);
-            polyline.Visibility = Visibility.Visible;
-            AnchorPoint = ParsePoint(sLFigure.PivotPoint);
-            DefineOutline();
-            DefineGizmoPoints();
-            Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(sLFigure.FillColor));
-            LineColor = new SolidColorBrush
-            {
-                Color = (Color)ColorConverter.ConvertFromString(sLFigure.LineColor)
-            };
-            canvas.Children.Add(polyline);
+            //canvas = _workPlace;
+            //polyline = ParseFromArray(sLFigure.Polyline);
+            //Name = sLFigure.Name;
+            //CenterPoint = ParsePoint(sLFigure.Scale);
+            //RotatePoint = ParsePoint(sLFigure.RotatePoint);
+            //ShapeType = (FigureType)sLFigure.FigureTypeNumber;////////////////
+            //Size = ParseSize(sLFigure.Size);
+            //StrokeWidth = Convert.ToDouble(sLFigure.LineStrokeThinkness);
+            //polyline.Visibility = Visibility.Visible;
+            //AnchorPoint = ParsePoint(sLFigure.MovePoint);
+            //DefineOutline();
+            //DefineGizmoPoints();
+            //Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(sLFigure.FillColor));
+            //LineColor = new SolidColorBrush
+            //{
+            //    Color = (Color)ColorConverter.ConvertFromString(sLFigure.LineColor)
+            //};
+            //canvas.Children.Add(polyline);
         }
         public FigureObject(string _name, FigureType _shapeType, Point _firstPoint, Point _secondPoint, Canvas _workPlace)
         {
@@ -306,19 +306,8 @@ namespace GraphicEditor.Functionality
         {
             return Size.Parse(deserealizedString.Replace(',', '.').Replace(';', ','));
         }
-        private static Point ParsePoint(string deserealizedString)
-        {
-            return Point.Parse(deserealizedString.Replace(',', '.').Replace(';', ','));
-        }
-        private Polyline ParseFromArray(string[] polyline)
-        {
-            Polyline tmpLine = new Polyline();
-            for (int i = 0; i < polyline.Length; i++)
-            {
-                tmpLine.Points.Add(ParsePoint(polyline[i]));
-            }
-            return tmpLine;
-        }
+
+
         private int NumberByName(string name)
         {
             for (int i = 0; i < canvas.Children.Count; i++)

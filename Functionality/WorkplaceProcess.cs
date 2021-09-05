@@ -13,8 +13,9 @@ namespace GraphicEditor.Functionality
 {
     public class WorkplaceProcess
     {
-        public List<FigureObj> allFigures = new List<FigureObj>();
-        public FiguresList FiguresList;
+        public List<FigureObj> AllFigures = new List<FigureObj>();
+        public FiguresList FiguresList = new FiguresList();
+        public FigureObj SelectedFigure;
 
         private Canvas workplace;
         private Point scrollPoint = new Point(0, 0);
@@ -26,6 +27,8 @@ namespace GraphicEditor.Functionality
 
         internal void LoadWorkplace()
         {
+            ClearCanvas();
+            FiguresList.Figures.Clear();
             Stream myStream = null;
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
@@ -45,7 +48,6 @@ namespace GraphicEditor.Functionality
                             FiguresList = sL;
                         }
                     }
-                    ClearCanvas();
                     CreateFiguresFromList();
                 }
                 catch (Exception ex)
@@ -58,9 +60,9 @@ namespace GraphicEditor.Functionality
         internal void SaveWorkplace()
         {
             SaveFileDialog dlg = new SaveFileDialog();
-            dlg.FileName = ""; // Default file name
-            dlg.DefaultExt = ".vec"; // Default file extension
-            dlg.Filter = "Vector documents (.vec)|*.vec"; // Filter files by extension
+            dlg.FileName = "";
+            dlg.DefaultExt = ".vec";
+            dlg.Filter = "Vector documents (.vec)|*.vec";
             Nullable<bool> result = dlg.ShowDialog();
             if (result == true)
             {
@@ -69,7 +71,7 @@ namespace GraphicEditor.Functionality
                     File.Delete(dlg.FileName);
                 }
                 string filename = dlg.FileName;
-                CreateSaveList(allFigures);
+                CreateSaveList(AllFigures);
                 XmlSerializer formatter = new XmlSerializer(FiguresList.GetType());
                 using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
                 {
@@ -78,26 +80,36 @@ namespace GraphicEditor.Functionality
                 MessageBox.Show("Файл успешно сохранен!");
             }
         }
-        internal void MovingWorkPlace(ScrollViewer Scroll,Point rMB_firstPoint, Point currentMousePos)
+        internal void MovingWorkPlace(ScrollViewer Scroll, Point rMB_firstPoint, Point currentMousePos)
         {
-                scrollPoint.X = Scroll.HorizontalOffset - rMB_firstPoint.DeltaTo(currentMousePos).X / 2;
-                scrollPoint.Y = Scroll.VerticalOffset - rMB_firstPoint.DeltaTo(currentMousePos).Y / 2;
-                Scroll.ScrollToHorizontalOffset(scrollPoint.X);
-                Scroll.ScrollToVerticalOffset(scrollPoint.Y);
+            scrollPoint.X = Scroll.HorizontalOffset - rMB_firstPoint.DeltaTo(currentMousePos).X / 2;
+            scrollPoint.Y = Scroll.VerticalOffset - rMB_firstPoint.DeltaTo(currentMousePos).Y / 2;
+            Scroll.ScrollToHorizontalOffset(scrollPoint.X);
+            Scroll.ScrollToVerticalOffset(scrollPoint.Y);
         }
 
         private void CreateFiguresFromList()
         {
             for (int i = 0; i < FiguresList.Figures.Count; i++)
             {
-                //FigureObj figureObject = new FigureObj(FiguresList.Figures[i], workplace);
-                //allFigures.Add(figureObject);
+                if ((FigureType)FiguresList.Figures[i].FigureTypeNumber == FigureType.Rectangle)
+                {
+                    FigureObj figure = new RectangleObj(FiguresList.Figures[i]);
+                    AllFigures.Add(figure);
+                    figure.PlacingInWorkPlace(workplace);
+                }
+                else if ((FigureType)FiguresList.Figures[i].FigureTypeNumber == FigureType.Line)
+                {
+                    FigureObj figure = new LineObj(FiguresList.Figures[i]);
+                    AllFigures.Add(figure);
+                    figure.PlacingInWorkPlace(workplace);
+                }
             }
         }
-        private void ClearCanvas()
+        public void ClearCanvas()
         {
             workplace.Children.Clear();
-            //InitializeShadows();
+            AllFigures.Clear();
         }
         private void CreateSaveList(List<FigureObj> list)
         {
@@ -106,10 +118,52 @@ namespace GraphicEditor.Functionality
             for (int i = 0; i < list.Count; i++)
             {
                 SLFigure sLFigure = new SLFigure();
-                sLFigure = sLFigure.CreateSLFigureFromFigureObject(allFigures[i]);
+                sLFigure = sLFigure.CreateSLFigureFromFigureObject(AllFigures[i]);
                 tmp.Add(sLFigure);
             }
             FiguresList.Figures = tmp;
+        }
+        internal Actions DetermindAction(Point clickPosition)
+        {
+            if (SelectedFigure == null)
+            {
+                foreach (var figure in AllFigures)
+                {
+                    if (figure.SelectMarker(clickPosition) == true)
+                    {
+                        SetSelectedFigure(figure);
+                        figure.ShowOutline();
+                        return Actions.Ready;
+                    }
+                    else if (figure.SelectLine(clickPosition) == true)
+                    {
+                        SetSelectedFigure(figure);
+                        figure.ShowOutline();
+                        return Actions.Ready;
+                    }
+                    else figure.HideOutline();
+                }
+            }
+            else
+            {
+                SelectedFigure.SelectMarker(clickPosition);
+                return Actions.MovePoint;
+            }
+
+            return Actions.None;
+        }
+        internal void DeselectFigure()
+        {
+            if (SelectedFigure != null)
+            {
+                SelectedFigure.HideOutline();
+                SelectedFigure.DeselectFigure();
+                SelectedFigure = null;
+            }
+        }
+        private void SetSelectedFigure(FigureObj figure)
+        {
+            SelectedFigure = figure;
         }
     }
 }
