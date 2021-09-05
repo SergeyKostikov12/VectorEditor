@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Serialization;
@@ -24,10 +21,14 @@ namespace GraphicEditor.Functionality
         {
             workplace = _worklace;
         }
+        public void ClearCanvas()
+        {
+            workplace.Children.Clear();
+            AllFigures.Clear();
+        }
 
         internal void LoadWorkplace()
         {
-            ClearCanvas();
             FiguresList.Figures.Clear();
             Stream myStream = null;
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -87,41 +88,14 @@ namespace GraphicEditor.Functionality
             Scroll.ScrollToHorizontalOffset(scrollPoint.X);
             Scroll.ScrollToVerticalOffset(scrollPoint.Y);
         }
-
-        private void CreateFiguresFromList()
+        internal void DeselectFigure()
         {
-            for (int i = 0; i < FiguresList.Figures.Count; i++)
+            if (SelectedFigure != null)
             {
-                if ((FigureType)FiguresList.Figures[i].FigureTypeNumber == FigureType.Rectangle)
-                {
-                    FigureObj figure = new RectangleObj(FiguresList.Figures[i]);
-                    AllFigures.Add(figure);
-                    figure.PlacingInWorkPlace(workplace);
-                }
-                else if ((FigureType)FiguresList.Figures[i].FigureTypeNumber == FigureType.Line)
-                {
-                    FigureObj figure = new LineObj(FiguresList.Figures[i]);
-                    AllFigures.Add(figure);
-                    figure.PlacingInWorkPlace(workplace);
-                }
+                SelectedFigure.HideOutline();
+                SelectedFigure.DeselectFigure();
+                SelectedFigure = null;
             }
-        }
-        public void ClearCanvas()
-        {
-            workplace.Children.Clear();
-            AllFigures.Clear();
-        }
-        private void CreateSaveList(List<FigureObj> list)
-        {
-            FiguresList = new FiguresList();
-            List<SLFigure> tmp = new List<SLFigure>();
-            for (int i = 0; i < list.Count; i++)
-            {
-                SLFigure sLFigure = new SLFigure();
-                sLFigure = sLFigure.CreateSLFigureFromFigureObject(AllFigures[i]);
-                tmp.Add(sLFigure);
-            }
-            FiguresList.Figures = tmp;
         }
         internal Actions DetermindAction(Point clickPosition)
         {
@@ -152,14 +126,36 @@ namespace GraphicEditor.Functionality
 
             return Actions.None;
         }
-        internal void DeselectFigure()
+
+        private void CreateFiguresFromList()
         {
-            if (SelectedFigure != null)
+            for (int i = 0; i < FiguresList.Figures.Count; i++)
             {
-                SelectedFigure.HideOutline();
-                SelectedFigure.DeselectFigure();
-                SelectedFigure = null;
+                if ((FigureType)FiguresList.Figures[i].FigureTypeNumber == FigureType.Rectangle)
+                {
+                    FigureObj figure = new RectangleObj(FiguresList.Figures[i]);
+                    AllFigures.Add(figure);
+                    figure.PlacingInWorkPlace(workplace);
+                }
+                else if ((FigureType)FiguresList.Figures[i].FigureTypeNumber == FigureType.Line)
+                {
+                    FigureObj figure = new LineObj(FiguresList.Figures[i]);
+                    AllFigures.Add(figure);
+                    figure.PlacingInWorkPlace(workplace);
+                }
             }
+        }
+        private void CreateSaveList(List<FigureObj> list)
+        {
+            FiguresList = new FiguresList();
+            List<SLFigure> tmp = new List<SLFigure>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                SLFigure sLFigure = new SLFigure();
+                sLFigure = sLFigure.CreateSLFigureFromFigureObject(AllFigures[i]);
+                tmp.Add(sLFigure);
+            }
+            FiguresList.Figures = tmp;
         }
         private void SetSelectedFigure(FigureObj figure)
         {

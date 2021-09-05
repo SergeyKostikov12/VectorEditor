@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -32,7 +28,7 @@ namespace GraphicEditor.Functionality
             MovePoint = new MarkerPoint(new Point(AnchorPoint.X + w, AnchorPoint.Y + h));
             DefineMarkers();
             Rectangle.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-            
+
         }
         public RectangleObj(SLFigure sLFigure)
         {
@@ -43,11 +39,9 @@ namespace GraphicEditor.Functionality
             {
                 Color = (Color)ColorConverter.ConvertFromString(sLFigure.LineColor)
             };
-            //AnchorPoint = sLFigure.AnchorPoint.ParsePoint();
             MovePoint = new MarkerPoint(sLFigure.MovePoint.ParsePoint());
             DefineMarkers();
         }
-
 
         public override void MoveMarker(Point position)
         {
@@ -64,68 +58,6 @@ namespace GraphicEditor.Functionality
                 ScaleRectangle(position);
             }
         }
-        private void ScaleRectangle(Point position)
-        {
-            int stroke = StrokeWidth;
-            ScaleTransform scale = new ScaleTransform();
-            scale.CenterX = MovePoint.Point.X;
-            scale.CenterY = MovePoint.Point.Y;
-            double delta = position.X - ScalePoint.X;
-            scale.ScaleX = 1 + delta / 100;
-            scale.ScaleY = 1 + delta/ 100;
-            ScalePoint.Move(position);
-
-            for (int i = 0; i < Rectangle.Points.Count; i++)
-            {
-                Rectangle.Points[i] = scale.Transform(Rectangle.Points[i]);
-            }
-        }
-        private void RotateRectangle(Point position)
-        {
-            //RotateTransform rotate = new RotateTransform();
-            RotateTransform rotate = new RotateTransform();
-
-            rotate.CenterX = MovePoint.X;
-            rotate.CenterY = MovePoint.Y;
-            Vector CA = new Vector(MovePoint.X - RotatePoint.X, MovePoint.Y - RotatePoint.Y);
-            Vector CB = new Vector(MovePoint.X - position.X, MovePoint.Y - position.Y);
-            double angle = Vector.AngleBetween(CA, CB) * Math.PI / 180;
-            rotate.Angle = angle;
-            Point tmpRP = rotate.Transform(RotatePoint.Point);
-            Point tmpSP = rotate.Transform(ScalePoint.Point);
-
-            for (int i = 0; i < Rectangle.Points.Count; i++)
-            {
-                Rectangle.Points[i] = rotate.Transform(Rectangle.Points[i]);
-            }
-
-
-            //A_corner = rotate.Transform(A_corner);
-            //B_corner = rotate.Transform(B_corner);
-            //C_corner = rotate.Transform(C_corner);
-            //D_corner = rotate.Transform(D_corner);
-            //rectangleRotate += angle;
-
-            //RectangleO.RenderTransform = transform;//new RotateTransform(rectangleRotate, RectangleO.Width / 2, RectangleO.Height / 2);
-            //outlineRectangle.RenderTransform = transform; //new RotateTransform(rectangleRotate, outlineRectangle.Width / 2, outlineRectangle.Height / 2);
-            //RectangleO.UpdateLayout();
-            RotatePoint.Move(tmpRP);
-            ScalePoint.Move(tmpSP);
-        }
-        private void MoveRectangle(Point position)
-        {
-            Point delta = MovePoint.Point.DeltaTo(position);
-            MovePoint.Move(position);
-            AnchorPoint = new Point(AnchorPoint.X + delta.X, AnchorPoint.Y + delta.Y);
-            RotatePoint.Move(new Point(RotatePoint.X + delta.X, RotatePoint.Y + delta.Y));
-            ScalePoint.Move(new Point(ScalePoint.X + delta.X, ScalePoint.Y + delta.Y));
-            for(int i = 0; i<Rectangle.Points.Count; i++)
-            {
-                Rectangle.Points[i] = new Point(Rectangle.Points[i].X + delta.X, Rectangle.Points[i].Y + delta.Y);
-            }
-        }
-
-
         public override void ShowOutline()
         {
             MovePoint.Show();
@@ -190,7 +122,28 @@ namespace GraphicEditor.Functionality
             HideOutline();
             SelectedMarker = null;
         }
+        public override void DeleteFigureFromWorkplace(Canvas canvas)
+        {
+            canvas.Children.Remove(Rectangle);
+            canvas.Children.Remove(MovePoint.Marker);
+            canvas.Children.Remove(RotatePoint.Marker);
+            canvas.Children.Remove(ScalePoint.Marker);
+        }
+        public override void ExecuteRelize(Point position)
+        {
+            RotatePoint.Move(new Point(MovePoint.X, MovePoint.Y - 50));
+            ScalePoint.Move(new Point(MovePoint.X + 100, MovePoint.Y));
+        }
 
+        protected override SolidColorBrush GetLineColor()
+        {
+            SolidColorBrush brush = (SolidColorBrush)Rectangle.Stroke;
+            return brush;
+        }
+        protected override void SetLineColor(SolidColorBrush colorBrush)
+        {
+            Rectangle.Stroke = colorBrush;
+        }
         protected override int GetStrokeWidth()
         {
             return (int)Rectangle.StrokeThickness;
@@ -207,15 +160,55 @@ namespace GraphicEditor.Functionality
         {
             Rectangle.Fill = brush;
         }
-        public override void DeleteFigureFromWorkplace(Canvas canvas)
-        {
-            canvas.Children.Remove(Rectangle);
-            canvas.Children.Remove(MovePoint.Marker);
-            canvas.Children.Remove(RotatePoint.Marker);
-            canvas.Children.Remove(ScalePoint.Marker);
-        }
 
-        private void DefineAnchorPoints(Point firstPoint, Point secondPoint) 
+        private void MoveRectangle(Point position)
+        {
+            Point delta = MovePoint.Point.DeltaTo(position);
+            MovePoint.Move(position);
+            AnchorPoint = new Point(AnchorPoint.X + delta.X, AnchorPoint.Y + delta.Y);
+            RotatePoint.Move(new Point(RotatePoint.X + delta.X, RotatePoint.Y + delta.Y));
+            ScalePoint.Move(new Point(ScalePoint.X + delta.X, ScalePoint.Y + delta.Y));
+            for (int i = 0; i < Rectangle.Points.Count; i++)
+            {
+                Rectangle.Points[i] = new Point(Rectangle.Points[i].X + delta.X, Rectangle.Points[i].Y + delta.Y);
+            }
+        }
+        private void RotateRectangle(Point position)
+        {
+            RotateTransform rotate = new RotateTransform();
+            rotate.CenterX = MovePoint.X;
+            rotate.CenterY = MovePoint.Y;
+            Vector CA = new Vector(MovePoint.X - RotatePoint.X, MovePoint.Y - RotatePoint.Y);
+            Vector CB = new Vector(MovePoint.X - position.X, MovePoint.Y - position.Y);
+            double angle = Vector.AngleBetween(CA, CB) * Math.PI / 180;
+            rotate.Angle = angle;
+            Point tmpRP = rotate.Transform(RotatePoint.Point);
+            Point tmpSP = rotate.Transform(ScalePoint.Point);
+
+            for (int i = 0; i < Rectangle.Points.Count; i++)
+            {
+                Rectangle.Points[i] = rotate.Transform(Rectangle.Points[i]);
+            }
+            RotatePoint.Move(tmpRP);
+            ScalePoint.Move(tmpSP);
+        }
+        private void ScaleRectangle(Point position)
+        {
+            int stroke = StrokeWidth;
+            ScaleTransform scale = new ScaleTransform();
+            scale.CenterX = MovePoint.Point.X;
+            scale.CenterY = MovePoint.Point.Y;
+            double delta = position.X - ScalePoint.X;
+            scale.ScaleX = 1 + delta / 100;
+            scale.ScaleY = 1 + delta / 100;
+            ScalePoint.Move(position);
+
+            for (int i = 0; i < Rectangle.Points.Count; i++)
+            {
+                Rectangle.Points[i] = scale.Transform(Rectangle.Points[i]);
+            }
+        }
+        private void DefineAnchorPoints(Point firstPoint, Point secondPoint)
         {
             double xMin = Math.Min(firstPoint.X, secondPoint.X);
             double yMin = Math.Min(firstPoint.Y, secondPoint.Y);
@@ -234,7 +227,6 @@ namespace GraphicEditor.Functionality
             FigureType = FigureType.Rectangle;
             double xTop = Math.Max(firstPoint.X, secondPoint.X);
             double yTop = Math.Max(firstPoint.Y, secondPoint.Y);
-
             double xMin = Math.Min(firstPoint.X, secondPoint.X);
             double yMin = Math.Min(firstPoint.Y, secondPoint.Y);
 
@@ -255,19 +247,6 @@ namespace GraphicEditor.Functionality
             Rectangle.StrokeEndLineCap = PenLineCap.Square;
             StrokeWidth = 1;
         }
-        protected override SolidColorBrush GetLineColor()
-        {
-            SolidColorBrush brush = (SolidColorBrush)Rectangle.Stroke;
-            return brush;
-        }
-        protected override void SetLineColor(SolidColorBrush colorBrush)
-        {
-            Rectangle.Stroke = colorBrush;
-        }
-        public override void ExecuteRelize(Point position)
-        {
-            RotatePoint.Move(new Point(MovePoint.X, MovePoint.Y - 50));
-            ScalePoint.Move(new Point(MovePoint.X + 100, MovePoint.Y));
-        }
+
     }
 }

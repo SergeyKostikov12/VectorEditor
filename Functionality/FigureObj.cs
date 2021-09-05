@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality
 {
@@ -24,10 +18,11 @@ namespace GraphicEditor.Functionality
         public abstract void PlacingInWorkPlace(Canvas canvas);
         public abstract void MoveMarker(Point position);
         public abstract void ExecuteRelize(Point position);
-        public virtual void ExecuteDoubleClick(Point position)
-        {
-        }
-        
+        public abstract void DeleteFigureFromWorkplace(Canvas canvas);
+        public abstract bool SelectMarker(Point poin);
+        public abstract bool SelectLine(Point point);
+        public abstract void DeselectFigure();
+        public virtual void ExecuteDoubleClick(Point position) {}
 
         protected abstract int GetStrokeWidth();
         protected abstract void SetStrokeWidth(int value);
@@ -36,11 +31,7 @@ namespace GraphicEditor.Functionality
         protected abstract SolidColorBrush GetLineColor();
         protected abstract void SetLineColor(SolidColorBrush colorBrush);
 
-        public abstract void DeleteFigureFromWorkplace(Canvas canvas);
 
-        public abstract bool SelectMarker(Point poin);
-        public abstract bool SelectLine(Point point);
 
-        public abstract void DeselectFigure();
     }
 }

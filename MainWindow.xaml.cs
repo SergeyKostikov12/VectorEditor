@@ -1,14 +1,7 @@
 ﻿using GraphicEditor.Functionality;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Xml.Serialization;
-using System.Windows.Shapes;
 
 namespace GraphicEditor
 {
@@ -22,24 +15,12 @@ namespace GraphicEditor
         public WidthPicker WidthPicker = new WidthPicker();
 
         private Point LMB_ClickPosition;
-        //private Point currentMousePos;
-
-
-
         private Point RMB_firstPoint;
 
         public MainWindow()
         {
             InitializeComponent();
             InitializeProcessors();
-        }
-
-        private void InitializeProcessors()
-        {
-            WorkplaceProcess = new WorkplaceProcess(WorkPlace);
-            Process = new FigureProcess(WorkPlace, Condition, WorkplaceProcess);
-            Condition = new WorkplaceCondition();
-            Shadow = new WorkplaceShadow(WorkPlace);
         }
 
         private void ButtonPress(object sender, RoutedEventArgs e)
@@ -50,8 +31,11 @@ namespace GraphicEditor
             if (buttonName == "LoadBtn")
             {
                 Condition.ButtonPressed = ButtonPressed.Load;
+                WorkplaceProcess.ClearCanvas();
                 WorkplaceProcess.DeselectFigure();
                 WorkplaceProcess.LoadWorkplace();
+                WorkplaceShadow workplaceShadow = new WorkplaceShadow(WorkPlace);
+                Shadow = workplaceShadow;
             }
             else if (buttonName == "SaveBtn")
             {
@@ -105,13 +89,13 @@ namespace GraphicEditor
                 }
                 else MessageBox.Show("Сначала выделите объект!");
             }
-            else if(buttonName == "MoveBtn")
+            else if (buttonName == "MoveBtn")
             {
                 WorkplaceProcess.ClearCanvas();
             }
 
         }
-        private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)///////////////////////////LMB_DOWN
+        private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             LMB_ClickPosition = e.GetPosition(WorkPlace);
             Process.LMB_ClickPosition = LMB_ClickPosition;
@@ -143,7 +127,7 @@ namespace GraphicEditor
                 Process.ExecuteDoubleClick(LMB_ClickPosition);
             }
         }
-        private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)/////////////////////////RMB_DOWN
+        private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             RMB_firstPoint = e.GetPosition(WorkPlace);
             SetCursor(CursorType.Arrow);
@@ -156,7 +140,7 @@ namespace GraphicEditor
             }
             Condition.ResetCondition();
         }
-        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)//////////////////////////////////////MOVE
+        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
         {
             Point currentMousePos = e.GetPosition(WorkPlace);
             if (Mouse.LeftButton == MouseButtonState.Pressed)
@@ -177,7 +161,6 @@ namespace GraphicEditor
                 {
                     Process.Drag(currentMousePos);
                 }
-
             }
 
             if (Condition.Action == Actions.DrawLine)
@@ -185,24 +168,12 @@ namespace GraphicEditor
                 Shadow.DrawLastPointShadowtLine(currentMousePos);
             }
 
-
             if (Mouse.RightButton == MouseButtonState.Pressed)
             {
                 WorkplaceProcess.MovingWorkPlace(Scroll, RMB_firstPoint, currentMousePos);
             }
         }
-
-        private bool AlllowDistance(Point currentMousePos)
-        {
-            Point delta = LMB_ClickPosition.AbsDeltaTo(currentMousePos);
-            if (delta.X > 5 || delta.Y > 5)
-            {
-                return true;
-            }
-            else return false;
-        }
-
-        private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)///////////////LMB_UP
+        private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Point endPoint = e.GetPosition(WorkPlace);
             Condition.MouseUp = true;
@@ -236,11 +207,23 @@ namespace GraphicEditor
             }
 
         }
-        private void WorkPlace_MouseRightButtonUp(object sender, MouseButtonEventArgs e) ///////////////RMB_UP
+
+        private void InitializeProcessors()
         {
-
+            WorkplaceProcess = new WorkplaceProcess(WorkPlace);
+            Process = new FigureProcess(WorkPlace, Condition, WorkplaceProcess);
+            Condition = new WorkplaceCondition();
+            Shadow = new WorkplaceShadow(WorkPlace);
         }
-
+        private bool AlllowDistance(Point currentMousePos)
+        {
+            Point delta = LMB_ClickPosition.AbsDeltaTo(currentMousePos);
+            if (delta.X > 5 || delta.Y > 5)
+            {
+                return true;
+            }
+            else return false;
+        }
         private void SetCursor(CursorType cursorType)
         {
             switch (cursorType)

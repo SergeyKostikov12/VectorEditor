@@ -1,8 +1,6 @@
 ﻿using GraphicEditor.Functionality;
 using System;
 using System.Collections.Generic;
-using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml.Serialization;
 
@@ -25,7 +23,7 @@ public class SLFigure
     }
     public SLFigure CreateSLFigureFromFigureObject(FigureObj figureObject)
     {
-        if(figureObject.FigureType == FigureType.Rectangle)
+        if (figureObject.FigureType == FigureType.Rectangle)
         {
             CreateRectangle(figureObject);
         }
@@ -42,7 +40,6 @@ public class SLFigure
         FigureTypeNumber = ((int)line.FigureType);
         LineStrokeThinkness = line.StrokeWidth.ToString();
         LineColor = line.LineColor.Color.ToString();
-        //FillColor = line.Fill.Color.ToString();
         Polyline = CreatePolilineString(line.Polyline);
         Markers = CreateMarkersString(line.Markers);
     }
