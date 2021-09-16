@@ -38,10 +38,10 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button x:Name="LoadBtn" Grid.Column="0"  Grid.Row=" 0" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress" >
+                    <Button x:Name="LoadBtn" Grid.Column="0"  Grid.Row=" 0" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="LoadButtonPress" >
                         <Image Source="Icons/load.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button x:Name="SaveBtn" Grid.Column="0" Grid.Row=" 1" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
+                    <Button x:Name="SaveBtn" Grid.Column="0" Grid.Row=" 1" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SaveButtonPress">
                         <Image Source="Icons/save.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Загрузить</Label>
@@ -56,10 +56,10 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button x:Name="RectBtn" Grid.Column="0" Grid.Row=" 0" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
+                    <Button x:Name="RectBtn" Grid.Column="0" Grid.Row=" 0" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="RectangleButtonPress">
                         <Image Source="Icons/rectangle.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button x:Name="LineBtn" Grid.Column="0" Grid.Row=" 1" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
+                    <Button x:Name="LineBtn" Grid.Column="0" Grid.Row=" 1" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="LineButtonPress">
                         <Image Source="Icons/line.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Прямоугольник</Label>
@@ -73,7 +73,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button x:Name="DeleteBtn" Grid.Column="0" Grid.Row=" 0" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
+                    <Button x:Name="DeleteBtn" Grid.Column="0" Grid.Row=" 0" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="DeleteButtonPress">
                         <Image Source="Icons/delete.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Удалить</Label>
@@ -89,13 +89,13 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button x:Name="LineWidthBtn" Grid.Column="0" Grid.Row=" 0" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
+                    <Button x:Name="LineWidthBtn" Grid.Column="0" Grid.Row=" 0" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="StrokeWidthButtonPress">
                         <Image Source="Icons/width.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button x:Name="ColorBtn" Grid.Column="0" Grid.Row=" 1" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
+                    <Button x:Name="ColorBtn" Grid.Column="0" Grid.Row=" 1" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="LineColorButtonPress">
                         <Image Source="Icons/color.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button x:Name="FillBtn" Grid.Column="0" Grid.Row=" 2" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonPress">
+                    <Button x:Name="FillBtn" Grid.Column="0" Grid.Row=" 2" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="FillButtonPress">
                         <Image Source="Icons/fill.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Толщина линии</Label>

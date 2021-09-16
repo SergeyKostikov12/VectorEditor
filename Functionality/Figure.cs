@@ -1,10 +1,12 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality
 {
-    public abstract class FigureObj
+    public abstract class Figure
     {
         public FigureType FigureType { get; protected set; } 
         public Point AnchorPoint { get; set; }
@@ -15,14 +17,17 @@ namespace GraphicEditor.Functionality
 
         public abstract void ShowOutline();
         public abstract void HideOutline();
-        public abstract void PlacingInWorkPlace(Canvas canvas);
         public abstract void MoveMarker(Point position);
         public abstract void ExecuteRelize(Point position);
-        public abstract void DeleteFigureFromWorkplace(Canvas canvas);
         public abstract bool SelectMarker(Point poin);
         public abstract bool SelectLine(Point point);
         public abstract void DeselectFigure();
-        public virtual void ExecuteDoubleClick(Point position) {}
+        public abstract List<Rectangle> GetMarkers();
+        public abstract Polyline GetShape();
+        public virtual Rectangle ExecuteDoubleClick(Point position) 
+        {
+            return null; 
+        }
 
         protected abstract int GetStrokeWidth();
         protected abstract void SetStrokeWidth(int value);

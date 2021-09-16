@@ -7,7 +7,7 @@ namespace GraphicEditor
     public partial class WidthPicker : Page
     {
         private int width;
-        public FigureObj Figure;
+        public Figure Figure;
         TextBlock WidthText;
         public WidthPicker()
         {
@@ -32,8 +32,11 @@ namespace GraphicEditor
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Figure.StrokeWidth = width;
-            this.Visibility = Visibility.Hidden;
+            if (Figure != null)
+            {
+                Figure.StrokeWidth = width;
+                this.Visibility = Visibility.Hidden;
+            }
         }
     }
 }

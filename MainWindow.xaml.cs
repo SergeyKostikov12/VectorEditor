@@ -1,7 +1,7 @@
 ﻿using GraphicEditor.Functionality;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace GraphicEditor
 {
@@ -23,94 +23,74 @@ namespace GraphicEditor
             InitializeProcessors();
         }
 
-        private void ButtonPress(object sender, RoutedEventArgs e)
+        private void LoadButtonPress(object sender, RoutedEventArgs e)
         {
-            Button btn = (Button)sender;
-            string buttonName = btn.Name;
-
-            if (buttonName == "LoadBtn")
-            {
-                Condition.ButtonPressed = ButtonPressed.Load;
-                WorkplaceProcess.ClearCanvas();
-                WorkplaceProcess.DeselectFigure();
-                WorkplaceProcess.LoadWorkplace();
-                WorkplaceShadow workplaceShadow = new WorkplaceShadow(WorkPlace);
-                Shadow = workplaceShadow;
-            }
-            else if (buttonName == "SaveBtn")
-            {
-                Condition.ButtonPressed = ButtonPressed.Save;
-                WorkplaceProcess.DeselectFigure();
-                WorkplaceProcess.SaveWorkplace();
-            }
-            else if (buttonName == "RectBtn")
-            {
-                Condition.ButtonPressed = ButtonPressed.Rect;
-                WorkplaceProcess.DeselectFigure();
-                SetCursor(CursorType.Crosshair);
-            }
-            else if (buttonName == "LineBtn")
-            {
-                Condition.ButtonPressed = ButtonPressed.Line;
-                WorkplaceProcess.DeselectFigure();
-                SetCursor(CursorType.Crosshair);
-            }
-            else if (buttonName == "DeleteBtn")
-            {
-                Process.DeleteFigure();
-                SetCursor(CursorType.Arrow);
-            }
-            else if (buttonName == "LineWidthBtn")
-            {
-                if (Process.SelectedFigure != null)
-                {
-                    ColoRPicker.Visibility = Visibility.Hidden;
-                    PropertyPanel.Content = WidthPicker;
-                    SetWidth();
-                }
-            }
-            else if (buttonName == "ColorBtn")
-            {
-                if (Process.SelectedFigure != null)
-                {
-                    PropertyPanel.Content = ColoRPicker;
-                    WidthPicker.Visibility = Visibility.Hidden;
-                    ColoRPicker.BtnPressed = ButtonPressed.Color;
-                    SetStyle();
-                }
-            }
-            else if (buttonName == "FillBtn")
-            {
-                if (Process.SelectedFigure != null)
-                {
-                    PropertyPanel.Content = ColoRPicker;
-                    ColoRPicker.BtnPressed = ButtonPressed.Fill;
-                    SetStyle();
-                }
-                else MessageBox.Show("Сначала выделите объект!");
-            }
-            else if (buttonName == "MoveBtn")
-            {
-                WorkplaceProcess.ClearCanvas();
-            }
-
+            Condition.ButtonPressed = ButtonPressed.Load;
+            WorkplaceProcess.ClearCanvas();
+            WorkplaceProcess.DeselectFigure();
+            WorkplaceProcess.LoadWorkplace();
+            WorkplaceShadow workplaceShadow = new WorkplaceShadow(WorkPlace);
+            Shadow = workplaceShadow;
         }
+        private void SaveButtonPress(object sender, RoutedEventArgs e)
+        {
+            Condition.ButtonPressed = ButtonPressed.Save;
+            WorkplaceProcess.DeselectFigure();
+            WorkplaceProcess.SaveWorkplace();
+        }
+        private void RectangleButtonPress(object sender, RoutedEventArgs e)
+        {
+            Condition.ButtonPressed = ButtonPressed.Rect;
+            WorkplaceProcess.DeselectFigure();
+            SetCursor(CursorType.Crosshair);
+        }
+        private void LineButtonPress(object sender, RoutedEventArgs e)
+        {
+            Condition.ButtonPressed = ButtonPressed.Line;
+            WorkplaceProcess.DeselectFigure();
+            SetCursor(CursorType.Crosshair);
+        }
+        private void DeleteButtonPress(object sender, RoutedEventArgs e)
+        {
+            WorkplaceProcess.DeleteFigure();
+            SetCursor(CursorType.Arrow);
+        }
+        private void StrokeWidthButtonPress(object sender, RoutedEventArgs e)
+        {
+            ColoRPicker.Visibility = Visibility.Hidden;
+            PropertyPanel.Content = WidthPicker;
+            SetWidth();
+        }
+        private void LineColorButtonPress(object sender, RoutedEventArgs e)
+        {
+            PropertyPanel.Content = ColoRPicker;
+            WidthPicker.Visibility = Visibility.Hidden;
+            ColoRPicker.BtnPressed = ButtonPressed.Color;
+            SetStyle();
+        }
+        private void FillButtonPress(object sender, RoutedEventArgs e)
+        {
+            PropertyPanel.Content = ColoRPicker;
+            ColoRPicker.BtnPressed = ButtonPressed.Fill;
+            SetStyle();
+        }
+
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             LMB_ClickPosition = e.GetPosition(WorkPlace);
-            Process.LMB_ClickPosition = LMB_ClickPosition;
+            WorkplaceProcess.SetLMB_ClickPosition(LMB_ClickPosition);
             Condition.MouseDown = true;
 
             if (Condition.ButtonPressed == ButtonPressed.Rect)
             {
                 Condition.Action = Actions.DrawRect;
                 Shadow.StartDrawRectShadow(LMB_ClickPosition);
-                Process.LMB_ClickPosition = LMB_ClickPosition;
+                WorkplaceProcess.SetLMB_ClickPosition(LMB_ClickPosition);
             }
             else if (Condition.ButtonPressed == ButtonPressed.Line)
             {
                 Condition.Action = Actions.DrawLine;
-                if (Shadow.ShadowLine.Points.Count == 0)
+                if (Shadow.GetShadowLine().Points.Count == 0)
                 {
                     Shadow.DrawLineShadow();
                     Shadow.SetLIneFirstPoint(LMB_ClickPosition);
@@ -124,7 +104,8 @@ namespace GraphicEditor
 
             if (e.ClickCount == 2)
             {
-                Process.ExecuteDoubleClick(LMB_ClickPosition);
+                Rectangle rect = Process.ExecuteDoubleClick(LMB_ClickPosition);
+                WorkplaceProcess.AddToWorkplace(rect);
             }
         }
         private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -135,7 +116,7 @@ namespace GraphicEditor
             if (Condition.Action == Actions.DrawLine)
             {
                 Shadow.RemoveLastPoint();
-                Process.CreatePolyline(Shadow.ShadowLine);
+                WorkplaceProcess.CreatePolyline(Shadow.GetShadowLine());
                 Shadow.Clear();
             }
             Condition.ResetCondition();
@@ -181,17 +162,17 @@ namespace GraphicEditor
             if (Condition.Action == Actions.DrawRect)
             {
                 Condition.Action = Actions.None;
-                Process.CreateRect(endPoint);
+                WorkplaceProcess.CreateRect(endPoint);
                 Shadow.Clear();
             }
             else if (Condition.Action == Actions.DrawLine)
             {
                 if (Condition.IsDrawLine())
                 {
-                    if (Shadow.ShadowLine.Points.Count <= 2)
+                    if (Shadow.GetShadowLine().Points.Count <= 2)
                     {
                         Condition.Action = Actions.None;
-                        Process.CreateLine(LMB_ClickPosition, endPoint);
+                        WorkplaceProcess.CreateLine(LMB_ClickPosition, endPoint);
                         Shadow.Clear();
                     }
                     Condition.ResetMouseState();
@@ -211,7 +192,7 @@ namespace GraphicEditor
         private void InitializeProcessors()
         {
             WorkplaceProcess = new WorkplaceProcess(WorkPlace);
-            Process = new FigureProcess(WorkPlace, Condition, WorkplaceProcess);
+            Process = new FigureProcess(WorkplaceProcess);
             Condition = new WorkplaceCondition();
             Shadow = new WorkplaceShadow(WorkPlace);
         }
@@ -244,13 +225,14 @@ namespace GraphicEditor
         }
         private void SetWidth()
         {
-            WidthPicker.Figure = Process.SelectedFigure;
+            WidthPicker.Figure = WorkplaceProcess.GetSelectedFigure();
             WidthPicker.Visibility = Visibility.Visible;
         }
         private void SetStyle()
         {
-            ColoRPicker.Figure = Process.SelectedFigure;
+            ColoRPicker.Figure = WorkplaceProcess.GetSelectedFigure();
             ColoRPicker.Visibility = Visibility.Visible;
         }
+
     }
 }

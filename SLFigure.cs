@@ -21,7 +21,7 @@ public class SLFigure
     {
 
     }
-    public SLFigure CreateSLFigureFromFigureObject(FigureObj figureObject)
+    public SLFigure CreateSLFigureFromFigureObject(Figure figureObject)
     {
         if (figureObject.FigureType == FigureType.Rectangle)
         {
@@ -34,24 +34,28 @@ public class SLFigure
         return this;
     }
 
-    private void CreatePolyline(FigureObj figureObject)
+    private void CreatePolyline(Figure figureObject)
     {
-        LineObj line = (LineObj)figureObject;
+        LineFigure line = (LineFigure)figureObject;
         FigureTypeNumber = ((int)line.FigureType);
         LineStrokeThinkness = line.StrokeWidth.ToString();
         LineColor = line.LineColor.Color.ToString();
-        Polyline = CreatePolilineString(line.Polyline);
-        Markers = CreateMarkersString(line.Markers);
+        Polyline = CreatePolilineString(line.GetPolyline());
+        Markers = CreateMarkersString(line.GetMarkerPoints());
+        //Polyline = CreatePolilineString(line.polyline);
+        //Markers = CreateMarkersString(line.markers);
     }
-    private void CreateRectangle(FigureObj figureObject)
+    private void CreateRectangle(Figure figureObject)
     {
-        RectangleObj rectangle = (RectangleObj)figureObject;
+        RectangleFigure rectangle = (RectangleFigure)figureObject;
         FigureTypeNumber = ((int)rectangle.FigureType);
-        MovePoint = rectangle.MovePoint.Point.ToString();
+        MovePoint = rectangle.GetMoveMarker().ToString();
+       // MovePoint = rectangle.MovePoint.Point.ToString();
         LineStrokeThinkness = rectangle.StrokeWidth.ToString();
         LineColor = rectangle.LineColor.Color.ToString();
         FillColor = rectangle.Fill.Color.ToString();
-        Polyline = CreatePolilineString(rectangle.Rectangle);
+        Polyline = CreatePolilineString(rectangle.GetRectangle());
+        //Polyline = CreatePolilineString(rectangle.Rectangle);
     }
     private string[] CreatePolilineString(Polyline polyline)
     {

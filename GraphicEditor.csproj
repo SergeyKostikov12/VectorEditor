@@ -86,16 +86,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Functionality\MatrixExtension.cs" />
     <Compile Include="Functionality\WorkplaceProcess.cs" />
     <Compile Include="Functionality\WorkplaceShadow.cs" />
     <Compile Include="Functionality\WorkplaceCondition.cs" />
     <Compile Include="Functionality\FigureProcess.cs" />
     <Compile Include="Functionality\Enums.cs" />
-    <Compile Include="Functionality\FigureObj.cs" />
+    <Compile Include="Functionality\Figure.cs" />
     <Compile Include="FiguresList.cs" />
-    <Compile Include="Functionality\LineObj.cs" />
+    <Compile Include="Functionality\LineFigure.cs" />
     <Compile Include="Functionality\MarkerPoint.cs" />
-    <Compile Include="Functionality\RectangleObj.cs" />
+    <Compile Include="Functionality\RectangleFigure.cs" />
     <Compile Include="SLFigure.cs" />
     <Compile Include="Styler.xaml.cs">
       <DependentUpon>Styler.xaml</DependentUpon>
@@ -143,10 +144,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="GraphicEditor_1_TemporaryKey.pfx" />
-    <None Include="GraphicEditor_2_TemporaryKey.pfx" />
-    <None Include="GraphicEditor_3_TemporaryKey.pfx" />
-    <None Include="GraphicEditor_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

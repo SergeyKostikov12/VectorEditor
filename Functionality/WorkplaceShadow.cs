@@ -8,17 +8,15 @@ namespace GraphicEditor.Functionality
 {
     public class WorkplaceShadow
     {
-        public enum LineTypes { Line, Polyline }
-        public LineTypes LineType;
         private Rectangle shadowRect;
         private Polyline shadowLine;
         private Canvas workplace;
         private Point firstPoint;
-        public bool FirstPointIsDefined
+        private bool FirstPointIsDefined
         {
             get
             {
-                if (ShadowLine.Points.Count == 0)
+                if (shadowLine.Points.Count == 0)
                 {
                     return true;
                 }
@@ -28,9 +26,6 @@ namespace GraphicEditor.Functionality
                 }
             }
         }
-        public Point FirstPoint { get => firstPoint; set => firstPoint = value; }
-        public Rectangle ShadowRect { get => shadowRect; set => shadowRect = value; }
-        public Polyline ShadowLine { get => shadowLine; set => shadowLine = value; }
 
         public WorkplaceShadow(Canvas _workplace)
         {
@@ -38,6 +33,10 @@ namespace GraphicEditor.Functionality
             InitializeShadows();
         }
 
+        public Polyline GetShadowLine()
+        {
+            return shadowLine;
+        }
         internal void StartDrawRectShadow(Point LMB_ClickPosition)
         {
             firstPoint = LMB_ClickPosition;
@@ -49,7 +48,7 @@ namespace GraphicEditor.Functionality
         }
         internal void SetLIneFirstPoint(Point _firstPoint)
         {
-            FirstPoint = _firstPoint;
+            firstPoint = _firstPoint;
             shadowLine.Points.Add(firstPoint);
             shadowLine.Points[0] = firstPoint;
             shadowLine.UpdateLayout();
@@ -103,7 +102,7 @@ namespace GraphicEditor.Functionality
                 StrokeThickness = 1,
                 Visibility = Visibility.Hidden
             };
-            ShadowRect = rectangle;
+            shadowRect = rectangle;
             Polyline line = new Polyline
             {
                 Stroke = Brushes.Blue,
@@ -112,9 +111,9 @@ namespace GraphicEditor.Functionality
                 Visibility = Visibility.Hidden
             };
 
-            ShadowLine = line;
-            workplace.Children.Add(ShadowRect);
-            workplace.Children.Add(ShadowLine);
+            shadowLine = line;
+            workplace.Children.Add(shadowRect);
+            workplace.Children.Add(shadowLine);
         }
     }
 }

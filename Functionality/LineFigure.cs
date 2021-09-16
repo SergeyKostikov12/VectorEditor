@@ -7,32 +7,29 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality
 {
-    class LineObj : FigureObj
+    class LineFigure : Figure
     {
         private List<MarkerPoint> markers;
         private Polyline polyline;
-        private Canvas canvas;
+        //private Canvas canvas;
+        private MarkerPoint selectedMarker;
 
-        public MarkerPoint SelectedMarker;
-        public List<MarkerPoint> Markers { get => markers; private set => markers = value; }
-        public Polyline Polyline { get => polyline; private set => polyline = value; }
-
-        public LineObj(Polyline polyline)
+        public LineFigure(Polyline line)
         {
-            CreatePolyline(polyline);
-            DefinePolyline(polyline);
+            CreatePolyline();
+            DefinePolyline(line);
             DefineMarkerPoints();
         }
-        public LineObj(Point firstPoint, Point secondPoint)
+        public LineFigure(Point firstPoint, Point secondPoint)
         {
             CreatePolyline(firstPoint, secondPoint);
             DefineMarkerPoints();
         }
-        public LineObj (SLFigure sLFigure)
+        public LineFigure (SLFigure sLFigure)
         {
-            CreatePolyline(sLFigure.Polyline.ParsePolylineFromArray());
+            CreatePolyline();
             DefinePolyline(sLFigure.Polyline.ParsePolylineFromArray());
-            Polyline.StrokeThickness = Convert.ToInt32(sLFigure.LineStrokeThinkness);
+            polyline.StrokeThickness = Convert.ToInt32(sLFigure.LineStrokeThinkness);
             DefineMarkerPoints();
             LineColor = new SolidColorBrush
             {
@@ -40,27 +37,29 @@ namespace GraphicEditor.Functionality
             };
         }
 
+
+        internal Polyline GetPolyline()
+        {
+            return polyline;
+        }
+
+        internal List<MarkerPoint> GetMarkerPoints()
+        {
+            return markers;
+        }
+
         public override void ShowOutline()
         {
-            foreach (var marker in Markers)
+            foreach (var marker in markers)
             {
                 marker.Show();
             }
         }
         public override void HideOutline()
         {
-            foreach (var marker in Markers)
+            foreach (var marker in markers)
             {
                 marker.Hide();
-            }
-        }
-        public override void PlacingInWorkPlace(Canvas _canvas)
-        {
-            canvas = _canvas;
-            canvas.Children.Add(Polyline);
-            foreach (var marker in Markers)
-            {
-                canvas.Children.Add(marker.Marker);
             }
         }
         public override bool SelectMarker(Point point)
@@ -70,48 +69,40 @@ namespace GraphicEditor.Functionality
                 bool result = marker.Point.ItInsideCircle(point, StrokeWidth);
                 if (result)
                 {
-                    SelectedMarker = marker;
+                    selectedMarker = marker;
                     ShowOutline();
                     return true;
                 }
                 else
                 {
-                    SelectedMarker = null;
+                    selectedMarker = null;
                 }
             }
             return false;
-        }
-        public override void DeleteFigureFromWorkplace(Canvas canvas)
-        {
-            foreach (var marker in markers)
-            {
-                canvas.Children.Remove(marker.Marker);
-            }
-            canvas.Children.Remove(polyline);
         }
         public override void MoveMarker(Point position)
         {
             for (int i = 0; i < markers.Count; i++)
             {
-                if (markers[i].Equals(SelectedMarker))
+                if (markers[i].Equals(selectedMarker))
                 {
                     markers[i].Move(position);
-                    Polyline.Points[i] = position;
+                    polyline.Points[i] = position;
                 }
             }
         }
         public override void ExecuteRelize(Point position)
         {
-            if (SelectedMarker != null)
+            if (selectedMarker != null)
             {
                 for (int i = 0; i < polyline.Points.Count; i++)
                 {
-                    if (SelectedMarker.Point.ItInsideCircle(polyline.Points[i], StrokeWidth) && !SelectedMarker.Equals(markers[i]))
+                    if (selectedMarker.Point.ItInsideCircle(polyline.Points[i], StrokeWidth) && !selectedMarker.Equals(markers[i]))
                     {
-                        SelectedMarker.Hide();
-                        markers.Remove(SelectedMarker);
+                        selectedMarker.Hide();
+                        markers.Remove(selectedMarker);
                         polyline.Points.RemoveAt(i);
-                        SelectedMarker = null;
+                        selectedMarker = null;
                         break;
                     }
                 }
@@ -124,7 +115,7 @@ namespace GraphicEditor.Functionality
                 }
             }
         }
-        public override void ExecuteDoubleClick(Point position)
+        public override Rectangle ExecuteDoubleClick(Point position)
         {
             for (int i = 0; i <polyline.Points.Count-1; i++)
             {
@@ -137,16 +128,17 @@ namespace GraphicEditor.Functionality
                     marker.SetMarkerSize(StrokeWidth);
                     markers.Insert(i+1, marker);
                     marker.Show();
-                    canvas.Children.Add(marker.Marker);
-                    return;
+                    //canvas.Children.Add(marker.Marker);
+                    return marker.Marker;
                 }
             }
+            return null;
         }
         public override bool SelectLine(Point point)
         {
             for (int i = 0; i < markers.Count - 1; i++)
             {
-                if (point.AngleBetweenPoints(markers[i].Point, markers[i + 1].Point) > 60)
+                if (point.AbsAngleBetweenPoints(markers[i].Point, markers[i + 1].Point) > 60)
                 {
                     double A = point.Length(markers[i + 1].Point);
                     double B = point.Length(markers[i].Point);
@@ -166,16 +158,16 @@ namespace GraphicEditor.Functionality
         public override void DeselectFigure()
         {
             HideOutline();
-            SelectedMarker = null;
+            selectedMarker = null;
         }
 
         protected override int GetStrokeWidth()
         {
-            return (int)Polyline.StrokeThickness;
+            return (int)polyline.StrokeThickness;
         }
         protected override void SetStrokeWidth(int value)
         {
-            Polyline.StrokeThickness = value;
+            polyline.StrokeThickness = value;
             RefreshMarkerPoints();
         }
         protected override SolidColorBrush GetFill()
@@ -189,52 +181,72 @@ namespace GraphicEditor.Functionality
         }
         protected override SolidColorBrush GetLineColor()
         {
-            SolidColorBrush brush = (SolidColorBrush)Polyline.Stroke;
+            SolidColorBrush brush = (SolidColorBrush)polyline.Stroke;
             return brush;
         }
         protected override void SetLineColor(SolidColorBrush colorBrush)
         {
-            Polyline.Stroke = colorBrush;
+            polyline.Stroke = colorBrush;
         }
 
-        private void CreatePolyline(Polyline polyline)
+        private void CreatePolyline()
         {
             FigureType = FigureType.Line;
-            Markers = new List<MarkerPoint>();
-            Polyline = new Polyline();
+            markers = new List<MarkerPoint>();
+            polyline = new Polyline();
+            polyline.StrokeEndLineCap = PenLineCap.Round;
+            polyline.StrokeLineJoin = PenLineJoin.Round;
         }
         private void CreatePolyline(Point firstPoint, Point secondPoint)
         {
             FigureType = FigureType.Line;
-            Markers = new List<MarkerPoint>();
-            Polyline = new Polyline();
-            Polyline.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-            Polyline.Points.Add(firstPoint);
-            Polyline.Points.Add(secondPoint);
+            markers = new List<MarkerPoint>();
+            polyline = new Polyline();
+            polyline.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+            polyline.StrokeEndLineCap = PenLineCap.Square;
+            polyline.StrokeLineJoin = PenLineJoin.Round;
+            polyline.Points.Add(firstPoint);
+            polyline.Points.Add(secondPoint);
         }
         private void RefreshMarkerPoints()
         {
-            for (int i = 0; i < Markers.Count; i++)
+            for (int i = 0; i < markers.Count; i++)
             {
-                Markers[i].SetMarkerSize(StrokeWidth);
+                markers[i].SetMarkerSize(StrokeWidth);
+                markers[i].Move(polyline.Points[i]);
             }
         }
-        private void DefinePolyline(Polyline polyline)
+        private void DefinePolyline(Polyline line)
         {
-            foreach (var point in polyline.Points)
+            foreach (var point in line.Points)
             {
-                Polyline.Points.Add(point);
+                polyline.Points.Add(point);
             }
         }
         private void DefineMarkerPoints()
         {
-            foreach (var point in Polyline.Points)
+            foreach (var point in polyline.Points)
             {
                 markers.Add(new MarkerPoint(point));
             }
-            Polyline.StrokeThickness = StrokeWidth;
-            Polyline.Visibility = Visibility.Visible;
-            Polyline.Stroke = Brushes.Black;
+            polyline.StrokeThickness = StrokeWidth;
+            polyline.Visibility = Visibility.Visible;
+            polyline.Stroke = Brushes.Black;
+        }
+
+        public override List<Rectangle> GetMarkers()
+        {
+            List<Rectangle> rects = new List<Rectangle>();
+            foreach (var marker in markers)
+            {
+                rects.Add(marker.Marker);
+            }
+            return rects;
+        }
+
+        public override Polyline GetShape()
+        {
+            return polyline;
         }
     }
 }

@@ -31,7 +31,7 @@ public static class Extensions
         Point b = secondPoint;
         Point c = centre;
 
-        if (c.AngleBetweenPoints(a, b) > 60)
+        if (c.AbsAngleBetweenPoints(a, b) > 60)
         {
             double A = c.Length(b);
             double B = c.Length(a);
@@ -53,7 +53,7 @@ public static class Extensions
     {
         return Math.Sqrt(Math.Pow(secondPoint.X - point.X, 2) + Math.Pow(secondPoint.Y - point.Y, 2));
     }
-    public static double AngleBetweenPoints(this Point centre, Point first, Point second)
+    public static double AbsAngleBetweenPoints(this Point centre, Point first, Point second)
     {
         Point A = first;
         Point B = second;
@@ -65,9 +65,26 @@ public static class Extensions
         double angle = Math.Abs(Vector.AngleBetween(CA, CB));
         return angle;
     }
+    public static double AngleBetweenPoints(this Point centre, Point first, Point second)
+    {
+        Point A = first;
+        Point B = second;
+        Point C = centre;
+
+        Vector CA = new Vector(A.X - C.X, A.Y - C.Y);
+        Vector CB = new Vector(B.X - C.X, B.Y - C.Y);
+
+        double angle = Vector.AngleBetween(CA, CB);
+        return angle;
+    }
     public static Point ParsePoint( this string deserealizedString)
     {
         return Point.Parse(deserealizedString.Replace(',', '.').Replace(';', ','));
+    }
+    public static Point NewPosition(this Point @this, Point newPosition)
+    {
+        Point pt = new Point(newPosition.X, newPosition.Y);
+        return pt;
     }
     public static Polyline ParsePolylineFromArray( this string[] polyline)
     {

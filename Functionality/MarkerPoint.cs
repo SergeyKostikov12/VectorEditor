@@ -8,15 +8,12 @@ public class MarkerPoint
     private double x;
     private double y;
     private Point point;
-    private Rectangle marker;
     private int markerSize;
-    private Point anchorPoint;
 
     public double X { get => x; set => SetX(value); }
     public double Y { get => y; set => SetY(value); }
     public Point Point { get => point; set => SetPoint(value); }
-
-    public Rectangle Marker { get => marker; }
+    public Rectangle Marker { get; }
 
     public MarkerPoint(Point pt)
     {
@@ -24,7 +21,7 @@ public class MarkerPoint
         y = pt.Y;
         point = pt;
         markerSize = 1;
-        marker = new Rectangle
+        Marker = new Rectangle
         {
             Height = 10 + markerSize,
             Width = 10 + markerSize,
@@ -33,16 +30,15 @@ public class MarkerPoint
             StrokeThickness = 1,
             Visibility = Visibility.Hidden
         };
-        anchorPoint = new Point();
         RefreshAnchorPoint();
     }
     public void Show()
     {
-        marker.Visibility = Visibility.Visible;
+        Marker.Visibility = Visibility.Visible;
     }
     public void Hide()
     {
-        marker.Visibility = Visibility.Hidden;
+        Marker.Visibility = Visibility.Hidden;
     }
     public void Move(Point newPosition)
     {
@@ -68,17 +64,17 @@ public class MarkerPoint
     }
     public void SetMarkerSize(int size)
     {
-        marker.Height -= markerSize;
-        marker.Width -= markerSize;
+        Marker.Height -= markerSize;
+        Marker.Width -= markerSize;
         markerSize = size;
-        marker.Height += markerSize;
-        marker.Width += markerSize;
+        Marker.Height += markerSize;
+        Marker.Width += markerSize;
+        RefreshAnchorPoint();
     }
     private void RefreshAnchorPoint()
     {
-        Point pt = new Point(X - markerSize / 2 - marker.Width/2, Y - markerSize / 2 - marker.Height/2);
-        Canvas.SetLeft(marker, pt.X);
-        Canvas.SetTop(marker, pt.Y);
-        anchorPoint = pt;
+        Point pt = new Point(X - Marker.Width/2, Y - Marker.Height/2);
+        Canvas.SetLeft(Marker, pt.X);
+        Canvas.SetTop(Marker, pt.Y);
     }
 }
