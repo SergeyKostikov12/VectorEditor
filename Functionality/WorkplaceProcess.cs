@@ -23,11 +23,6 @@ namespace GraphicEditor.Functionality
         {
             workplace = _worklace;
         }
-        public void ClearCanvas()
-        {
-            workplace.Children.Clear();
-            AllFigures.Clear();
-        }
 
         internal void LoadWorkplace()
         {
@@ -83,12 +78,10 @@ namespace GraphicEditor.Functionality
                 MessageBox.Show("Файл успешно сохранен!");
             }
         }
-
         internal void SetLMB_ClickPosition(Point LMB_ClickPositionPoint)
         {
             lMB_ClickPosition = LMB_ClickPositionPoint;
         }
-
         internal void MovingWorkPlace(ScrollViewer Scroll, Point rMB_firstPoint, Point currentMousePos)
         {
             scrollPoint.X = Scroll.HorizontalOffset - rMB_firstPoint.DeltaTo(currentMousePos).X / 2;
@@ -105,36 +98,6 @@ namespace GraphicEditor.Functionality
                 selectedFigure = null;
             }
         }
-        internal Actions DetermindAction(Point clickPosition)
-        {
-            if (selectedFigure == null)
-            {
-                foreach (var figure in AllFigures)
-                {
-                    if (figure.SelectMarker(clickPosition) == true)
-                    {
-                        SetSelectedFigure(figure);
-                        figure.ShowOutline();
-                        return Actions.Ready;
-                    }
-                    else if (figure.SelectLine(clickPosition) == true)
-                    {
-                        SetSelectedFigure(figure);
-                        figure.ShowOutline();
-                        return Actions.Ready;
-                    }
-                    else figure.HideOutline();
-                }
-            }
-            else
-            {
-                selectedFigure.SelectMarker(clickPosition);
-                return Actions.MovePoint;
-            }
-
-            return Actions.None;
-        }
-
         internal void AddToWorkplace(object obj)
         {
             if (obj != null)
@@ -145,7 +108,6 @@ namespace GraphicEditor.Functionality
                 }
             }
         }
-
         private void CreateFiguresFromList()
         {
             for (int i = 0; i < FiguresList.Figures.Count; i++)
@@ -164,7 +126,6 @@ namespace GraphicEditor.Functionality
                 }
             }
         }
-
         private void PlacingInWorkPlace(Figure figure)
         {
             workplace.Children.Add(figure.GetShape());
@@ -174,7 +135,6 @@ namespace GraphicEditor.Functionality
                 workplace.Children.Add(marker);
             }
         }
-
         private void CreateSaveList(List<Figure> list)
         {
             FiguresList = new FiguresList();
@@ -191,11 +151,6 @@ namespace GraphicEditor.Functionality
         {
             selectedFigure = figure;
         }
-        public Figure GetSelectedFigure()
-        {
-            return selectedFigure;
-        }
-
         internal void DeleteFigure()
         {
             if (selectedFigure != null)
@@ -244,6 +199,44 @@ namespace GraphicEditor.Functionality
                 workplace.Children.Add(marker);
             }
             AllFigures.Add(figure);
+        }
+        internal Actions DetermindAction(Point clickPosition)
+        {
+            if (selectedFigure == null)
+            {
+                foreach (var figure in AllFigures)
+                {
+                    if (figure.SelectMarker(clickPosition) == true)
+                    {
+                        SetSelectedFigure(figure);
+                        figure.ShowOutline();
+                        return Actions.Ready;
+                    }
+                    else if (figure.SelectLine(clickPosition) == true)
+                    {
+                        SetSelectedFigure(figure);
+                        figure.ShowOutline();
+                        return Actions.Ready;
+                    }
+                    else figure.HideOutline();
+                }
+            }
+            else
+            {
+                selectedFigure.SelectMarker(clickPosition);
+                return Actions.MovePoint;
+            }
+
+            return Actions.None;
+        }
+        public Figure GetSelectedFigure()
+        {
+            return selectedFigure;
+        }
+        public void ClearCanvas()
+        {
+            workplace.Children.Clear();
+            AllFigures.Clear();
         }
 
     }

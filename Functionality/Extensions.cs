@@ -4,15 +4,15 @@ using System.Windows.Shapes;
 
 public static class Extensions
 {
-    public static Point AbsDeltaTo(this Point point, Point newPosition)
-    {
-        Point absDelta = new Point(Math.Abs(newPosition.X - point.X), Math.Abs(newPosition.Y - point.Y));
-        return absDelta;
-    }
     public static Point DeltaTo(this Point point, Point newPosition)
     {
         Point delta = new Point(newPosition.X - point.X, newPosition.Y - point.Y);
         return delta;
+    }
+    public static Point AbsDeltaTo(this Point point, Point newPosition)
+    {
+        Point absDelta = new Point(Math.Abs(newPosition.X - point.X), Math.Abs(newPosition.Y - point.Y));
+        return absDelta;
     }
     public static bool ItInsideCircle(this Point centre, Point point, int lineThinkness)
     {

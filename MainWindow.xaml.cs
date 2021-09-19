@@ -1,18 +1,20 @@
 ﻿using GraphicEditor.Functionality;
+using System;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace GraphicEditor
 {
     public partial class MainWindow : Window
     {
-        public WorkplaceProcess WorkplaceProcess;
-        public FigureProcess Process;
-        public WorkplaceCondition Condition;
-        public WorkplaceShadow Shadow;
-        public ColorPicker ColoRPicker = new ColorPicker();
-        public WidthPicker WidthPicker = new WidthPicker();
+        private WorkplaceProcess WorkplaceProcess;
+        private FigureProcess Process;
+        private WorkplaceCondition Condition;
+        private WorkplaceShadow Shadow;
+        private ColorPicker ColoRPicker = new ColorPicker();
+        private WidthPicker WidthPicker = new WidthPicker();
 
         private Point LMB_ClickPosition;
         private Point RMB_firstPoint;
@@ -63,18 +65,35 @@ namespace GraphicEditor
         }
         private void LineColorButtonPress(object sender, RoutedEventArgs e)
         {
-            PropertyPanel.Content = ColoRPicker;
-            WidthPicker.Visibility = Visibility.Hidden;
-            ColoRPicker.BtnPressed = ButtonPressed.Color;
-            SetStyle();
+            PaintLineColorButton();
         }
         private void FillButtonPress(object sender, RoutedEventArgs e)
         {
+            PaintFillColorButton();
+        }
+        private void PaintLineColorButton()
+        {
+            Process.SetFigureLineColor((SolidColorBrush)LineColorField.Background);
+        }
+        private void PaintFillColorButton()
+        {
+           Process.SetFigureFillColor((SolidColorBrush)FillColorField.Background);
+        }
+        private void LineColorFieldButtonPress(object sender, RoutedEventArgs e)
+        {
+            PropertyPanel.Content = ColoRPicker;
+            WidthPicker.Visibility = Visibility.Hidden;
+            ColoRPicker.BtnPressed = ButtonPressed.Color;
+            ColoRPicker.Visibility = Visibility.Visible;
+            ColoRPicker.GetButtonColor(sender);
+        }
+        private void FillColorFieldButtonPress(object sender, RoutedEventArgs e)
+        {
             PropertyPanel.Content = ColoRPicker;
             ColoRPicker.BtnPressed = ButtonPressed.Fill;
-            SetStyle();
+            ColoRPicker.Visibility = Visibility.Visible;
+            ColoRPicker.GetButtonColor(sender);
         }
-
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             LMB_ClickPosition = e.GetPosition(WorkPlace);
@@ -188,7 +207,6 @@ namespace GraphicEditor
             }
 
         }
-
         private void InitializeProcessors()
         {
             WorkplaceProcess = new WorkplaceProcess(WorkPlace);
@@ -228,11 +246,5 @@ namespace GraphicEditor
             WidthPicker.Figure = WorkplaceProcess.GetSelectedFigure();
             WidthPicker.Visibility = Visibility.Visible;
         }
-        private void SetStyle()
-        {
-            ColoRPicker.Figure = WorkplaceProcess.GetSelectedFigure();
-            ColoRPicker.Visibility = Visibility.Visible;
-        }
-
     }
 }

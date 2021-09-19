@@ -5,22 +5,10 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 
 
-interface IFigure
-{
-    void ShowOutline();
-    void HideOutline();
-    void MoveMarker(Point position);
-    void ExecuteRelize(Point position);
-    bool SelectMarker(Point poin);
-    bool SelectLine(Point point);
-    void DeselectFigure();
-    List<Rectangle> GetMarkers();
-    Polyline GetShape();
-}
 
 namespace GraphicEditor.Functionality
 {
-    public abstract class Figure : IFigure
+    public abstract class Figure
     {
         public FigureType FigureType { get; protected set; } 
         public Point AnchorPoint { get; set; }
@@ -29,6 +17,13 @@ namespace GraphicEditor.Functionality
         public SolidColorBrush Fill { get => GetFill(); set => SetFill(value); }
 
 
+
+        protected abstract int GetStrokeWidth(); //all
+        protected abstract void SetStrokeWidth(int value); //all
+        protected abstract SolidColorBrush GetFill(); //all
+        protected abstract void SetFill(SolidColorBrush brush); //all
+        protected abstract SolidColorBrush GetLineColor(); //all
+        protected abstract void SetLineColor(SolidColorBrush colorBrush); //all
         public abstract void ShowOutline(); //all
         public abstract void HideOutline(); //all
         public abstract void MoveMarker(Point position); //all
@@ -42,13 +37,6 @@ namespace GraphicEditor.Functionality
         {
             return null; 
         }
-
-        protected abstract int GetStrokeWidth(); //all
-        protected abstract void SetStrokeWidth(int value); //all
-        protected abstract SolidColorBrush GetFill(); //all
-        protected abstract void SetFill(SolidColorBrush brush); //all
-        protected abstract SolidColorBrush GetLineColor(); //all
-        protected abstract void SetLineColor(SolidColorBrush colorBrush); //all
 
 
 

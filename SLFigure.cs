@@ -10,6 +10,7 @@ public class SLFigure
     [XmlElement] public int FigureTypeNumber;
     [XmlElement] public string AnchorPoint;
     [XmlElement] public string MovePoint;
+    [XmlElement] public string RotatePoint;
     [XmlElement] public string FillColor;
     [XmlElement] public string LineColor;
     [XmlElement] public string LineStrokeThinkness;
@@ -34,6 +35,15 @@ public class SLFigure
         return this;
     }
 
+    public string GetMovePoint()
+    {
+        return MovePoint;
+    }
+    public string GetRotatePoint()
+    {
+        return RotatePoint;
+    }
+
     private void CreatePolyline(Figure figureObject)
     {
         LineFigure line = (LineFigure)figureObject;
@@ -42,20 +52,17 @@ public class SLFigure
         LineColor = line.LineColor.Color.ToString();
         Polyline = CreatePolilineString(line.GetPolyline());
         Markers = CreateMarkersString(line.GetMarkerPoints());
-        //Polyline = CreatePolilineString(line.polyline);
-        //Markers = CreateMarkersString(line.markers);
     }
     private void CreateRectangle(Figure figureObject)
     {
         RectangleFigure rectangle = (RectangleFigure)figureObject;
         FigureTypeNumber = ((int)rectangle.FigureType);
         MovePoint = rectangle.GetMoveMarker().ToString();
-       // MovePoint = rectangle.MovePoint.Point.ToString();
+        RotatePoint = rectangle.GetRotateMarker().ToString();
         LineStrokeThinkness = rectangle.StrokeWidth.ToString();
         LineColor = rectangle.LineColor.Color.ToString();
         FillColor = rectangle.Fill.Color.ToString();
         Polyline = CreatePolilineString(rectangle.GetRectangle());
-        //Polyline = CreatePolilineString(rectangle.Rectangle);
     }
     private string[] CreatePolilineString(Polyline polyline)
     {

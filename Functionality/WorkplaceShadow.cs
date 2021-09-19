@@ -12,20 +12,6 @@ namespace GraphicEditor.Functionality
         private Polyline shadowLine;
         private Canvas workplace;
         private Point firstPoint;
-        private bool FirstPointIsDefined
-        {
-            get
-            {
-                if (shadowLine.Points.Count == 0)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
 
         public WorkplaceShadow(Canvas _workplace)
         {
@@ -33,9 +19,27 @@ namespace GraphicEditor.Functionality
             InitializeShadows();
         }
 
-        public Polyline GetShadowLine()
+        private void InitializeShadows()
         {
-            return shadowLine;
+            Rectangle rectangle = new Rectangle
+            {
+                Stroke = Brushes.Blue,
+                StrokeDashArray = new DoubleCollection() { 4, 4 },
+                StrokeThickness = 1,
+                Visibility = Visibility.Hidden
+            };
+            shadowRect = rectangle;
+            Polyline line = new Polyline
+            {
+                Stroke = Brushes.Blue,
+                StrokeDashArray = new DoubleCollection() { 4, 4 },
+                StrokeThickness = 1,
+                Visibility = Visibility.Hidden
+            };
+
+            shadowLine = line;
+            workplace.Children.Add(shadowRect);
+            workplace.Children.Add(shadowLine);
         }
         internal void StartDrawRectShadow(Point LMB_ClickPosition)
         {
@@ -93,27 +97,9 @@ namespace GraphicEditor.Functionality
         {
             shadowLine.Points.RemoveAt(shadowLine.Points.Count - 1);
         }
-        private void InitializeShadows()
+        public Polyline GetShadowLine()
         {
-            Rectangle rectangle = new Rectangle
-            {
-                Stroke = Brushes.Blue,
-                StrokeDashArray = new DoubleCollection() { 4, 4 },
-                StrokeThickness = 1,
-                Visibility = Visibility.Hidden
-            };
-            shadowRect = rectangle;
-            Polyline line = new Polyline
-            {
-                Stroke = Brushes.Blue,
-                StrokeDashArray = new DoubleCollection() { 4, 4 },
-                StrokeThickness = 1,
-                Visibility = Visibility.Hidden
-            };
-
-            shadowLine = line;
-            workplace.Children.Add(shadowRect);
-            workplace.Children.Add(shadowLine);
+            return shadowLine;
         }
     }
 }

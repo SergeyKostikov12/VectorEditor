@@ -11,7 +11,6 @@ namespace GraphicEditor.Functionality
     {
         private List<MarkerPoint> markers;
         private Polyline polyline;
-        //private Canvas canvas;
         private MarkerPoint selectedMarker;
 
         public LineFigure(Polyline line)
@@ -38,16 +37,85 @@ namespace GraphicEditor.Functionality
         }
 
 
+        private void CreatePolyline()
+        {
+            FigureType = FigureType.Line;
+            markers = new List<MarkerPoint>();
+            polyline = new Polyline();
+            polyline.StrokeEndLineCap = PenLineCap.Round;
+            polyline.StrokeLineJoin = PenLineJoin.Round;
+        }
+        private void CreatePolyline(Point firstPoint, Point secondPoint)
+        {
+            FigureType = FigureType.Line;
+            markers = new List<MarkerPoint>();
+            polyline = new Polyline();
+            polyline.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+            polyline.StrokeEndLineCap = PenLineCap.Square;
+            polyline.StrokeLineJoin = PenLineJoin.Round;
+            polyline.Points.Add(firstPoint);
+            polyline.Points.Add(secondPoint);
+        }
+        private void RefreshMarkerPoints()
+        {
+            for (int i = 0; i < markers.Count; i++)
+            {
+                markers[i].SetMarkerSize(StrokeWidth);
+                markers[i].Move(polyline.Points[i]);
+            }
+        }
+        private void DefinePolyline(Polyline line)
+        {
+            foreach (var point in line.Points)
+            {
+                polyline.Points.Add(point);
+            }
+        }
+        private void DefineMarkerPoints()
+        {
+            foreach (var point in polyline.Points)
+            {
+                markers.Add(new MarkerPoint(point));
+            }
+            polyline.StrokeThickness = StrokeWidth;
+            polyline.Visibility = Visibility.Visible;
+            polyline.Stroke = Brushes.Black;
+        }
+        protected override int GetStrokeWidth()
+        {
+            return (int)polyline.StrokeThickness;
+        }
+        protected override void SetStrokeWidth(int value)
+        {
+            polyline.StrokeThickness = value;
+            RefreshMarkerPoints();
+        }
+        protected override SolidColorBrush GetFill()
+        {
+            MessageBox.Show("Невозможно получить Кисть заливки!!!");
+            return null;
+        }
+        protected override void SetFill(SolidColorBrush brush)
+        {
+            MessageBox.Show("Невозможно залить Линию!!!");
+        }
+        protected override SolidColorBrush GetLineColor()
+        {
+            SolidColorBrush brush = (SolidColorBrush)polyline.Stroke;
+            return brush;
+        }
+        protected override void SetLineColor(SolidColorBrush colorBrush)
+        {
+            polyline.Stroke = colorBrush;
+        }
         internal Polyline GetPolyline()
         {
             return polyline;
         }
-
         internal List<MarkerPoint> GetMarkerPoints()
         {
             return markers;
         }
-
         public override void ShowOutline()
         {
             foreach (var marker in markers)
@@ -160,80 +228,6 @@ namespace GraphicEditor.Functionality
             HideOutline();
             selectedMarker = null;
         }
-
-        protected override int GetStrokeWidth()
-        {
-            return (int)polyline.StrokeThickness;
-        }
-        protected override void SetStrokeWidth(int value)
-        {
-            polyline.StrokeThickness = value;
-            RefreshMarkerPoints();
-        }
-        protected override SolidColorBrush GetFill()
-        {
-            MessageBox.Show("Невозможно получить Кисть заливки!!!");
-            return null;
-        }
-        protected override void SetFill(SolidColorBrush brush)
-        {
-            MessageBox.Show("Невозможно залить Линию!!!");
-        }
-        protected override SolidColorBrush GetLineColor()
-        {
-            SolidColorBrush brush = (SolidColorBrush)polyline.Stroke;
-            return brush;
-        }
-        protected override void SetLineColor(SolidColorBrush colorBrush)
-        {
-            polyline.Stroke = colorBrush;
-        }
-
-        private void CreatePolyline()
-        {
-            FigureType = FigureType.Line;
-            markers = new List<MarkerPoint>();
-            polyline = new Polyline();
-            polyline.StrokeEndLineCap = PenLineCap.Round;
-            polyline.StrokeLineJoin = PenLineJoin.Round;
-        }
-        private void CreatePolyline(Point firstPoint, Point secondPoint)
-        {
-            FigureType = FigureType.Line;
-            markers = new List<MarkerPoint>();
-            polyline = new Polyline();
-            polyline.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-            polyline.StrokeEndLineCap = PenLineCap.Square;
-            polyline.StrokeLineJoin = PenLineJoin.Round;
-            polyline.Points.Add(firstPoint);
-            polyline.Points.Add(secondPoint);
-        }
-        private void RefreshMarkerPoints()
-        {
-            for (int i = 0; i < markers.Count; i++)
-            {
-                markers[i].SetMarkerSize(StrokeWidth);
-                markers[i].Move(polyline.Points[i]);
-            }
-        }
-        private void DefinePolyline(Polyline line)
-        {
-            foreach (var point in line.Points)
-            {
-                polyline.Points.Add(point);
-            }
-        }
-        private void DefineMarkerPoints()
-        {
-            foreach (var point in polyline.Points)
-            {
-                markers.Add(new MarkerPoint(point));
-            }
-            polyline.StrokeThickness = StrokeWidth;
-            polyline.Visibility = Visibility.Visible;
-            polyline.Stroke = Brushes.Black;
-        }
-
         public override List<Rectangle> GetMarkers()
         {
             List<Rectangle> rects = new List<Rectangle>();
@@ -243,7 +237,6 @@ namespace GraphicEditor.Functionality
             }
             return rects;
         }
-
         public override Polyline GetShape()
         {
             return polyline;

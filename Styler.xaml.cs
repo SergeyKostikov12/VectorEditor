@@ -1,4 +1,5 @@
 ﻿using GraphicEditor.Functionality;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,12 +9,9 @@ namespace GraphicEditor
 {
     public partial class ColorPicker : Page
     {
-        private SolidColorBrush brush;
-        Figure figure;
         public ButtonPressed BtnPressed;
-
-        public SolidColorBrush Brush { get => brush; set => brush = value; }
-        public Figure Figure { get => figure; set => figure = value; }
+        private Button colorBtn;
+        private SolidColorBrush Brush { get ; set ; }
 
         public ColorPicker()
         {
@@ -60,29 +58,23 @@ namespace GraphicEditor
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (BtnPressed == ButtonPressed.Color)
-            {
-                if (Figure != null)
-                {
-                    Figure.LineColor = (SolidColorBrush)(sender as Button).Background;
-                    BtnPressed = ButtonPressed.None;
-                }
-            }
-            else if (BtnPressed == ButtonPressed.Fill)
-            {
-                if (Figure != null)
-                {
-                    Figure.Fill = (SolidColorBrush)(sender as Button).Background;
-                    BtnPressed = ButtonPressed.None;
-                }
-            }
-
+            Brush = (SolidColorBrush)(sender as Button).Background;
+            colorBtn.Background = Brush;
             this.Visibility = Visibility.Hidden;
+        }
+        internal SolidColorBrush GetColor(Button lineColorField)
+        {
+            throw new NotImplementedException();
+        }
+        internal void GetButtonColor(object sender)
+        {
+            colorBtn = (Button)sender;
         }
         public Brush GetColor()
         {
             this.Visibility = Visibility.Hidden;
             return Brush;
         }
+
     }
 }

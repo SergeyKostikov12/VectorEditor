@@ -86,7 +86,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Functionality\MatrixExtension.cs" />
     <Compile Include="Functionality\WorkplaceProcess.cs" />
     <Compile Include="Functionality\WorkplaceShadow.cs" />
     <Compile Include="Functionality\WorkplaceCondition.cs" />

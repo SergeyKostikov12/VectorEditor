@@ -8,7 +8,7 @@ namespace GraphicEditor
     {
         private int width;
         public Figure Figure;
-        TextBlock WidthText;
+        private TextBlock WidthText;
         public WidthPicker()
         {
             AddBlock();
