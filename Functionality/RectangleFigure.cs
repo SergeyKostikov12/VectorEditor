@@ -27,7 +27,7 @@ namespace GraphicEditor.Functionality
             rotateMarker = new MarkerPoint(new Point(moveMarker.X - 50, moveMarker.Y));
             DefineMarkers();
             rectangle.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-
+            rectangle.StrokeEndLineCap = PenLineCap.Square;
         }
         public RectangleFigure(SLFigure sLFigure)
         {
@@ -38,6 +38,7 @@ namespace GraphicEditor.Functionality
             {
                 Color = (Color)ColorConverter.ConvertFromString(sLFigure.LineColor)
             };
+            rectangle.StrokeEndLineCap = PenLineCap.Square;
             moveMarker = new MarkerPoint(sLFigure.GetMovePoint().ParsePoint());
             rotateMarker = new MarkerPoint(sLFigure.GetRotatePoint().ParsePoint());
             DefineMarkers();
@@ -167,7 +168,7 @@ namespace GraphicEditor.Functionality
             rectangle.Stroke = Brushes.Black;
             rectangle.StrokeThickness = 1;
             rectangle.StrokeEndLineCap = PenLineCap.Square;
-            StrokeWidth = 1;
+            //StrokeWidth = 1;
         }
         internal Polyline GetRectangle()
         {
@@ -197,7 +198,16 @@ namespace GraphicEditor.Functionality
         protected override void SetStrokeWidth(int value)
         {
             rectangle.StrokeThickness = value;
+            RefreshMarkerPoints();
         }
+
+        private void RefreshMarkerPoints()
+        {
+            moveMarker.SetMarkerSize(StrokeWidth);
+            rotateMarker.SetMarkerSize(StrokeWidth);
+            scaleMarker.SetMarkerSize(StrokeWidth);
+        }
+
         protected override SolidColorBrush GetFill()
         {
             return (SolidColorBrush)rectangle.Fill;
