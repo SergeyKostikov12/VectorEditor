@@ -29,7 +29,7 @@ namespace GraphicEditor.Functionality
             rectangle.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
             rectangle.StrokeEndLineCap = PenLineCap.Square;
         }
-        public RectangleFigure(SLFigure sLFigure)
+        public RectangleFigure(SerializableFigure sLFigure)
         {
             rectangle = sLFigure.Polyline.ParsePolylineFromArray();
             StrokeWidth = Convert.ToInt32(sLFigure.LineStrokeThinkness);

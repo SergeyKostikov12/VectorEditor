@@ -1,5 +1,7 @@
 ﻿using GraphicEditor.Functionality;
+using Microsoft.Win32;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -9,10 +11,10 @@ namespace GraphicEditor
 {
     public partial class MainWindow : Window
     {
-        private WorkplaceProcess WorkplaceProcess;
+        private Workplace Workplace;
         private FigureProcess Process;
-        private WorkplaceCondition Condition;
-        private WorkplaceShadow Shadow;
+        //private WorkplaceCondition Condition;
+        //private WorkplaceShadow Shadow;
         private ColorPicker ColoRPicker = new ColorPicker();
         private WidthPicker WidthPicker = new WidthPicker();
 
@@ -27,34 +29,31 @@ namespace GraphicEditor
 
         private void LoadButtonPress(object sender, RoutedEventArgs e)
         {
-            Condition.ButtonPressed = ButtonPressed.Load;
-            WorkplaceProcess.ClearCanvas();
-            WorkplaceProcess.DeselectFigure();
-            WorkplaceProcess.LoadWorkplace();
-            WorkplaceShadow workplaceShadow = new WorkplaceShadow(WorkPlace);
-            Shadow = workplaceShadow;
+            Workplace.LoadWorkplace();
         }
+
+
         private void SaveButtonPress(object sender, RoutedEventArgs e)
         {
             Condition.ButtonPressed = ButtonPressed.Save;
-            WorkplaceProcess.DeselectFigure();
-            WorkplaceProcess.SaveWorkplace();
+            Workplace.DeselectFigure();
+            Workplace.SaveWorkplace();
         }
         private void RectangleButtonPress(object sender, RoutedEventArgs e)
         {
             Condition.ButtonPressed = ButtonPressed.Rect;
-            WorkplaceProcess.DeselectFigure();
+            Workplace.DeselectFigure();
             SetCursor(CursorType.Crosshair);
         }
         private void LineButtonPress(object sender, RoutedEventArgs e)
         {
             Condition.ButtonPressed = ButtonPressed.Line;
-            WorkplaceProcess.DeselectFigure();
+            Workplace.DeselectFigure();
             SetCursor(CursorType.Crosshair);
         }
         private void DeleteButtonPress(object sender, RoutedEventArgs e)
         {
-            WorkplaceProcess.DeleteFigure();
+            Workplace.DeleteFigure();
             SetCursor(CursorType.Arrow);
         }
         private void StrokeWidthButtonPress(object sender, RoutedEventArgs e)
@@ -96,15 +95,15 @@ namespace GraphicEditor
         }
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            LMB_ClickPosition = e.GetPosition(WorkPlace);
-            WorkplaceProcess.SetLMB_ClickPosition(LMB_ClickPosition);
+            LMB_ClickPosition = e.GetPosition(WorkPlaceCanvas);
+            Workplace.SetLMB_ClickPosition(LMB_ClickPosition);
             Condition.MouseDown = true;
 
             if (Condition.ButtonPressed == ButtonPressed.Rect)
             {
                 Condition.Action = Actions.DrawRect;
                 Shadow.StartDrawRectShadow(LMB_ClickPosition);
-                WorkplaceProcess.SetLMB_ClickPosition(LMB_ClickPosition);
+                Workplace.SetLMB_ClickPosition(LMB_ClickPosition);
             }
             else if (Condition.ButtonPressed == ButtonPressed.Line)
             {
@@ -118,31 +117,31 @@ namespace GraphicEditor
             }
             else if (Condition.ButtonPressed == ButtonPressed.None)
             {
-                Condition.Action = WorkplaceProcess.DetermindAction(LMB_ClickPosition);
+                Condition.Action = Workplace.DetermindAction(LMB_ClickPosition);
             }
 
             if (e.ClickCount == 2)
             {
                 Rectangle rect = Process.ExecuteDoubleClick(LMB_ClickPosition);
-                WorkplaceProcess.AddToWorkplace(rect);
+                Workplace.AddToWorkplace(rect);
             }
         }
         private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            RMB_firstPoint = e.GetPosition(WorkPlace);
+            RMB_firstPoint = e.GetPosition(WorkPlaceCanvas);
             SetCursor(CursorType.Arrow);
-            WorkplaceProcess.DeselectFigure();
+            Workplace.DeselectFigure();
             if (Condition.Action == Actions.DrawLine)
             {
                 Shadow.RemoveLastPoint();
-                WorkplaceProcess.CreatePolyline(Shadow.GetShadowLine());
+                Workplace.CreatePolyline(Shadow.GetShadowLine());
                 Shadow.Clear();
             }
             Condition.ResetCondition();
         }
         private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
         {
-            Point currentMousePos = e.GetPosition(WorkPlace);
+            Point currentMousePos = e.GetPosition(WorkPlaceCanvas);
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 if (Condition.Action == Actions.DrawRect)
@@ -170,18 +169,18 @@ namespace GraphicEditor
 
             if (Mouse.RightButton == MouseButtonState.Pressed)
             {
-                WorkplaceProcess.MovingWorkPlace(Scroll, RMB_firstPoint, currentMousePos);
+                Workplace.MovingWorkPlace(Scroll, RMB_firstPoint, currentMousePos);
             }
         }
         private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            Point endPoint = e.GetPosition(WorkPlace);
+            Point endPoint = e.GetPosition(WorkPlaceCanvas);
             Condition.MouseUp = true;
 
             if (Condition.Action == Actions.DrawRect)
             {
                 Condition.Action = Actions.None;
-                WorkplaceProcess.CreateRect(endPoint);
+                Workplace.CreateRect(endPoint);
                 Shadow.Clear();
             }
             else if (Condition.Action == Actions.DrawLine)
@@ -191,7 +190,7 @@ namespace GraphicEditor
                     if (Shadow.GetShadowLine().Points.Count <= 2)
                     {
                         Condition.Action = Actions.None;
-                        WorkplaceProcess.CreateLine(LMB_ClickPosition, endPoint);
+                        Workplace.CreateLine(LMB_ClickPosition, endPoint);
                         Shadow.Clear();
                     }
                     Condition.ResetMouseState();
@@ -209,10 +208,10 @@ namespace GraphicEditor
         }
         private void InitializeProcessors()
         {
-            WorkplaceProcess = new WorkplaceProcess(WorkPlace);
-            Process = new FigureProcess(WorkplaceProcess);
+            Workplace = new Workplace(WorkPlaceCanvas);
+            Process = new FigureProcess(Workplace);
             Condition = new WorkplaceCondition();
-            Shadow = new WorkplaceShadow(WorkPlace);
+            Shadow = new WorkplaceShadow(WorkPlaceCanvas);
         }
         private bool AlllowDistance(Point currentMousePos)
         {
@@ -228,22 +227,22 @@ namespace GraphicEditor
             switch (cursorType)
             {
                 case CursorType.Hand:
-                    WorkPlace.Cursor = Cursors.Hand;
+                    WorkPlaceCanvas.Cursor = Cursors.Hand;
                     break;
                 case CursorType.Crosshair:
-                    WorkPlace.Cursor = Cursors.Cross;
+                    WorkPlaceCanvas.Cursor = Cursors.Cross;
                     break;
                 case CursorType.Arrow:
-                    WorkPlace.Cursor = Cursors.Arrow;
+                    WorkPlaceCanvas.Cursor = Cursors.Arrow;
                     break;
                 default:
-                    WorkPlace.Cursor = Cursors.Arrow;
+                    WorkPlaceCanvas.Cursor = Cursors.Arrow;
                     break;
             }
         }
         private void SetWidth()
         {
-            WidthPicker.Figure = WorkplaceProcess.GetSelectedFigure();
+            WidthPicker.Figure = Workplace.GetSelectedFigure();
             WidthPicker.Visibility = Visibility.Visible;
         }
     }

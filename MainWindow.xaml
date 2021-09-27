@@ -123,7 +123,7 @@
         </GroupBox>
         <GroupBox Grid.Column="1" Header="Рабочая область">
             <ScrollViewer x:Name="Scroll" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-                <Canvas x:Name="WorkPlace" Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}" Height="4000" Width="4000" MouseRightButtonDown="WorkPlace_MouseRightButtonDown" MouseLeftButtonDown="WorkPlace_MouseLeftButtonDown" MouseMove="WorkPlace_MouseMove" MouseLeftButtonUp="WorkPlace_MouseLeftButtonUp" />
+                <Canvas x:Name="WorkPlaceCanvas" Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}" Height="4000" Width="4000" MouseRightButtonDown="WorkPlace_MouseRightButtonDown" MouseLeftButtonDown="WorkPlace_MouseLeftButtonDown" MouseMove="WorkPlace_MouseMove" MouseLeftButtonUp="WorkPlace_MouseLeftButtonUp" />
             </ScrollViewer>
         </GroupBox>
     </Grid>

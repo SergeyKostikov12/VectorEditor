@@ -86,7 +86,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Functionality\WorkplaceProcess.cs" />
+    <Compile Include="Functionality\Serializator.cs" />
+    <Compile Include="Functionality\Workplace.cs" />
     <Compile Include="Functionality\WorkplaceShadow.cs" />
     <Compile Include="Functionality\WorkplaceCondition.cs" />
     <Compile Include="Functionality\FigureProcess.cs" />
@@ -96,7 +97,7 @@
     <Compile Include="Functionality\LineFigure.cs" />
     <Compile Include="Functionality\MarkerPoint.cs" />
     <Compile Include="Functionality\RectangleFigure.cs" />
-    <Compile Include="SLFigure.cs" />
+    <Compile Include="SerializableFigure.cs" />
     <Compile Include="Styler.xaml.cs">
       <DependentUpon>Styler.xaml</DependentUpon>
     </Compile>

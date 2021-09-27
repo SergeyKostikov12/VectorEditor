@@ -9,52 +9,35 @@ using System.Xml.Serialization;
 
 namespace GraphicEditor.Functionality
 {
-    public class WorkplaceProcess
+    public class Workplace
     {
-        private Point lMB_ClickPosition;
-        public List<Figure> AllFigures = new List<Figure>();
-        public FiguresList FiguresList = new FiguresList();
-
-        private Figure selectedFigure;
+        //public FiguresList FiguresList = new FiguresList();
+        //private Serializator serializator = new Serializator();
         private Canvas workplace;
+        private WorkplaceCondition Condition = new WorkplaceCondition();
+        public List<Figure> AllFigures = new List<Figure>();
+        private Point lMB_ClickPosition;
+        private Figure selectedFigure;
         private Point scrollPoint = new Point(0, 0);
 
-        public WorkplaceProcess(Canvas _worklace)
+        public Workplace(Canvas _worklace)
         {
             workplace = _worklace;
         }
 
         internal void LoadWorkplace()
         {
-            FiguresList.Figures.Clear();
-            Stream myStream = null;
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
-            openFileDialog.RestoreDirectory = true;
-            var xmlSerializer = new XmlSerializer(typeof(FiguresList));
-            Nullable<bool> result = openFileDialog.ShowDialog();
+            Condition.ButtonPressed = ButtonPressed.Load;
+            Serializator serializator = new Serializator();
+            serializator.Deserealize();
+            var list = serializator.GetFiguresList();
+            if (list.Count == 0) return;
+            DeselectFigure();
+            ClearCanvas();
 
-            if (result == true)
-            {
-                try
-                {
-                    if ((myStream = openFileDialog.OpenFile()) != null)
-                    {
-                        using (myStream)
-                        {
-                            FiguresList sL = (FiguresList)xmlSerializer.Deserialize(myStream);
-                            FiguresList = sL;
-                        }
-                    }
-                    CreateFiguresFromList();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-                workplace.UpdateLayout();
-            }
         }
+
+
         internal void SaveWorkplace()
         {
             SaveFileDialog dlg = new SaveFileDialog();
@@ -98,34 +81,14 @@ namespace GraphicEditor.Functionality
                 selectedFigure = null;
             }
         }
-        internal void AddToWorkplace(object obj)
+        internal void AddToWorkplace(Rectangle rect)
         {
-            if (obj != null)
+            if (rect != null)
             {
-                if (obj is Rectangle)
-                {
-                    workplace.Children.Add((Rectangle)obj);
-                }
+                workplace.Children.Add(rect);
             }
         }
-        private void CreateFiguresFromList()
-        {
-            for (int i = 0; i < FiguresList.Figures.Count; i++)
-            {
-                if ((FigureType)FiguresList.Figures[i].FigureTypeNumber == FigureType.Rectangle)
-                {
-                    Figure figure = new RectangleFigure(FiguresList.Figures[i]);
-                    AllFigures.Add(figure);
-                    PlacingInWorkPlace(figure);
-                }
-                else if ((FigureType)FiguresList.Figures[i].FigureTypeNumber == FigureType.Line)
-                {
-                    Figure figure = new LineFigure(FiguresList.Figures[i]);
-                    AllFigures.Add(figure);
-                    PlacingInWorkPlace(figure);
-                }
-            }
-        }
+        
         private void PlacingInWorkPlace(Figure figure)
         {
             workplace.Children.Add(figure.GetShape());
@@ -138,10 +101,10 @@ namespace GraphicEditor.Functionality
         private void CreateSaveList(List<Figure> list)
         {
             FiguresList = new FiguresList();
-            List<SLFigure> tmp = new List<SLFigure>();
+            List<SerializableFigure> tmp = new List<SerializableFigure>();
             for (int i = 0; i < list.Count; i++)
             {
-                SLFigure sLFigure = new SLFigure();
+                SerializableFigure sLFigure = new SerializableFigure();
                 sLFigure = sLFigure.CreateSLFigureFromFigureObject(AllFigures[i]);
                 tmp.Add(sLFigure);
             }
@@ -186,7 +149,7 @@ namespace GraphicEditor.Functionality
             {
                 workplace.Children.Add(marker);
             }
-            AllFigures.Add(figure);
+            //AllFigures.Add(figure);
         }
         internal void CreatePolyline(Polyline shadowLine)
         {
@@ -238,6 +201,5 @@ namespace GraphicEditor.Functionality
             workplace.Children.Clear();
             AllFigures.Clear();
         }
-
     }
 }

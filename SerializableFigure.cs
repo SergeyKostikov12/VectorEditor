@@ -5,7 +5,7 @@ using System.Windows.Shapes;
 using System.Xml.Serialization;
 
 [Serializable]
-public class SLFigure
+public class SerializableFigure
 {
     [XmlElement] public int FigureTypeNumber;
     [XmlElement] public string AnchorPoint;
@@ -18,11 +18,11 @@ public class SLFigure
     [XmlArray] public string[] Polyline;
     [XmlArray] public string[] Markers;
 
-    public SLFigure()
+    public SerializableFigure()
     {
 
     }
-    public SLFigure CreateSLFigureFromFigureObject(Figure figureObject)
+    public SerializableFigure CreateSLFigureFromFigureObject(Figure figureObject)
     {
         if (figureObject.FigureType == FigureType.Rectangle)
         {

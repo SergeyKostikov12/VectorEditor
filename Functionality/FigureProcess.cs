@@ -9,7 +9,7 @@ namespace GraphicEditor
     public class FigureProcess
     {
 
-        private WorkplaceProcess workplaceProcess;
+        private Workplace workplaceProcess;
         private Figure SelectedFigure
         {
             get
@@ -18,7 +18,7 @@ namespace GraphicEditor
             }
         }
 
-        public FigureProcess(WorkplaceProcess _workplaceProcess)
+        public FigureProcess(Workplace _workplaceProcess)
         {
             workplaceProcess = _workplaceProcess;
         }

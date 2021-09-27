@@ -24,7 +24,7 @@ namespace GraphicEditor.Functionality
             CreatePolyline(firstPoint, secondPoint);
             DefineMarkerPoints();
         }
-        public LineFigure (SLFigure sLFigure)
+        public LineFigure (SerializableFigure sLFigure)
         {
             CreatePolyline();
             DefinePolyline(sLFigure.Polyline.ParsePolylineFromArray());
