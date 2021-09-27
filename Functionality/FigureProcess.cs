@@ -25,31 +25,26 @@ namespace GraphicEditor
 
         internal Rectangle ExecuteDoubleClick(Point point)
         {
-            if (SelectedFigure != null)
-            {
-                Rectangle rect = SelectedFigure.ExecuteDoubleClick(point);
-                return rect;
-            }
-            return null;
+            if (SelectedFigure == null) return null;
+
+            Rectangle rect = SelectedFigure.ExecuteDoubleClick(point);
+            return rect;
         }
         internal void ExecuteRelize(Point endPoint)
         {
-            if (SelectedFigure != null)
-            {
-                SelectedFigure.ExecuteRelize(endPoint);
-            }
+            if (SelectedFigure == null) return;
+            SelectedFigure.ExecuteRelize(endPoint);
         }
         internal void SetFigureLineColor(SolidColorBrush lineColor)
         {
-            if (SelectedFigure != null)
-            {
-                SelectedFigure.LineColor = lineColor;
-            }
-            else
+            if (SelectedFigure == null)
             {
                 MessageBox.Show("Сначала выберите объект");
+                return;
             }
+            SelectedFigure.LineColor = lineColor;
         }
+
         internal void SetFigureFillColor(SolidColorBrush fillColor)
         {
             if (SelectedFigure != null)

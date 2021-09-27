@@ -87,7 +87,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Functionality\Serializator.cs" />
-    <Compile Include="Functionality\Workplace.cs" />
     <Compile Include="Functionality\WorkplaceShadow.cs" />
     <Compile Include="Functionality\WorkplaceCondition.cs" />
     <Compile Include="Functionality\FigureProcess.cs" />
@@ -103,6 +102,9 @@
     </Compile>
     <Compile Include="WidthPicker.xaml.cs">
       <DependentUpon>WidthPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Workplace.xaml.cs">
+      <DependentUpon>Workplace.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -122,6 +124,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WidthPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Workplace.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

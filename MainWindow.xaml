@@ -10,7 +10,7 @@
     <Grid  HorizontalAlignment="Left">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="810"/>
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Column="0" Header="Панель управления" Width="Auto" Height="Auto">
             <Grid Margin="3,10,0,0" Width="195">
@@ -121,10 +121,8 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Column="1" Header="Рабочая область">
-            <ScrollViewer x:Name="Scroll" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-                <Canvas x:Name="WorkPlaceCanvas" Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}" Height="4000" Width="4000" MouseRightButtonDown="WorkPlace_MouseRightButtonDown" MouseLeftButtonDown="WorkPlace_MouseLeftButtonDown" MouseMove="WorkPlace_MouseMove" MouseLeftButtonUp="WorkPlace_MouseLeftButtonUp" />
-            </ScrollViewer>
+        <GroupBox Grid.Column="1" Header="Рабочая область" >
+            <Frame x:Name="WorkplacePanel" Margin="0,0,0,0"/>
         </GroupBox>
     </Grid>
 </Window>

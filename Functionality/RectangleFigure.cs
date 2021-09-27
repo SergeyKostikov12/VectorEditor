@@ -303,5 +303,10 @@ namespace GraphicEditor.Functionality
         {
             return rectangle;
         }
+
+        public override Rectangle ExecuteDoubleClick(Point position)
+        {
+            return null;
+        }
     }
 }

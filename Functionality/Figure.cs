@@ -18,25 +18,22 @@ namespace GraphicEditor.Functionality
 
 
 
-        protected abstract int GetStrokeWidth(); //all
-        protected abstract void SetStrokeWidth(int value); //all
-        protected abstract SolidColorBrush GetFill(); //all
-        protected abstract void SetFill(SolidColorBrush brush); //all
-        protected abstract SolidColorBrush GetLineColor(); //all
-        protected abstract void SetLineColor(SolidColorBrush colorBrush); //all
-        public abstract void ShowOutline(); //all
-        public abstract void HideOutline(); //all
-        public abstract void MoveMarker(Point position); //all
-        public abstract void ExecuteRelize(Point position); //all
-        public abstract bool SelectMarker(Point poin); //all
-        public abstract bool SelectLine(Point point); //all
-        public abstract void DeselectFigure(); //all
-        public abstract List<Rectangle> GetMarkers(); //all
-        public abstract Polyline GetShape(); //all
-        public virtual Rectangle ExecuteDoubleClick(Point position) //line
-        {
-            return null; 
-        }
+        protected abstract int GetStrokeWidth();
+        protected abstract void SetStrokeWidth(int value);
+        protected abstract SolidColorBrush GetFill();
+        protected abstract void SetFill(SolidColorBrush brush);
+        protected abstract SolidColorBrush GetLineColor();
+        protected abstract void SetLineColor(SolidColorBrush colorBrush);
+        public abstract void ShowOutline();
+        public abstract void HideOutline(); 
+        public abstract void MoveMarker(Point position); 
+        public abstract void ExecuteRelize(Point position); 
+        public abstract bool SelectMarker(Point poin); 
+        public abstract bool SelectLine(Point point); 
+        public abstract void DeselectFigure(); 
+        public abstract List<Rectangle> GetMarkers(); 
+        public abstract Polyline GetShape();
+        public abstract Rectangle ExecuteDoubleClick(Point position);
 
 
 

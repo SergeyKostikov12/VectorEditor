@@ -15,8 +15,9 @@ namespace GraphicEditor.Functionality
         private Stream stream;
         private FiguresList figuresList = new FiguresList();
         private List<Figure> figures = new List<Figure>();
+        private string fileName;
 
-        public void Deserealize()
+        public void Load()
         {
             GetStream();
             CreateSerializableFiguresList();
@@ -37,7 +38,12 @@ namespace GraphicEditor.Functionality
             stream = myStream;
         }
 
-        private List<Figure> GetFiguresList()
+        internal void Save(object v)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Figure> GetFiguresList()
         {
             return figures;
         }
@@ -58,6 +64,55 @@ namespace GraphicEditor.Functionality
                 MessageBox.Show(ex.Message);
             }
         }
+
+        internal void Save(List<Figure> allFigures)
+        {
+            figures = allFigures;
+            OpenFileDialog();
+            CreateSaveList();
+            Serialize();
+        }
+
+        private void OpenFileDialog()
+        {
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.FileName = "";
+            saveFileDialog.DefaultExt = ".vec";
+            saveFileDialog.Filter = "Vector documents (.vec)|*.vec";
+            Nullable<bool> result = saveFileDialog.ShowDialog();
+            if (result == false) return;
+
+            if (saveFileDialog.FileName.Length != 0)
+            {
+                File.Delete(saveFileDialog.FileName);
+            }
+            fileName = saveFileDialog.FileName;
+
+        }
+
+        private void Serialize()
+        {
+
+            XmlSerializer formatter = new XmlSerializer(figuresList.GetType());
+            using (FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate))
+            {
+                formatter.Serialize(fs, figuresList);
+            }
+            MessageBox.Show("Файл успешно сохранен!");
+        }
+        private void CreateSaveList()
+        {
+            figuresList = new FiguresList();
+            List<SerializableFigure> tmp = new List<SerializableFigure>();
+            for (int i = 0; i < figures.Count; i++)
+            {
+                SerializableFigure sLFigure = new SerializableFigure();
+                sLFigure = sLFigure.CreateSLFigureFromFigureObject(figures[i]);
+                tmp.Add(sLFigure);
+            }
+            figuresList.Figures = tmp;
+        }
         private void CreateFiguresFromSerializableList()
         {
             for (int i = 0; i < figuresList.Figures.Count; i++)
@@ -74,5 +129,6 @@ namespace GraphicEditor.Functionality
                 }
             }
         }
+
     }
 }
