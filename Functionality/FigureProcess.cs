@@ -23,19 +23,19 @@ namespace GraphicEditor
             workplaceProcess = _workplaceProcess;
         }
 
-        internal Rectangle ExecuteDoubleClick(Point point)
+        private Rectangle ExecuteDoubleClick(Point point)
         {
             if (SelectedFigure == null) return null;
 
             Rectangle rect = SelectedFigure.ExecuteDoubleClick(point);
             return rect;
         }
-        internal void ExecuteRelize(Point endPoint)
+        private void ExecuteRelize(Point endPoint)
         {
             if (SelectedFigure == null) return;
             SelectedFigure.ExecuteRelize(endPoint);
         }
-        internal void SetFigureLineColor(SolidColorBrush lineColor)
+        private void SetFigureLineColor(SolidColorBrush lineColor)
         {
             if (SelectedFigure == null)
             {
@@ -45,7 +45,7 @@ namespace GraphicEditor
             SelectedFigure.LineColor = lineColor;
         }
 
-        internal void SetFigureFillColor(SolidColorBrush fillColor)
+        private void SetFigureFillColor(SolidColorBrush fillColor)
         {
             if (SelectedFigure != null)
             {

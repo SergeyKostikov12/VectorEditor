@@ -17,11 +17,12 @@ namespace GraphicEditor.Functionality
         private List<Figure> figures = new List<Figure>();
         private string fileName;
 
-        public void Load()
+        public List<Figure> Load()
         {
             GetStream();
             CreateSerializableFiguresList();
             CreateFiguresFromSerializableList();
+            return figures;
         }
 
 

@@ -20,26 +20,25 @@ namespace GraphicEditor
     /// </summary>
     public partial class Workplace : Page
     {
-        private Canvas workplace;
-        private ScrollViewer scroll;
         private WorkplaceShadow Shadow;
-        private WorkplaceCondition Condition = new WorkplaceCondition();
+        private WorkplaceCondition Condition;
         private FigureProcess FigureProcess;
+        private Figure selectedFigure;
         public List<Figure> AllFigures = new List<Figure>();
         private Point firstClickLMB;
         private Point firstClickRMB;
-        private Figure selectedFigure;
+        private Point scrollPoint = new Point(0, 0);
 
-        internal object GetFigures()
+        private object GetFigures()
         {
             throw new NotImplementedException();
         }
 
-        private Point scrollPoint = new Point(0, 0);
 
         //Workplace_Class workplace;
-        public Workplace()
+        public Workplace(WorkplaceCondition condition)
         {
+            Condition = condition;
             InitializeComponent();
         }
 
@@ -102,20 +101,17 @@ namespace GraphicEditor
 
         }
 
-
-
-        internal void ExecuteDoubleClick(Point clickPosition)
+        private void ExecuteDoubleClick(Point clickPosition)
         {
 
 
             Rectangle rect = selectedFigure.ExecuteDoubleClick(clickPosition);
             AddToWorkplace(rect);
         }
-        internal void MouseLeftButtonDownClick(Point point)
+        private void MouseLeftButtonDownClick(Point point)
         {
             Point clickPosition = point;
             Condition.MouseDown = true;
-
             if (Condition.ButtonPressed == ButtonPressed.Rect)
             {
                 Condition.Action = Actions.DrawRect;
@@ -137,7 +133,7 @@ namespace GraphicEditor
                 Condition.Action = DetermindAction(clickPosition);
             }
         }
-        internal void MouseRightButtonDownClick()
+        private void MouseRightButtonDownClick()
         {
             workplace.Cursor = Cursors.Arrow;
             DeselectFigure();
@@ -149,7 +145,7 @@ namespace GraphicEditor
             }
             Condition.ResetCondition();
         }
-        internal void Move(Point currentMousePos)
+        private void Move(Point currentMousePos)
         {
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
@@ -183,16 +179,12 @@ namespace GraphicEditor
         }
 
 
-        internal void LoadWorkplace()
+        private void LoadWorkplace(List<Fugure> figures)
         {
-            Condition.ButtonPressed = ButtonPressed.Load;
-            Serializator serializator = new Serializator();
-            serializator.Load();
-            var list = serializator.GetFiguresList();
             if (list.Count == 0) return;
             DeselectFigure();
             ClearCanvas();
-            AllFigures = list;
+            AllFigures = figures;
             AddToWorkplace(list);
         }
 
@@ -209,7 +201,7 @@ namespace GraphicEditor
             }
         }
 
-        internal void SaveWorkplace()
+        private void SaveWorkplace()
         {
             Condition.ButtonPressed = ButtonPressed.Save;
             DeselectFigure();
@@ -217,26 +209,26 @@ namespace GraphicEditor
             serializator.Save(AllFigures);
         }
 
-        internal void StartDrawLine()///
+        private void StartDrawLine()///
         {
             Condition.ButtonPressed = ButtonPressed.Line;
             DeselectFigure();
             workplace.Cursor = Cursors.Cross;
         }
 
-        internal void StartDrawRectangle()
+        private void StartDrawRectangle()
         {
             Condition.ButtonPressed = ButtonPressed.Rect;
             workplace.Cursor = Cursors.Cross;
             DeselectFigure();
         }
 
-        internal void SetLMB_ClickPosition(Point LMB_ClickPositionPoint)
+        private void SetLMB_ClickPosition(Point LMB_ClickPositionPoint)
         {
             firstClickLMB = LMB_ClickPositionPoint;
         }
 
-        internal void MovingWorkPlace(ScrollViewer Scroll, Point rMB_firstPoint, Point currentMousePos)
+        private void MovingWorkPlace(ScrollViewer Scroll, Point rMB_firstPoint, Point currentMousePos)
         {
             scrollPoint.X = Scroll.HorizontalOffset - rMB_firstPoint.DeltaTo(currentMousePos).X / 2;
             scrollPoint.Y = Scroll.VerticalOffset - rMB_firstPoint.DeltaTo(currentMousePos).Y / 2;
@@ -244,7 +236,7 @@ namespace GraphicEditor
             Scroll.ScrollToVerticalOffset(scrollPoint.Y);
         }
 
-        internal void DeselectFigure()
+        private void DeselectFigure()
         {
             if (selectedFigure == null) return;
             selectedFigure.HideOutline();
@@ -252,7 +244,7 @@ namespace GraphicEditor
             selectedFigure = null;
         }
 
-        internal void AddToWorkplace(Rectangle rect)
+        private void AddToWorkplace(Rectangle rect)
         {
             if (rect == null) return;
             workplace.Children.Add(rect);
@@ -271,7 +263,7 @@ namespace GraphicEditor
         {
             selectedFigure = figure;
         }
-        internal void DeleteFigure()
+        private void DeleteFigure()
         {
             if (selectedFigure == null)
             {
@@ -288,7 +280,7 @@ namespace GraphicEditor
             AllFigures.Remove(selectedFigure);
             DeselectFigure();
         }
-        internal void CreateRect(Point endPoint)
+        private void CreateRect(Point endPoint)
         {
             Figure figure = new RectangleFigure(firstClickLMB, endPoint);
             workplace.Children.Add(figure.GetShape());
@@ -299,7 +291,7 @@ namespace GraphicEditor
             }
             AllFigures.Add(figure);
         }
-        internal void CreateLine(Point firstPoint, Point endPoint)
+        private void CreateLine(Point firstPoint, Point endPoint)
         {
             Figure figure = new LineFigure(firstPoint, endPoint);
             workplace.Children.Add(figure.GetShape());
@@ -310,7 +302,7 @@ namespace GraphicEditor
             }
             //AllFigures.Add(figure);
         }
-        internal void CreatePolyline(Polyline shadowLine)
+        private void CreatePolyline(Polyline shadowLine)
         {
             shadowLine.Points.RemoveAt(0);
             Figure figure = new LineFigure(shadowLine);
@@ -322,7 +314,7 @@ namespace GraphicEditor
             }
             AllFigures.Add(figure);
         }
-        internal Actions DetermindAction(Point clickPosition)
+        private Actions DetermindAction(Point clickPosition)
         {
             if (selectedFigure == null)
             {

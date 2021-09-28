@@ -13,7 +13,7 @@ namespace GraphicEditor
     {
         private Workplace workplace;
         private FigureProcess FigureProcess;
-        //private WorkplaceCondition Condition;
+        private WorkplaceCondition Condition;
         //private WorkplaceShadow Shadow;
         private Serializator serializator;
         private ColorPicker ColoRPicker = new ColorPicker();
@@ -30,10 +30,9 @@ namespace GraphicEditor
 
         private void LoadButtonPress(object sender, RoutedEventArgs e)
         {
-
-
-            serializator.Save(workplace.GetFigures());
-            workplace.LoadWorkplace();
+            Condition.ButtonPressed = ButtonPressed.Load;
+            var figures = serializator.Load()
+            workplace.LoadWorkplace(figures);
         }
         private void SaveButtonPress(object sender, RoutedEventArgs e)
         {
@@ -91,15 +90,8 @@ namespace GraphicEditor
 
         private void InitializeProcessors()
         {
-            Workplace workplace = new Workplace();
+            Workplace workplace = new Workplace(Condition);
             WorkplacePanel.Content = workplace;
-
-
-            //остальное ненужно!!!
-            //workplace = new Workplace(WorkPlaceCanvas, Scroll);
-            FigureProcess = new FigureProcess(workplace);
-            //Condition = new WorkplaceCondition();
-            //Shadow = new WorkplaceShadow(WorkPlaceCanvas);
         }
         
 
@@ -124,7 +116,7 @@ namespace GraphicEditor
         //}
         private void SetWidth()
         {
-            //WidthPicker.Figure = workplace.GetSelectedFigure();
+            WidthPicker.Figure = workplace.GetSelectedFigure();
             WidthPicker.Visibility = Visibility.Visible;
         }
 
