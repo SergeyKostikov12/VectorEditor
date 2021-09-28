@@ -185,7 +185,7 @@ namespace GraphicEditor
             DeselectFigure();
             ClearCanvas();
             AllFigures = figures;
-            AddToWorkplace(list);
+            AddToWorkplace(figures);
         }
 
         private void AddToWorkplace(List<Figure> figures)
@@ -203,7 +203,7 @@ namespace GraphicEditor
 
         private void SaveWorkplace()
         {
-            Condition.ButtonPressed = ButtonPressed.Save;
+          
             DeselectFigure();
             Serializator serializator = new Serializator();
             serializator.Save(AllFigures);

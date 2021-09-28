@@ -36,6 +36,7 @@ namespace GraphicEditor
         }
         private void SaveButtonPress(object sender, RoutedEventArgs e)
         {
+              Condition.ButtonPressed = ButtonPressed.Save;
             workplace.SaveWorkplace();
         }
         private void RectangleButtonPress(object sender, RoutedEventArgs e)
