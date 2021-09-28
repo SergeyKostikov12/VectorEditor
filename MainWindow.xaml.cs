@@ -11,16 +11,12 @@ namespace GraphicEditor
 {
     public partial class MainWindow : Window
     {
-        private Workplace workplace;
-        private FigureProcess FigureProcess;
-        private WorkplaceCondition Condition;
-        //private WorkplaceShadow Shadow;
-        private Serializator serializator;
+        private WorkplaceCondition Condition = new WorkplaceCondition();
+        private Serializator serializator = new Serializator();
         private ColorPicker ColoRPicker = new ColorPicker();
         private WidthPicker WidthPicker = new WidthPicker();
+        private Workplace workplace;
 
-        //private Point LMB_ClickPosition;
-        //private Point RMB_firstPoint;
 
         public MainWindow()
         {
@@ -31,23 +27,26 @@ namespace GraphicEditor
         private void LoadButtonPress(object sender, RoutedEventArgs e)
         {
             Condition.ButtonPressed = ButtonPressed.Load;
-            var figures = serializator.Load()
+            var figures = serializator.Load();
             workplace.LoadWorkplace(figures);
         }
-        private void SaveButtonPress(object sender, RoutedEventArgs e)
+        public void SaveButtonPress(object sender, RoutedEventArgs e)
         {
-              Condition.ButtonPressed = ButtonPressed.Save;
-            workplace.SaveWorkplace();
+            Condition.ButtonPressed = ButtonPressed.Save;
+            var figures = workplace.GetAllFigures();
+            serializator.Save(figures);
         }
-        private void RectangleButtonPress(object sender, RoutedEventArgs e)
+        public void RectangleButtonPress(object sender, RoutedEventArgs e)
         {
+            Condition.ButtonPressed = ButtonPressed.Rect;
             workplace.StartDrawRectangle();
         }
-        private void LineButtonPress(object sender, RoutedEventArgs e)
+        public void LineButtonPress(object sender, RoutedEventArgs e)
         {
+            Condition.ButtonPressed = ButtonPressed.Line;
             workplace.StartDrawLine();
         }
-        private void DeleteButtonPress(object sender, RoutedEventArgs e)
+        public void DeleteButtonPress(object sender, RoutedEventArgs e)
         {
             workplace.DeleteFigure();
         }
@@ -65,13 +64,13 @@ namespace GraphicEditor
         {
             PaintFillColorButton();
         }
-        private void PaintLineColorButton()
+        public void PaintLineColorButton()
         {
-            FigureProcess.SetFigureLineColor((SolidColorBrush)LineColorField.Background);
+            workplace.SetFigureLineColor((SolidColorBrush)LineColorField.Background);
         }
-        private void PaintFillColorButton()
+        public void PaintFillColorButton()
         {
-           FigureProcess.SetFigureFillColor((SolidColorBrush)FillColorField.Background);
+           workplace.SetFigureFillColor((SolidColorBrush)FillColorField.Background);
         }
         private void LineColorFieldButtonPress(object sender, RoutedEventArgs e)
         {
@@ -91,30 +90,13 @@ namespace GraphicEditor
 
         private void InitializeProcessors()
         {
-            Workplace workplace = new Workplace(Condition);
+            workplace = new Workplace(Condition);
             WorkplacePanel.Content = workplace;
         }
         
 
 
-        //private void SetCursor(CursorType cursorType)
-        //{
-        //    switch (cursorType)
-        //    {
-        //        case CursorType.Hand:
-        //            WorkPlaceCanvas.Cursor = Cursors.Hand;
-        //            break;
-        //        case CursorType.Crosshair:
-                    
-        //            break;
-        //        case CursorType.Arrow:
-        //            WorkPlaceCanvas.Cursor = Cursors.Arrow;
-        //            break;
-        //        default:
-        //            WorkPlaceCanvas.Cursor = Cursors.Arrow;
-        //            break;
-        //    }
-        //}
+        
         private void SetWidth()
         {
             WidthPicker.Figure = workplace.GetSelectedFigure();

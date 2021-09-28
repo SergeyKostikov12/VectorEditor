@@ -89,7 +89,6 @@
     <Compile Include="Functionality\Serializator.cs" />
     <Compile Include="Functionality\WorkplaceShadow.cs" />
     <Compile Include="Functionality\WorkplaceCondition.cs" />
-    <Compile Include="Functionality\FigureProcess.cs" />
     <Compile Include="Functionality\Enums.cs" />
     <Compile Include="Functionality\Figure.cs" />
     <Compile Include="FiguresList.cs" />

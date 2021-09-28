@@ -32,7 +32,6 @@ namespace GraphicEditor.Functionality
         public RectangleFigure(SerializableFigure sLFigure)
         {
             rectangle = sLFigure.Polyline.ParsePolylineFromArray();
-            StrokeWidth = Convert.ToInt32(sLFigure.LineStrokeThinkness);
             Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(sLFigure.FillColor));
             LineColor = new SolidColorBrush
             {
@@ -42,6 +41,7 @@ namespace GraphicEditor.Functionality
             moveMarker = new MarkerPoint(sLFigure.GetMovePoint().ParsePoint());
             rotateMarker = new MarkerPoint(sLFigure.GetRotatePoint().ParsePoint());
             DefineMarkers();
+            StrokeWidth = Convert.ToInt32(sLFigure.LineStrokeThinkness);
         }
 
         private void MoveScaleMarker(Point position)

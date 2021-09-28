@@ -19,7 +19,7 @@ namespace GraphicEditor.Functionality
 
         public List<Figure> Load()
         {
-            GetStream();
+            if(!GetStream()) return figures;
             CreateSerializableFiguresList();
             CreateFiguresFromSerializableList();
             return figures;
@@ -27,21 +27,17 @@ namespace GraphicEditor.Functionality
 
 
 
-        private void GetStream()
+        private bool GetStream()
         {
             Stream myStream = null;
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
             openFileDialog.RestoreDirectory = true;
             Nullable<bool> result = openFileDialog.ShowDialog();
-            if (result == false) return;
-            if ((myStream = openFileDialog.OpenFile()) == null) return;
+            if (result == false) return false;
+            if ((myStream = openFileDialog.OpenFile()) == null) return false;
             stream = myStream;
-        }
-
-        internal void Save(object v)
-        {
-            throw new NotImplementedException();
+            return true;
         }
 
         public List<Figure> GetFiguresList()
@@ -69,12 +65,12 @@ namespace GraphicEditor.Functionality
         internal void Save(List<Figure> allFigures)
         {
             figures = allFigures;
-            OpenFileDialog();
+            if(!OpenFileDialog()) return;
             CreateSaveList();
             Serialize();
         }
 
-        private void OpenFileDialog()
+        private bool OpenFileDialog()
         {
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -82,14 +78,14 @@ namespace GraphicEditor.Functionality
             saveFileDialog.DefaultExt = ".vec";
             saveFileDialog.Filter = "Vector documents (.vec)|*.vec";
             Nullable<bool> result = saveFileDialog.ShowDialog();
-            if (result == false) return;
+            if (result == false) return false;
 
             if (saveFileDialog.FileName.Length != 0)
             {
                 File.Delete(saveFileDialog.FileName);
             }
             fileName = saveFileDialog.FileName;
-
+            return true;
         }
 
         private void Serialize()

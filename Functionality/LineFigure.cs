@@ -24,12 +24,12 @@ namespace GraphicEditor.Functionality
             CreatePolyline(firstPoint, secondPoint);
             DefineMarkerPoints();
         }
-        public LineFigure (SerializableFigure sLFigure)
+        public LineFigure (SerializableFigure sLFigure)//1
         {
             CreatePolyline();
             DefinePolyline(sLFigure.Polyline.ParsePolylineFromArray());
-            polyline.StrokeThickness = Convert.ToInt32(sLFigure.LineStrokeThinkness);
             DefineMarkerPoints();
+            polyline.StrokeThickness = Convert.ToInt32(sLFigure.LineStrokeThinkness);
             LineColor = new SolidColorBrush
             {
                 Color = (Color)ColorConverter.ConvertFromString(sLFigure.LineColor)
@@ -161,27 +161,55 @@ namespace GraphicEditor.Functionality
         }
         public override void ExecuteRelize(Point position)
         {
-            if (selectedMarker != null)
+            if (polyline.Points.Count <= 2) return;
+            if (selectedMarker == null) return;
+            int n = 0;
+            for (int i = 0; i < markers.Count; i++)
+			{
+                if (!markers[i].Equals(selectedMarker)) continue;
+                n = i;
+                break;
+			}
+            if (n == 0 || n == markers.Count-1)
             {
-                for (int i = 0; i < polyline.Points.Count; i++)
+                if (n==0)
                 {
-                    if (selectedMarker.Point.ItInsideCircle(polyline.Points[i], StrokeWidth) && !selectedMarker.Equals(markers[i]))
+                    if (selectedMarker.Point.ItInsideCircle(polyline.Points[1], StrokeWidth))
                     {
                         selectedMarker.Hide();
                         markers.Remove(selectedMarker);
-                        polyline.Points.RemoveAt(i);
+                        polyline.Points.RemoveAt(0);
                         selectedMarker = null;
-                        break;
                     }
                 }
-                if (polyline.Points.Count == 1)
+                if (n == polyline.Points.Count-1)
                 {
-                    polyline.Points.Clear();
-                    polyline.Visibility = Visibility.Hidden;
-                    markers[0].Hide();
-                    markers.Clear();
+                    if(selectedMarker.Point.ItInsideCircle(polyline.Points[polyline.Points.Count-2], StrokeWidth))
+                    {
+                        selectedMarker.Hide();
+                        markers.Remove(selectedMarker);
+                        polyline.Points.RemoveAt(polyline.Points.Count-1);
+                        selectedMarker = null;                    }
                 }
             }
+            else
+            {
+                if(selectedMarker.Point.ItInsideCircle(markers[n-1].Point, StrokeWidth))
+                {
+                    selectedMarker.Hide();
+                    markers.Remove(selectedMarker);
+                    polyline.Points.RemoveAt(n);
+                    selectedMarker = null; 
+                }
+                else if(selectedMarker.Point.ItInsideCircle(markers[n+1].Point, StrokeWidth))
+                {
+                    selectedMarker.Hide();
+                    markers.Remove(selectedMarker);
+                    polyline.Points.RemoveAt(n);
+                    selectedMarker = null; 
+                }
+            }
+
         }
         public override Rectangle ExecuteDoubleClick(Point position)
         {
