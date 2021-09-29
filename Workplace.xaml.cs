@@ -92,15 +92,12 @@ namespace GraphicEditor
         }
         public void SetFigureFillColor(SolidColorBrush fillColor)
         {
-            if (selectedFigure != null)
-            {
-                selectedFigure.Fill = fillColor;
-            }
-            else
+            if (selectedFigure == null)
             {
                 MessageBox.Show("Сначала выберите объект");
+                return;
             }
-
+                selectedFigure.Fill = fillColor;
         }
 
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

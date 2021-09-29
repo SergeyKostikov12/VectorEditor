@@ -20,8 +20,8 @@ public class SerializableFigure
 
     public SerializableFigure()
     {
-
     }
+
     public SerializableFigure CreateSLFigureFromFigureObject(Figure figureObject)
     {
         if (figureObject.FigureType == FigureType.Rectangle)
