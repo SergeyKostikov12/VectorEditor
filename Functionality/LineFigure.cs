@@ -41,18 +41,22 @@ namespace GraphicEditor.Functionality
         {
             FigureType = FigureType.Line;
             markers = new List<MarkerPoint>();
-            polyline = new Polyline();
-            polyline.StrokeEndLineCap = PenLineCap.Round;
-            polyline.StrokeLineJoin = PenLineJoin.Round;
+            polyline = new Polyline
+            {
+                StrokeEndLineCap = PenLineCap.Round,
+                StrokeLineJoin = PenLineJoin.Round
+            };
         }
         private void CreatePolyline(Point firstPoint, Point secondPoint)
         {
             FigureType = FigureType.Line;
             markers = new List<MarkerPoint>();
-            polyline = new Polyline();
-            polyline.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-            polyline.StrokeEndLineCap = PenLineCap.Square;
-            polyline.StrokeLineJoin = PenLineJoin.Round;
+            polyline = new Polyline
+            {
+                Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                StrokeEndLineCap = PenLineCap.Square,
+                StrokeLineJoin = PenLineJoin.Round
+            };
             polyline.Points.Add(firstPoint);
             polyline.Points.Add(secondPoint);
         }
@@ -108,11 +112,11 @@ namespace GraphicEditor.Functionality
         {
             polyline.Stroke = colorBrush;
         }
-        internal Polyline GetPolyline()
+        public Polyline GetPolyline()
         {
             return polyline;
         }
-        internal List<MarkerPoint> GetMarkerPoints()
+        public List<MarkerPoint> GetMarkerPoints()
         {
             return markers;
         }

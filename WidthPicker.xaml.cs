@@ -1,4 +1,5 @@
 ﻿using GraphicEditor.Functionality;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -37,6 +38,16 @@ namespace GraphicEditor
                 Figure.StrokeWidth = width;
                 this.Visibility = Visibility.Hidden;
             }
+        }
+
+        internal void Show()
+        {
+            this.Visibility = Visibility.Visible;
+        }
+
+        internal void Hide()
+        {
+            this.Visibility = Visibility.Hidden;
         }
     }
 }

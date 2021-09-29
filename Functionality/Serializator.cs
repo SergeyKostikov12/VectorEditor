@@ -26,7 +26,7 @@ namespace GraphicEditor.Functionality
         }
         private bool GetStream()
         {
-            Stream myStream = null;
+            Stream myStream;
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
             openFileDialog.RestoreDirectory = true;

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Shapes;
 
 public static class Extensions
@@ -75,16 +73,16 @@ public static class Extensions
         double angle = Vector.AngleBetween(CA, CB);
         return angle;
     }
-    public static Point ParsePoint( this string deserealizedString)
+    public static Point ParsePoint(this string deserealizedString)
     {
         return Point.Parse(deserealizedString.Replace(',', '.').Replace(';', ','));
     }
-    public static Point NewPosition(this Point @this, Point newPosition)
+    public static Point NewPosition(this Point point, Point newPosition)
     {
         Point pt = new Point(newPosition.X, newPosition.Y);
         return pt;
     }
-    public static Polyline ParsePolylineFromArray( this string[] polyline)
+    public static Polyline ParsePolylineFromArray(this string[] polyline)
     {
         Polyline tmpLine = new Polyline();
         for (int i = 0; i < polyline.Length; i++)

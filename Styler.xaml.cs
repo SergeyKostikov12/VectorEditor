@@ -1,6 +1,4 @@
-﻿using GraphicEditor.Functionality;
-using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -9,7 +7,6 @@ namespace GraphicEditor
 {
     public partial class ColorPicker : Page
     {
-        public ButtonPressed BtnPressed;
         private Button colorBtn;
         private SolidColorBrush Brush { get ; set ; }
 
@@ -38,7 +35,7 @@ namespace GraphicEditor
                     RowDefinition rd = new RowDefinition();
                     rd.Height = GridLength.Auto;
                     grid.RowDefinitions.Add(rd);
-                    Button btn = CreateButton(values[x].Brush, c, r);
+                    Button btn = CreateButton(values[x].Brush);
                     Grid.SetColumn(btn, c);
                     Grid.SetRow(btn, r);
                     grid.Children.Add(btn);
@@ -47,7 +44,7 @@ namespace GraphicEditor
             }
             this.Content = grid;
         }
-        private Button CreateButton(Brush color, int Col, int Row)
+        private Button CreateButton(Brush color)
         {
             Button button = new Button();
             button.Background = color;
@@ -56,25 +53,27 @@ namespace GraphicEditor
             button.Height = 20;
             return button;
         }
+
+        public void Hide()
+        {
+            this.Visibility = Visibility.Hidden;
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Brush = (SolidColorBrush)(sender as Button).Background;
             colorBtn.Background = Brush;
             this.Visibility = Visibility.Hidden;
         }
-        internal SolidColorBrush GetColor(Button lineColorField)
+
+        internal void Show()
         {
-            throw new NotImplementedException();
+            this.Visibility = Visibility.Visible;
         }
+
         internal void GetButtonColor(object sender)
         {
             colorBtn = (Button)sender;
         }
-        public Brush GetColor()
-        {
-            this.Visibility = Visibility.Hidden;
-            return Brush;
-        }
-
     }
 }

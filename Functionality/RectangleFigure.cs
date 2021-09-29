@@ -55,10 +55,12 @@ namespace GraphicEditor.Functionality
             }
             Point tmpAxis = new Point(moveMarker.Point.X - 100, moveMarker.Point.Y);
             double angle = moveMarker.Point.AngleBetweenPoints(rotateMarker.Point, tmpAxis);
-            RotateTransform rotate = new RotateTransform();
-            rotate.CenterX = moveMarker.Point.X;
-            rotate.CenterY = moveMarker.Point.Y;
-            rotate.Angle = angle;
+            RotateTransform rotate = new RotateTransform
+            {
+                CenterX = moveMarker.Point.X,
+                CenterY = moveMarker.Point.Y,
+                Angle = angle
+            };
 
             tmp.Points[0] = position;
             tmp.Points[4] = position;
@@ -76,9 +78,11 @@ namespace GraphicEditor.Functionality
             Point centre = new Point(tmp.Points[0].X + width / 2, tmp.Points[0].Y + height / 2);
             
             Point offset = centre.DeltaTo(moveMarker.Point);
-            TranslateTransform translate = new TranslateTransform();
-            translate.X = offset.X;
-            translate.Y = offset.Y;
+            TranslateTransform translate = new TranslateTransform
+            {
+                X = offset.X,
+                Y = offset.Y
+            };
             for (int i = 0; i<tmp.Points.Count; i++)
             {
                 Point pt = translate.Transform(tmp.Points[i]);
@@ -116,9 +120,11 @@ namespace GraphicEditor.Functionality
         }
         private void RotateRectangle(Point position)
         {
-            RotateTransform rotate = new RotateTransform();
-            rotate.CenterX = moveMarker.X;
-            rotate.CenterY = moveMarker.Y;
+            RotateTransform rotate = new RotateTransform
+            {
+                CenterX = moveMarker.X,
+                CenterY = moveMarker.Y
+            };
             Vector CA = new Vector(moveMarker.X - rotateMarker.X, moveMarker.Y - rotateMarker.Y);
             Vector CB = new Vector(moveMarker.X - position.X, moveMarker.Y - position.Y);
             double angle = Vector.AngleBetween(CA, CB) * Math.PI / 180;
@@ -170,18 +176,6 @@ namespace GraphicEditor.Functionality
             rectangle.StrokeEndLineCap = PenLineCap.Square;
             //StrokeWidth = 1;
         }
-        internal Polyline GetRectangle()
-        {
-            return rectangle;
-        }
-        internal Point GetMoveMarker()
-        {
-            return moveMarker.Point;
-        }
-        internal Point GetRotateMarker()
-        {
-            return rotateMarker.Point;
-        }
         protected override SolidColorBrush GetLineColor()
         {
             SolidColorBrush brush = (SolidColorBrush)rectangle.Stroke;
@@ -200,14 +194,12 @@ namespace GraphicEditor.Functionality
             rectangle.StrokeThickness = value;
             RefreshMarkerPoints();
         }
-
         private void RefreshMarkerPoints()
         {
             moveMarker.SetMarkerSize(StrokeWidth);
             rotateMarker.SetMarkerSize(StrokeWidth);
             scaleMarker.SetMarkerSize(StrokeWidth);
         }
-
         protected override SolidColorBrush GetFill()
         {
             return (SolidColorBrush)rectangle.Fill;
@@ -293,20 +285,33 @@ namespace GraphicEditor.Functionality
         }
         public override List<Rectangle> GetMarkers()
         {
-            List<Rectangle> rects = new List<Rectangle>();
-            rects.Add(moveMarker.Marker);
-            rects.Add(rotateMarker.Marker);
-            rects.Add(scaleMarker.Marker);
+            List<Rectangle> rects = new List<Rectangle>
+            {
+                moveMarker.Marker,
+                rotateMarker.Marker,
+                scaleMarker.Marker
+            };
             return rects;
         }
         public override Polyline GetShape()
         {
             return rectangle;
         }
-
         public override Rectangle ExecuteDoubleClick(Point position)
         {
             return null;
+        }
+        public Polyline GetRectangle()
+        {
+            return rectangle;
+        }
+        public Point GetMoveMarker()
+        {
+            return moveMarker.Point;
+        }
+        public Point GetRotateMarker()
+        {
+            return rotateMarker.Point;
         }
     }
 }

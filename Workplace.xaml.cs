@@ -1,16 +1,9 @@
 ﻿using GraphicEditor.Functionality;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace GraphicEditor
@@ -18,7 +11,7 @@ namespace GraphicEditor
     public partial class Workplace : Page
     {
         private WorkplaceShadow Shadow;
-        private WorkplaceCondition Condition;
+        private WorkplaceCondition Condition = new WorkplaceCondition();
         private Figure selectedFigure;
         public List<Figure> AllFigures = new List<Figure>();
         private Point firstClickLMB;
@@ -26,9 +19,8 @@ namespace GraphicEditor
         private Point scrollPoint = new Point(0, 0);
 
 
-        public Workplace(WorkplaceCondition condition)
+        public Workplace()
         {
-            Condition = condition;
             InitializeComponent();
             Shadow = new WorkplaceShadow(WorkPlaceCanvas);
         }
@@ -47,13 +39,13 @@ namespace GraphicEditor
                 firstClickLMB = clickPosition;
             }
             Condition.MouseDown = true;
-            if (Condition.ButtonPressed == ButtonPressed.Rect)
+            if (Condition.DrawingMode == DrawingMode.DrawRectMode)
             {
                 Condition.Action = Actions.DrawRect;
                 Shadow.StartDrawRectShadow(clickPosition);
                 firstClickLMB = clickPosition;
             }
-            else if (Condition.ButtonPressed == ButtonPressed.Line)
+            else if (Condition.DrawingMode == DrawingMode.DrawLineMode)
             {
                 Condition.Action = Actions.DrawLine;
                 if (Shadow.GetShadowLine().Points.Count == 0)
@@ -63,11 +55,26 @@ namespace GraphicEditor
                     Shadow.SetLineSecondPoint(clickPosition);
                 }
             }
-            else if (Condition.ButtonPressed == ButtonPressed.None)
+            else if (Condition.DrawingMode == DrawingMode.None)
             {
                 Condition.Action = DetermindAction(clickPosition);
             }
         }
+
+        internal void ReadyDrawLine()
+        {
+            Condition.DrawingMode = DrawingMode.DrawLineMode;
+            WorkPlaceCanvas.Cursor = Cursors.Cross;
+            DeselectFigure();
+        }
+
+        internal void ReadyDrawRectangle()
+        {
+            Condition.DrawingMode = DrawingMode.DrawRectMode;
+            WorkPlaceCanvas.Cursor = Cursors.Cross;
+            DeselectFigure();
+        }
+
         private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             firstClickRMB = e.GetPosition(WorkPlaceCanvas);
@@ -294,6 +301,7 @@ namespace GraphicEditor
             DeselectFigure();
             AllFigures = fig;
             AddToWorkplace(fig);
+            Condition.ResetCondition();
         }
         private List<Figure> CloneList(List<Figure> oldList)
         {
@@ -304,8 +312,6 @@ namespace GraphicEditor
             }
             return newlist;
         }
-
-
         public void DeleteFigure()
         {
             if (selectedFigure == null)
@@ -322,11 +328,6 @@ namespace GraphicEditor
             }
             AllFigures.Remove(selectedFigure);
             firstClickLMB = new Point();
-            DeselectFigure();
-        }
-        public void SetCrossCursor()
-        {
-            WorkPlaceCanvas.Cursor = Cursors.Cross;
             DeselectFigure();
         }
         public void SetFigureLineColor(SolidColorBrush lineColor)

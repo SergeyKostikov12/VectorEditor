@@ -6,94 +6,68 @@ namespace GraphicEditor
 {
     public partial class MainWindow : Window
     {
-        private WorkplaceCondition Condition = new WorkplaceCondition();
         private Serializator Serializator = new Serializator();
         private ColorPicker ColoRPicker = new ColorPicker();
         private WidthPicker WidthPicker = new WidthPicker();
-        private Workplace Workplace;
+        private Workplace Workplace = new Workplace();
 
 
         public MainWindow()
         {
             InitializeComponent();
-            InitializeProcessors();
+            WorkplacePanel.Content = Workplace;
         }
 
         private void LoadButtonPress(object sender, RoutedEventArgs e)
         {
-            Condition.ButtonPressed = ButtonPressed.Load;
             var figures = Serializator.Load();
             Workplace.LoadWorkplace(figures);
-            Condition.ResetCondition();
         }
         public void SaveButtonPress(object sender, RoutedEventArgs e)
         {
-            Condition.ButtonPressed = ButtonPressed.Save;
             var figures = Workplace.GetAllFigures();
             Serializator.Save(figures);
-            Condition.ResetCondition();
         }
         public void RectangleButtonPress(object sender, RoutedEventArgs e)
         {
-            Condition.ButtonPressed = ButtonPressed.Rect;
-            Workplace.SetCrossCursor();
+            Workplace.ReadyDrawRectangle();
+            
         }
         public void LineButtonPress(object sender, RoutedEventArgs e)
         {
-            Condition.ButtonPressed = ButtonPressed.Line;
-            Workplace.SetCrossCursor();
+            Workplace.ReadyDrawLine();
         }
         public void DeleteButtonPress(object sender, RoutedEventArgs e)
         {
             Workplace.DeleteFigure();
         }
-        private void StrokeWidthButtonPress(object sender, RoutedEventArgs e)
+        private void ThinknessButtonPress(object sender, RoutedEventArgs e)
         {
-            ColoRPicker.Visibility = Visibility.Hidden;
-            PropertyPanel.Content = WidthPicker;
-            SetWidth();
+            ToolPanel.Content = WidthPicker;
+            ColoRPicker.Hide();
+            WidthPicker.Show();
+            WidthPicker.Figure = Workplace.GetSelectedFigure();
         }
         private void LineColorButtonPress(object sender, RoutedEventArgs e)
         {
-            PaintLineColorButton();
+            Workplace.SetFigureLineColor((SolidColorBrush)LineColorField.Background);
         }
         private void FillButtonPress(object sender, RoutedEventArgs e)
         {
-            PaintFillColorButton();
-        }
-        public void PaintLineColorButton()
-        {
-            Workplace.SetFigureLineColor((SolidColorBrush)LineColorField.Background);
-        }
-        public void PaintFillColorButton()
-        {
-           Workplace.SetFigureFillColor((SolidColorBrush)FillColorField.Background);
+            Workplace.SetFigureFillColor((SolidColorBrush)FillColorField.Background);
         }
         private void LineColorFieldButtonPress(object sender, RoutedEventArgs e)
         {
-            PropertyPanel.Content = ColoRPicker;
-            WidthPicker.Visibility = Visibility.Hidden;
-            ColoRPicker.BtnPressed = ButtonPressed.Color;
-            ColoRPicker.Visibility = Visibility.Visible;
+            ToolPanel.Content = ColoRPicker;
+            WidthPicker.Hide();
+            ColoRPicker.Show();
             ColoRPicker.GetButtonColor(sender);
         }
         private void FillColorFieldButtonPress(object sender, RoutedEventArgs e)
         {
-            PropertyPanel.Content = ColoRPicker;
-            ColoRPicker.BtnPressed = ButtonPressed.Fill;
-            ColoRPicker.Visibility = Visibility.Visible;
+            ToolPanel.Content = ColoRPicker;
+            ColoRPicker.Show();
             ColoRPicker.GetButtonColor(sender);
         }
-        private void InitializeProcessors()
-        {
-            Workplace = new Workplace(Condition);
-            WorkplacePanel.Content = Workplace;
-        }
-        private void SetWidth()
-        {
-            WidthPicker.Figure = Workplace.GetSelectedFigure();
-            WidthPicker.Visibility = Visibility.Visible;
-        }
-
     }
 }

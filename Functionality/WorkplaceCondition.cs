@@ -3,7 +3,7 @@
     public class WorkplaceCondition
     {
         public Actions Action;
-        public ButtonPressed ButtonPressed;
+        public DrawingMode DrawingMode;
         public bool MouseDown = false;
         public bool MouseDrag = false;
         public bool MouseUp = false;
@@ -11,13 +11,11 @@
         internal void ResetCondition()
         {
             Action = Actions.None;
-            ButtonPressed = ButtonPressed.None;
+            DrawingMode = DrawingMode.None;
         }
         public bool IsDrawLine()
         {
-            if (MouseDown & MouseDrag & MouseDrag) return true;
-            else if (MouseDown & MouseUp) return false;
-            else return false;
+            return MouseDown & MouseDrag; 
         }
         public void ResetMouseState()
         {
