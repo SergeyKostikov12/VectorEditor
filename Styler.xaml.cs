@@ -27,13 +27,13 @@ namespace GraphicEditor
                   ToArray();
 
             Grid grid = new Grid();
-            grid.Margin = new Thickness(0, 0, 0, 0);
+            grid.Margin = new Thickness(0, 0, 10, 5);
 
             int x = 0;
-            for (int c = 0; c < 8; c++)
+            for (int c = 0; c < 7; c++)
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition());
-                for (int r = 0; r < 4; r++)
+                for (int r = 0; r < 3; r++)
                 {
                     RowDefinition rd = new RowDefinition();
                     rd.Height = GridLength.Auto;

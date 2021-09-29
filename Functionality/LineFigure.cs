@@ -224,7 +224,6 @@ namespace GraphicEditor.Functionality
                     marker.SetMarkerSize(StrokeWidth);
                     markers.Insert(i+1, marker);
                     marker.Show();
-                    //canvas.Children.Add(marker.Marker);
                     return marker.Marker;
                 }
             }

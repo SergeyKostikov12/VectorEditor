@@ -24,9 +24,6 @@ namespace GraphicEditor.Functionality
             CreateFiguresFromSerializableList();
             return figures;
         }
-
-
-
         private bool GetStream()
         {
             Stream myStream = null;

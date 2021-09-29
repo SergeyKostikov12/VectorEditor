@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -15,8 +14,6 @@ namespace GraphicEditor.Functionality
         public int StrokeWidth { get => GetStrokeWidth(); set => SetStrokeWidth(value); }
         public SolidColorBrush LineColor { get => GetLineColor(); set => SetLineColor(value); }
         public SolidColorBrush Fill { get => GetFill(); set => SetFill(value); }
-
-
 
         protected abstract int GetStrokeWidth();
         protected abstract void SetStrokeWidth(int value);
@@ -34,8 +31,5 @@ namespace GraphicEditor.Functionality
         public abstract List<Rectangle> GetMarkers(); 
         public abstract Polyline GetShape();
         public abstract Rectangle ExecuteDoubleClick(Point position);
-
-
-
     }
 }

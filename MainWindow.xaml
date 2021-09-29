@@ -117,7 +117,7 @@
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Толщина линии</Label>
                 </Grid>
                 <Grid Grid.Row="8" Name="GridPanel">
-                    <Frame x:Name="PropertyPanel" Margin="0,0,0,0" NavigationUIVisibility="Hidden" Width="190"/>
+                    <Frame x:Name="PropertyPanel" Margin="0,0,0,0" NavigationUIVisibility="Hidden" Width="195" Height="65"/>
                 </Grid>
             </Grid>
         </GroupBox>

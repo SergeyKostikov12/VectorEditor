@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Shapes;
 
 public static class Extensions
@@ -31,23 +33,19 @@ public static class Extensions
         Point b = secondPoint;
         Point c = centre;
 
-        if (c.AbsAngleBetweenPoints(a, b) > 60)
+        if (c.AbsAngleBetweenPoints(a, b) < 60) return false;
+        double A = c.Length(b);
+        double B = c.Length(a);
+        double C = a.Length(b);
+        double radius = lineThinkness + 10;
+        double p = (A + B + C) / 2;
+        double S = Math.Sqrt(p * (p - A) * (p - B) * (p - C));
+        double h = 2 * S / C;
+        if (h <= radius)
         {
-            double A = c.Length(b);
-            double B = c.Length(a);
-            double C = a.Length(b);
-
-            double radius = lineThinkness + 10;
-            double p = (A + B + C) / 2;
-            double S = Math.Sqrt(p * (p - A) * (p - B) * (p - C));
-            double h = 2 * S / C;
-            if (h <= radius)
-            {
-                return true;
-            }
-            else return false;
+            return true;
         }
-        return false;
+        else return false;
     }
     public static double Length(this Point point, Point secondPoint)
     {

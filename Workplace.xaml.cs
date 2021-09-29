@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor
 {
-    /// <summary>
-    /// Логика взаимодействия для Workplace.xaml
-    /// </summary>
     public partial class Workplace : Page
     {
         private WorkplaceShadow Shadow;
@@ -36,91 +33,54 @@ namespace GraphicEditor
             Shadow = new WorkplaceShadow(WorkPlaceCanvas);
         }
 
-        public Figure GetSelectedFigure()
-        {
-            return selectedFigure;
-        }
-        public void LoadWorkplace(List<Figure> figures)
-        {
-            if (figures.Count == 0) return;
-            DeselectFigure();
-            ClearCanvas();
-            AllFigures = figures;
-            AddToWorkplace(figures);
-        }
-        public List<Figure> GetAllFigures()
-        {
-            return AllFigures;
-        }
-        public void DeleteFigure()
-        {
-            if (selectedFigure == null)
-            {
-                MessageBox.Show("Сначала выделите объект!");
-                return;
-            }
-            WorkPlaceCanvas.Cursor = Cursors.Arrow;
-            WorkPlaceCanvas.Children.Remove(selectedFigure.GetShape());
-            var markers = selectedFigure.GetMarkers();
-            foreach (var marker in markers)
-            {
-                WorkPlaceCanvas.Children.Remove(marker);
-            }
-            AllFigures.Remove(selectedFigure);
-            firstClickLMB = new Point();
-            DeselectFigure();
-        }
-        public void StartDrawRectangle()
-        {
-            
-            WorkPlaceCanvas.Cursor = Cursors.Cross;
-            DeselectFigure();
-        }
-        public void StartDrawLine()
-        {
-            DeselectFigure();
-            WorkPlaceCanvas.Cursor = Cursors.Cross;
-        }
-        public void SetFigureLineColor(SolidColorBrush lineColor)
-        {
-            if (selectedFigure == null)
-            {
-                MessageBox.Show("Сначала выберите объект");
-                return;
-            }
-            selectedFigure.LineColor = lineColor;
-        }
-        public void SetFigureFillColor(SolidColorBrush fillColor)
-        {
-            if (selectedFigure == null)
-            {
-                MessageBox.Show("Сначала выберите объект");
-                return;
-            }
-                selectedFigure.Fill = fillColor;
-        }
-
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point clickPosition = e.GetPosition(WorkPlaceCanvas);
             if (e.ClickCount == 2)
             {
-                ExecuteDoubleClick(clickPosition);
+                Rectangle rect = selectedFigure.ExecuteDoubleClick(clickPosition);
+                AddToWorkplace(rect);
                 return;
             }
-            MouseLeftButtonDownClick(clickPosition);
+            if (firstClickLMB.X == 0 && firstClickLMB.Y == 0)
+            {
+                firstClickLMB = clickPosition;
+            }
+            Condition.MouseDown = true;
+            if (Condition.ButtonPressed == ButtonPressed.Rect)
+            {
+                Condition.Action = Actions.DrawRect;
+                Shadow.StartDrawRectShadow(clickPosition);
+                firstClickLMB = clickPosition;
+            }
+            else if (Condition.ButtonPressed == ButtonPressed.Line)
+            {
+                Condition.Action = Actions.DrawLine;
+                if (Shadow.GetShadowLine().Points.Count == 0)
+                {
+                    Shadow.DrawLineShadow();
+                    Shadow.SetLIneFirstPoint(firstClickLMB);
+                    Shadow.SetLineSecondPoint(clickPosition);
+                }
+            }
+            else if (Condition.ButtonPressed == ButtonPressed.None)
+            {
+                Condition.Action = DetermindAction(clickPosition);
+            }
         }
         private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             firstClickRMB = e.GetPosition(WorkPlaceCanvas);
-            MouseRightButtonDownClick();
-        }
-        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
-        {
-            Point currentMousePos = e.GetPosition(WorkPlaceCanvas);
-
-            Move(currentMousePos);
-
+            WorkPlaceCanvas.Cursor = Cursors.Arrow;
+            DeselectFigure();
+            if (Condition.Action == Actions.DrawLine)
+            {
+                Shadow.RemoveLastPoint();
+                CreatePolyline(Shadow.GetShadowLine());
+                firstClickLMB = new Point();
+                Shadow.Clear();
+            }
+            Condition.ResetCondition();
         }
         private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -130,7 +90,7 @@ namespace GraphicEditor
             if (Condition.Action == Actions.DrawRect)
             {
                 Condition.Action = Actions.None;
-                CreateRect(endPoint);
+                CreateRectangle(endPoint);
                 firstClickLMB = new Point();
                 Shadow.Clear();
             }
@@ -158,61 +118,10 @@ namespace GraphicEditor
             }
 
         }
+        private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point currentMousePos = e.GetPosition(WorkPlaceCanvas);
 
-        private void ExecuteRelize(Point endPoint)
-        {
-            if (selectedFigure == null) return;
-            selectedFigure.ExecuteRelize(endPoint);
-        }
-        private void ExecuteDoubleClick(Point clickPosition) 
-        {
-            Rectangle rect = selectedFigure.ExecuteDoubleClick(clickPosition);
-            AddToWorkplace(rect);
-        }
-        private void MouseLeftButtonDownClick(Point point)
-        {
-            Point clickPosition = point;
-            if(firstClickLMB.X == 0 && firstClickLMB.Y == 0)
-            {
-                firstClickLMB = point;
-            }
-            Condition.MouseDown = true;
-            if (Condition.ButtonPressed == ButtonPressed.Rect)
-            {
-                Condition.Action = Actions.DrawRect;
-                Shadow.StartDrawRectShadow(clickPosition);
-                SetLMB_ClickPosition(clickPosition);
-            }
-            else if (Condition.ButtonPressed == ButtonPressed.Line)
-            {
-                Condition.Action = Actions.DrawLine;
-                if (Shadow.GetShadowLine().Points.Count == 0)
-                {
-                    Shadow.DrawLineShadow();
-                    Shadow.SetLIneFirstPoint(firstClickLMB);
-                    Shadow.SetLineSecondPoint(clickPosition);
-                }
-            }
-            else if (Condition.ButtonPressed == ButtonPressed.None)
-            {
-                Condition.Action = DetermindAction(clickPosition);
-            }
-        }
-        private void MouseRightButtonDownClick()
-        {
-            WorkPlaceCanvas.Cursor = Cursors.Arrow;
-            DeselectFigure();
-            if (Condition.Action == Actions.DrawLine)
-            {
-                Shadow.RemoveLastPoint();
-                CreatePolyline(Shadow.GetShadowLine());
-                firstClickLMB = new Point();
-                Shadow.Clear();
-            }
-            Condition.ResetCondition();
-        }
-        private void Move(Point currentMousePos)
-        {
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 if (Condition.Action == Actions.DrawRect)
@@ -229,7 +138,7 @@ namespace GraphicEditor
                 }
                 else if (Condition.Action == Actions.MovePoint)
                 {
-                    Drag(currentMousePos);
+                    DragFigure(currentMousePos);
                 }
             }
 
@@ -240,15 +149,31 @@ namespace GraphicEditor
 
             if (Mouse.RightButton == MouseButtonState.Pressed)
             {
-                MovingWorkPlace(Scroll, firstClickRMB, currentMousePos);
+                MoveWorkPlace(Scroll, firstClickRMB, currentMousePos);
             }
+
         }
-        private void Drag(Point position)
+
+        private void CreateRectangle(Point endPoint)
         {
-            if (selectedFigure != null)
+            Figure figure = new RectangleFigure(firstClickLMB, endPoint);
+            WorkPlaceCanvas.Children.Add(figure.GetShape());
+            var markers = figure.GetMarkers();
+            foreach (var marker in markers)
             {
-                selectedFigure.MoveMarker(position);
+                WorkPlaceCanvas.Children.Add(marker);
             }
+            AllFigures.Add(figure);
+        }
+        private void ExecuteRelize(Point endPoint)
+        {
+            if (selectedFigure == null) return;
+            selectedFigure.ExecuteRelize(endPoint);
+        }
+        private void AddToWorkplace(Rectangle rect)
+        {
+            if (rect == null) return;
+            WorkPlaceCanvas.Children.Add(rect);
         }
         private void AddToWorkplace(List<Figure> figures)
         {
@@ -262,80 +187,21 @@ namespace GraphicEditor
                 }
             }
         }
-        private void SetLMB_ClickPosition(Point LMB_ClickPositionPoint)
+        private bool AlllowDistance(Point currentMousePos)
         {
-            firstClickLMB = LMB_ClickPositionPoint;
-        }
-        private void MovingWorkPlace(ScrollViewer Scroll, Point rMB_firstPoint, Point currentMousePos)
-        {
-            scrollPoint.X = Scroll.HorizontalOffset - rMB_firstPoint.DeltaTo(currentMousePos).X / 2;
-            scrollPoint.Y = Scroll.VerticalOffset - rMB_firstPoint.DeltaTo(currentMousePos).Y / 2;
-            Scroll.ScrollToHorizontalOffset(scrollPoint.X);
-            Scroll.ScrollToVerticalOffset(scrollPoint.Y);
-        }
-        private void DeselectFigure()
-        {
-            if (selectedFigure == null) return;
-            selectedFigure.HideOutline();
-            selectedFigure.DeselectFigure();
-            selectedFigure = null;
-        }
-        private void AddToWorkplace(Rectangle rect)
-        {
-            if (rect == null) return;
-            WorkPlaceCanvas.Children.Add(rect);
-        }
-        private void PlacingInWorkPlace(Figure figure)
-        {
-            WorkPlaceCanvas.Children.Add(figure.GetShape());
-            var markers = figure.GetMarkers();
-            foreach (var marker in markers)
+            Point delta = firstClickLMB.AbsDeltaTo(currentMousePos);
+            if (delta.X > 5 || delta.Y > 5)
             {
-                WorkPlaceCanvas.Children.Add(marker);
+                return true;
             }
+            else return false;
         }
-        private void SetSelectedFigure(Figure figure)
+        private void DragFigure(Point position)
         {
-            selectedFigure = figure;
-        }
-        private void CreateRect(Point endPoint)
-        {
-            Figure figure = new RectangleFigure(firstClickLMB, endPoint);
-            WorkPlaceCanvas.Children.Add(figure.GetShape());
-            var markers = figure.GetMarkers();
-            foreach (var marker in markers)
+            if (selectedFigure != null)
             {
-                WorkPlaceCanvas.Children.Add(marker);
+                selectedFigure.MoveMarker(position);
             }
-            AllFigures.Add(figure);
-        }
-        private void CreateLine(Point firstPoint, Point endPoint)
-        {
-            Figure figure = new LineFigure(firstPoint, endPoint);
-            WorkPlaceCanvas.Children.Add(figure.GetShape());
-            var markers = figure.GetMarkers();
-            foreach (var marker in markers)
-            {
-                WorkPlaceCanvas.Children.Add(marker);
-            }
-            AllFigures.Add(figure);
-        }
-        private void CreatePolyline(Polyline shadowLine)
-        {
-            shadowLine.Points.RemoveAt(0);
-            Figure figure = new LineFigure(shadowLine);
-            WorkPlaceCanvas.Children.Add(figure.GetShape());
-            var markers = figure.GetMarkers();
-            foreach (var marker in markers)
-            {
-                WorkPlaceCanvas.Children.Add(marker);
-            }
-            AllFigures.Add(figure);
-        }
-        private void ClearCanvas()
-        {
-            WorkPlaceCanvas.Children.Clear();
-            AllFigures.Clear();
         }
         private Actions DetermindAction(Point clickPosition)
         {
@@ -366,22 +232,120 @@ namespace GraphicEditor
 
             return Actions.None;
         }
-        private bool AlllowDistance(Point currentMousePos)
+        private void DeselectFigure()
         {
-            Point delta = firstClickLMB.AbsDeltaTo(currentMousePos);
-            if (delta.X > 5 || delta.Y > 5)
+            if (selectedFigure == null) return;
+            selectedFigure.HideOutline();
+            selectedFigure.DeselectFigure();
+            selectedFigure = null;
+        }
+        private void CreatePolyline(Polyline shadowLine)
+        {
+            shadowLine.Points.RemoveAt(0);
+            Figure figure = new LineFigure(shadowLine);
+            WorkPlaceCanvas.Children.Add(figure.GetShape());
+            var markers = figure.GetMarkers();
+            foreach (var marker in markers)
             {
-                return true;
+                WorkPlaceCanvas.Children.Add(marker);
             }
-            else return false;
+            AllFigures.Add(figure);
+        }
+        private void CreateLine(Point firstPoint, Point endPoint)
+        {
+            Figure figure = new LineFigure(firstPoint, endPoint);
+            WorkPlaceCanvas.Children.Add(figure.GetShape());
+            var markers = figure.GetMarkers();
+            foreach (var marker in markers)
+            {
+                WorkPlaceCanvas.Children.Add(marker);
+            }
+            AllFigures.Add(figure);
+        }
+        private void MoveWorkPlace(ScrollViewer Scroll, Point rMB_firstPoint, Point currentMousePos)
+        {
+            scrollPoint.X = Scroll.HorizontalOffset - rMB_firstPoint.DeltaTo(currentMousePos).X / 2;
+            scrollPoint.Y = Scroll.VerticalOffset - rMB_firstPoint.DeltaTo(currentMousePos).Y / 2;
+            Scroll.ScrollToHorizontalOffset(scrollPoint.X);
+            Scroll.ScrollToVerticalOffset(scrollPoint.Y);
+        }
+        private void SetSelectedFigure(Figure figure)
+        {
+            selectedFigure = figure;
+        }
+        private void ClearWorkplace()
+        {
+            WorkPlaceCanvas.Children.Clear();
+            AllFigures.Clear();
+        }
+        public List<Figure> GetAllFigures()
+        {
+            return AllFigures;
+        }
+        public Figure GetSelectedFigure()
+        {
+            return selectedFigure;
+        }
+        public void LoadWorkplace(List<Figure> figures)
+        {
+            List<Figure> fig = CloneList(figures);
+            if (fig.Count == 0) return;
+            ClearWorkplace();
+            DeselectFigure();
+            AllFigures = fig;
+            AddToWorkplace(fig);
+        }
+        private List<Figure> CloneList(List<Figure> oldList)
+        {
+            List<Figure> newlist = new List<Figure>();
+            foreach (var item in oldList)
+            {
+                newlist.Add(item);
+            }
+            return newlist;
         }
 
-       // private Rectangle ExecuteDoubleClick(Point point)
-        //{
-         //   if (selectedFigure == null) return null;
 
-       //     Rectangle rect = selectedFigure.ExecuteDoubleClick(point);
-       //     return rect;
-      //  }
+        public void DeleteFigure()
+        {
+            if (selectedFigure == null)
+            {
+                MessageBox.Show("Сначала выделите объект!");
+                return;
+            }
+            WorkPlaceCanvas.Cursor = Cursors.Arrow;
+            WorkPlaceCanvas.Children.Remove(selectedFigure.GetShape());
+            var markers = selectedFigure.GetMarkers();
+            foreach (var marker in markers)
+            {
+                WorkPlaceCanvas.Children.Remove(marker);
+            }
+            AllFigures.Remove(selectedFigure);
+            firstClickLMB = new Point();
+            DeselectFigure();
+        }
+        public void SetCrossCursor()
+        {
+            WorkPlaceCanvas.Cursor = Cursors.Cross;
+            DeselectFigure();
+        }
+        public void SetFigureLineColor(SolidColorBrush lineColor)
+        {
+            if (selectedFigure == null)
+            {
+                MessageBox.Show("Сначала выберите объект");
+                return;
+            }
+            selectedFigure.LineColor = lineColor;
+        }
+        public void SetFigureFillColor(SolidColorBrush fillColor)
+        {
+            if (selectedFigure == null)
+            {
+                MessageBox.Show("Сначала выберите объект");
+                return;
+            }
+                selectedFigure.Fill = fillColor;
+        }
     }
 }

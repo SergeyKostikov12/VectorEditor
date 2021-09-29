@@ -24,22 +24,24 @@ namespace GraphicEditor
             Condition.ButtonPressed = ButtonPressed.Load;
             var figures = Serializator.Load();
             Workplace.LoadWorkplace(figures);
+            Condition.ResetCondition();
         }
         public void SaveButtonPress(object sender, RoutedEventArgs e)
         {
             Condition.ButtonPressed = ButtonPressed.Save;
             var figures = Workplace.GetAllFigures();
             Serializator.Save(figures);
+            Condition.ResetCondition();
         }
         public void RectangleButtonPress(object sender, RoutedEventArgs e)
         {
             Condition.ButtonPressed = ButtonPressed.Rect;
-            Workplace.StartDrawRectangle();
+            Workplace.SetCrossCursor();
         }
         public void LineButtonPress(object sender, RoutedEventArgs e)
         {
             Condition.ButtonPressed = ButtonPressed.Line;
-            Workplace.StartDrawLine();
+            Workplace.SetCrossCursor();
         }
         public void DeleteButtonPress(object sender, RoutedEventArgs e)
         {
