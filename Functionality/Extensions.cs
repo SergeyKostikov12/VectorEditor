@@ -77,11 +77,6 @@ public static class Extensions
     {
         return Point.Parse(deserealizedString.Replace(',', '.').Replace(';', ','));
     }
-    public static Point NewPosition(this Point point, Point newPosition)
-    {
-        Point pt = new Point(newPosition.X, newPosition.Y);
-        return pt;
-    }
     public static Polyline ParsePolylineFromArray(this string[] polyline)
     {
         Polyline tmpLine = new Polyline();

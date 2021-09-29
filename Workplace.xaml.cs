@@ -60,21 +60,6 @@ namespace GraphicEditor
                 Condition.Action = DetermindAction(clickPosition);
             }
         }
-
-        internal void ReadyDrawLine()
-        {
-            Condition.DrawingMode = DrawingMode.DrawLineMode;
-            WorkPlaceCanvas.Cursor = Cursors.Cross;
-            DeselectFigure();
-        }
-
-        internal void ReadyDrawRectangle()
-        {
-            Condition.DrawingMode = DrawingMode.DrawRectMode;
-            WorkPlaceCanvas.Cursor = Cursors.Cross;
-            DeselectFigure();
-        }
-
         private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             firstClickRMB = e.GetPosition(WorkPlaceCanvas);
@@ -285,6 +270,15 @@ namespace GraphicEditor
             WorkPlaceCanvas.Children.Clear();
             AllFigures.Clear();
         }
+        private List<Figure> CloneList(List<Figure> oldList)
+        {
+            List<Figure> newlist = new List<Figure>();
+            foreach (var item in oldList)
+            {
+                newlist.Add(item);
+            }
+            return newlist;
+        }
         public List<Figure> GetAllFigures()
         {
             return AllFigures;
@@ -303,14 +297,17 @@ namespace GraphicEditor
             AddToWorkplace(fig);
             Condition.ResetCondition();
         }
-        private List<Figure> CloneList(List<Figure> oldList)
+        public void ReadyDrawLine()
         {
-            List<Figure> newlist = new List<Figure>();
-            foreach (var item in oldList)
-            {
-                newlist.Add(item);
-            }
-            return newlist;
+            Condition.DrawingMode = DrawingMode.DrawLineMode;
+            WorkPlaceCanvas.Cursor = Cursors.Cross;
+            DeselectFigure();
+        }
+        public void ReadyDrawRectangle()
+        {
+            Condition.DrawingMode = DrawingMode.DrawRectMode;
+            WorkPlaceCanvas.Cursor = Cursors.Cross;
+            DeselectFigure();
         }
         public void DeleteFigure()
         {

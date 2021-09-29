@@ -1,0 +1,1 @@
+﻿public enum FigureType { Rectangle, Line }
