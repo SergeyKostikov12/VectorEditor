@@ -3,13 +3,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace GraphicEditor
+namespace GraphicEditor.Controls
 {
-    public partial class ColorPicker : Page
+    public partial class ColorPicker : UserControl
     {
-        private Button colorBtn;
-        private SolidColorBrush Brush { get ; set ; }
-
+        public event ColorPickEventHandler ColorPick;
         public ColorPicker()
         {
             InitializeComponent();
@@ -54,26 +52,10 @@ namespace GraphicEditor
             return button;
         }
 
-        public void Hide()
-        {
-            this.Visibility = Visibility.Hidden;
-        }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Brush = (SolidColorBrush)(sender as Button).Background;
-            colorBtn.Background = Brush;
-            this.Visibility = Visibility.Hidden;
-        }
-
-        internal void Show()
-        {
-            this.Visibility = Visibility.Visible;
-        }
-
-        internal void GetButtonColor(object sender)
-        {
-            colorBtn = (Button)sender;
+            SolidColorBrush color = (SolidColorBrush)(sender as Button).Background;
+            ColorPick.Invoke(this, new ColorPickEventArgs(color));
         }
     }
 }

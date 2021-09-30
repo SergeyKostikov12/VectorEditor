@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 
 public static class Extensions
@@ -85,5 +86,13 @@ public static class Extensions
             tmpLine.Points.Add(ParsePoint(polyline[i]));
         }
         return tmpLine;
+    }
+    public static void Show(this Control control)
+    {
+        control.Visibility = Visibility.Visible;
+    }
+    public static void Hide(this Control control)
+    {
+        control.Visibility = Visibility.Hidden;
     }
 }

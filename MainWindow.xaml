@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:GraphicEditor"
+        xmlns:subfolder="clr-namespace:GraphicEditor.Controls"
         mc:Ignorable="d"
         Title="Редактор" Height="768" Width="1024">
     <Grid  HorizontalAlignment="Left">
@@ -103,8 +104,8 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Label Grid.Column="0" Grid.Row="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Top">Цвет линии</Label>
-                        <Button x:Name="LineColorField" Background="Black" Grid.Row="0"  Height="25" Width="100" Click="LineColorFieldButtonPress" />
+                        <Label Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Margin="0,0,0,10">Цвет линии</Label>
+                        <Button x:Name="LineColorField" Background="Black" Grid.Row="1" Click="ColorButtonPress"  BorderThickness="0" BorderBrush="Black"/>
                     </Grid>
                     <Grid Grid.Row="2" Grid.Column="1">
                         <Grid.RowDefinitions>
@@ -112,7 +113,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Label Grid.Column="0" Grid.Row="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Top">Цвет заливки</Label>
-                        <Button x:Name="FillColorField" Background="Black" Grid.Row="0"  Height="25" Width="100" Click="FillColorFieldButtonPress" />
+                        <Button x:Name="FillColorField" Background="Black" Grid.Row="0"  Click="ColorButtonPress"  BorderBrush="Black" BorderThickness="0"/>
                     </Grid>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Толщина линии</Label>
                 </Grid>
@@ -122,7 +123,7 @@
             </Grid>
         </GroupBox>
         <GroupBox Grid.Column="1" Header="Рабочая область" >
-            <Frame x:Name="WorkplacePanel" Margin="0,0,0,0"/>
+            <subfolder:Workplace x:Name="Workplace"/>
         </GroupBox>
     </Grid>
 </Window>

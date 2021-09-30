@@ -1,14 +1,21 @@
 ﻿using GraphicEditor.Functionality;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GraphicEditor
+namespace GraphicEditor.Controls
 {
-    public partial class Workplace : Page
+    public partial class Workplace : UserControl
     {
         private WorkplaceShadow Shadow;
         private WorkplaceCondition Condition = new WorkplaceCondition();
@@ -287,6 +294,10 @@ namespace GraphicEditor
         {
             return selectedFigure;
         }
+        public int GetFigureLineWidth()
+        {
+            return selectedFigure.StrokeWidth;
+        }
         public void LoadWorkplace(List<Figure> figures)
         {
             List<Figure> fig = CloneList(figures);
@@ -343,7 +354,12 @@ namespace GraphicEditor
                 MessageBox.Show("Сначала выберите объект");
                 return;
             }
-                selectedFigure.Fill = fillColor;
+            selectedFigure.Fill = fillColor;
+        }
+        public void SetFigureWidth(int width)
+        {
+            if (selectedFigure == null) return;
+            selectedFigure.StrokeWidth = width;
         }
     }
 }

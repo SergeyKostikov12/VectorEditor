@@ -1,5 +1,7 @@
-﻿using GraphicEditor.Functionality;
+﻿using GraphicEditor.Controls;
+using GraphicEditor.Functionality;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace GraphicEditor
@@ -7,15 +9,29 @@ namespace GraphicEditor
     public partial class MainWindow : Window
     {
         private Serializator Serializator = new Serializator();
-        private ColorPicker ColoRPicker = new ColorPicker();
+        private ColorPicker ColorPicker = new ColorPicker();
         private WidthPicker WidthPicker = new WidthPicker();
-        private Workplace Workplace = new Workplace();
 
 
         public MainWindow()
         {
             InitializeComponent();
-            WorkplacePanel.Content = Workplace;
+            ColorPicker.ColorPick += ColorPicker_ColorPick;
+            WidthPicker.WidthPick += WidthPicker_WidthPick;
+        }
+
+        private void WidthPicker_WidthPick(object sender, WidthPickEventArgs e)
+        {
+            int width = e.Width;
+            Workplace.SetFigureWidth(width);
+        }
+
+        private void ColorPicker_ColorPick(object sender, ColorPickEventArgs e)
+        {
+            var color = e.Color;
+            LineColorField.Background = color;
+            FillColorField.Background = color;
+            ColorPicker.Hide();
         }
 
         private void LoadButtonPress(object sender, RoutedEventArgs e)
@@ -44,9 +60,8 @@ namespace GraphicEditor
         private void ThinknessButtonPress(object sender, RoutedEventArgs e)
         {
             ToolPanel.Content = WidthPicker;
-            ColoRPicker.Hide();
+            ColorPicker.Hide();
             WidthPicker.Show();
-            WidthPicker.Figure = Workplace.GetSelectedFigure();
         }
         private void LineColorButtonPress(object sender, RoutedEventArgs e)
         {
@@ -56,18 +71,11 @@ namespace GraphicEditor
         {
             Workplace.SetFigureFillColor((SolidColorBrush)FillColorField.Background);
         }
-        private void LineColorFieldButtonPress(object sender, RoutedEventArgs e)
+        private void ColorButtonPress(object sender, RoutedEventArgs e)
         {
-            ToolPanel.Content = ColoRPicker;
+            ToolPanel.Content = ColorPicker;
             WidthPicker.Hide();
-            ColoRPicker.Show();
-            ColoRPicker.GetButtonColor(sender);
-        }
-        private void FillColorFieldButtonPress(object sender, RoutedEventArgs e)
-        {
-            ToolPanel.Content = ColoRPicker;
-            ColoRPicker.Show();
-            ColoRPicker.GetButtonColor(sender);
+            ColorPicker.Show();
         }
     }
 }
