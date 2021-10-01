@@ -1,94 +1,227 @@
-﻿using System;
+﻿using GraphicEditor.Functionality;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using GraphicEditor.Functionality;
 
 namespace GraphicEditor.Controls
 {
     /// <summary>
     /// Логика взаимодействия для WorkplaceExample.xaml
+    /// Этот класс создан как Альтернатива Workplace.xaml.cs
     /// </summary>
     public partial class WorkplaceExample : UserControl
     {
-        Condition_ Condition = new Condition_();
-        DetermineClick Determine;
-        Figure SelectedFigure;
+        private Condition_ Condition = new Condition_();
+        private Figure SelectedFigure;
+
         public WorkplaceExample()
         {
             InitializeComponent();
-            Determine = new DetermineClick(Condition);
         }
 
+        public void ReadyDrawRectangle()
+        {
+            Condition.Mode = Mode.DrawRectMode;
+        }
+        public void ReadyDrawLine()
+        {
+            Condition.Mode = Mode.DrawLineMode;
+        }
+        public Figure GetSelectedFigure()
+        {
+            return SelectedFigure;
+        }
+        public void LoadWorkplace(List<Figure> figures)
+        {
+            List<Figure> fig = CloneList(figures);
+            if (fig.Count == 0) return;
+            ClearWorkplace();
+            DeselectFigure();
+            AllFigures = fig;
+            AddToWorkplace(fig);
+            Condition.Reset();
+        }
+        public void DeleteFigure()
+        {
+            if (selectedFigure == null)
+            {
+                MessageBox.Show("Сначала выделите объект!");
+                return;
+            }
+            WorkPlaceCanvas.Cursor = Cursors.Arrow;
+            WorkPlaceCanvas.Children.Remove(selectedFigure.GetShape());
+            var markers = selectedFigure.GetMarkers();
+            foreach (var marker in markers)
+            {
+                WorkPlaceCanvas.Children.Remove(marker);
+            }
+            AllFigures.Remove(selectedFigure);
+            firstClickLMB = new Point();
+            DeselectFigure();
+        }
+        public void SetFigureLineColor(SolidColorBrush lineColor)
+        {
+            if (selectedFigure == null)
+            {
+                MessageBox.Show("Сначала выберите объект");
+                return;
+            }
+            selectedFigure.LineColor = lineColor;
+        }
+        public void SetFigureFillColor(SolidColorBrush fillColor)
+        {
+            if (selectedFigure == null)
+            {
+                MessageBox.Show("Сначала выберите объект");
+                return;
+            }
+            selectedFigure.Fill = fillColor;
+        }
+        public void SetFigureWidth(int width)
+        {
+            if (selectedFigure == null) return;
+            selectedFigure.StrokeWidth = width;
+        }
 
 
         private void WorkPlaceCanvasExample_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Determine.Click(MouseAction.LMB_Down);
-            SetAction();
-        }
-
-
-        private void WorkPlaceCanvasExample_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            Determine.Click(MouseAction.LMB_Up);
-        }
-
-        private void WorkPlaceCanvasExample_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            Determine.Click(MouseAction.RMB_Down);
-            
-        }
-
-
-        private void WorkPlaceCanvasExample_MouseMove(object sender, MouseEventArgs e)
-        {
-            Determine.Click(MouseAction.Move);
-            Move();
-        }
-
-        private void Move()
-        {
-            
-        }
-
-        private void SetAction()
-        {
+            Condition.Click(MouseAction.LeftButtonDown);
+            Point clickPosition = e.GetPosition(WorkPlaceCanvasExample);
+            if (e.ClickCount == 2)
+            {
+                InsertPolylinePoint(clickPosition);
+            }
             if (Condition.Mode == Mode.DrawRectMode)
             {
-                Condition.Action = Action.DrawRect;
+                StartDrawRectangle(clickPosition);
                 return;
             }
             else if (Condition.Mode == Mode.DrawLineMode)
             {
-                Condition.Action = Action.DrawLine;
+                StartDrawLine(clickPosition);
                 return;
             }
-            TrySelectFigure();
+            else if (Condition.Mode == Mode.DrawPolyline)
+            {
+                StartDrawPolyline(clickPosition);
+                return;
+            }
+            else if (Condition.Mode == Mode.DrawPolylineProcess)
+            {
+                AddPolylinePoint(clickPosition);
+                return;
+            }
+            SelectFigure(clickPosition);
+        }
+        private void WorkPlaceCanvasExample_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed)
+                return;
+            Condition.Click(MouseAction.Move);
+            Point currentPosition = e.GetPosition(WorkPlaceCanvasExample);
+            if (Condition.Mode == Mode.DrawRectMode)
+            {
+                DrawingRectangle(currentPosition);
+            }
+            else if (Condition.Mode == Mode.DrawLineMode)
+            {
+                DrawingLine(currentPosition);
+            }
+            else if (Condition.Mode == Mode.DrawPolylineProcess)
+            {
+                DrawingPolyline(currentPosition);
+            }
+            else if (Condition.Mode == Mode.MoveMarker)
+            {
+                MovingMarker(currentPosition);
+            }
+        }
+        private void WorkPlaceCanvasExample_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Condition.Click(MouseAction.LeftButtonUp);
+            Point clickPosition = e.GetPosition(WorkPlaceCanvasExample);
+            if (Condition.Mode == Mode.DrawRectMode)
+            {
+                EndDrawRectangle(clickPosition);
+                return;
+            }
+            else if (Condition.Mode == Mode.DrawLineMode)
+            {
+                EndDrawLine(clickPosition);
+                return;
+            }
+        }
+        private void WorkPlaceCanvasExample_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Condition.Click(MouseAction.RightButtonDown);
+            if (Condition.Mode == Mode.DrawPolylineProcess)
+            {
+                EndDrawPolyline();
+            }
+            Condition.Reset();
         }
 
-        private void TrySelectFigure()
+
+        private void InsertPolylinePoint(Point clickPosition)
         {
-            
+            throw new NotImplementedException();
+        }
+        private void StartDrawRectangle(Point clickPosition)
+        {
+            throw new NotImplementedException();
+        }
+        private void StartDrawLine(Point clickPosition)
+        {
+            throw new NotImplementedException();
+        }
+        private void StartDrawPolyline(Point clickPosition)
+        {
+            throw new NotImplementedException();
+        }
+        private void AddPolylinePoint(Point clickPosition)
+        {
+            throw new NotImplementedException();
+        }
+        private void SelectFigure(Point clickPosition)
+        {
+            throw new NotImplementedException();
         }
 
-        internal void ReadyDrawRectangle()
+
+        private void DrawingRectangle(Point currentPosition)
         {
-            Condition.Mode = Mode.DrawRectMode;
+            throw new NotImplementedException();
+        }
+        private void DrawingLine(Point currentPosition)
+        {
+            throw new NotImplementedException();
+        }
+        private void DrawingPolyline(Point currentPosition)
+        {
+            throw new NotImplementedException();
+        }
+        private void MovingMarker(Point currentPosition)
+        {
+            throw new NotImplementedException();
         }
 
-        internal void ReadyDrawLine()
+
+        private void EndDrawRectangle(Point clickPosition)
         {
-            Condition.Mode = Mode.DrawLineMode;
+            throw new NotImplementedException();
+        }
+        private void EndDrawLine(Point clickPosition)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void EndDrawPolyline()
+        {
+            throw new NotImplementedException();
         }
     }
 }
