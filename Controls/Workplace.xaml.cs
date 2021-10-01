@@ -35,7 +35,7 @@ namespace GraphicEditor.Controls
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point clickPosition = e.GetPosition(WorkPlaceCanvas);
-            if (e.ClickCount == 2)
+            if (e.ClickCount == 2 && selectedFigure != null)
             {
                 Rectangle rect = selectedFigure.ExecuteDoubleClick(clickPosition);
                 AddToWorkplace(rect);
@@ -46,6 +46,7 @@ namespace GraphicEditor.Controls
                 firstClickLMB = clickPosition;
             }
             Condition.MouseDown = true;
+
             if (Condition.DrawingMode == DrawingMode.DrawRectMode)
             {
                 Condition.Action = Actions.DrawRect;

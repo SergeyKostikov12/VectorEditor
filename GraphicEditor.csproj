@@ -90,7 +90,6 @@
     <Compile Include="Controls\ColorPicker.cs">
       <DependentUpon>ColorPicker.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\DetermineClick.cs" />
     <Compile Include="Controls\WidthPicker.xaml.cs">
       <DependentUpon>WidthPicker.xaml</DependentUpon>
     </Compile>
@@ -199,5 +198,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
