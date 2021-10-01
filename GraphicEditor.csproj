@@ -90,14 +90,19 @@
     <Compile Include="Controls\ColorPicker.cs">
       <DependentUpon>ColorPicker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\DetermineClick.cs" />
     <Compile Include="Controls\WidthPicker.xaml.cs">
       <DependentUpon>WidthPicker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Workplace.xaml.cs">
       <DependentUpon>Workplace.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\WorkplaceExample.xaml.cs">
+      <DependentUpon>WorkplaceExample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Enums\Action.cs" />
     <Compile Include="Enums\DrawingMode.cs" />
+    <Compile Include="Functionality\Condition_.cs" />
     <Compile Include="Functionality\Serializator.cs" />
     <Compile Include="Functionality\WorkplaceShadow.cs" />
     <Compile Include="Functionality\WorkplaceCondition.cs" />
@@ -118,6 +123,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\Workplace.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\WorkplaceExample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

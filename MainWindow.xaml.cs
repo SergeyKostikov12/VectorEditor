@@ -11,7 +11,7 @@ namespace GraphicEditor
         private Serializator Serializator = new Serializator();
         private ColorPicker ColorPicker = new ColorPicker();
         private WidthPicker WidthPicker = new WidthPicker();
-
+        private WorkplaceExample WorkplaceExample = new WorkplaceExample();
 
         public MainWindow()
         {
@@ -20,40 +20,31 @@ namespace GraphicEditor
             WidthPicker.WidthPick += WidthPicker_WidthPick;
         }
 
-        private void WidthPicker_WidthPick(object sender, WidthPickEventArgs e)
-        {
-            int width = e.Width;
-            Workplace.SetFigureWidth(width);
-        }
-
-        private void ColorPicker_ColorPick(object sender, ColorPickEventArgs e)
-        {
-            var color = e.Color;
-            LineColorField.Background = color;
-            FillColorField.Background = color;
-            ColorPicker.Hide();
-        }
 
         private void LoadButtonPress(object sender, RoutedEventArgs e)
         {
             var figures = Serializator.Load();
             Workplace.LoadWorkplace(figures);
+
         }
-        public void SaveButtonPress(object sender, RoutedEventArgs e)
+        private void SaveButtonPress(object sender, RoutedEventArgs e)
         {
             var figures = Workplace.GetAllFigures();
             Serializator.Save(figures);
         }
-        public void RectangleButtonPress(object sender, RoutedEventArgs e)
+        private void RectangleButtonPress(object sender, RoutedEventArgs e)
         {
             Workplace.ReadyDrawRectangle();
-            
+
+            WorkplaceExample.ReadyDrawRectangle();
         }
-        public void LineButtonPress(object sender, RoutedEventArgs e)
+        private void LineButtonPress(object sender, RoutedEventArgs e)
         {
             Workplace.ReadyDrawLine();
+
+            WorkplaceExample.ReadyDrawLine();
         }
-        public void DeleteButtonPress(object sender, RoutedEventArgs e)
+        private void DeleteButtonPress(object sender, RoutedEventArgs e)
         {
             Workplace.DeleteFigure();
         }
@@ -76,6 +67,19 @@ namespace GraphicEditor
             ToolPanel.Content = ColorPicker;
             WidthPicker.Hide();
             ColorPicker.Show();
+        }
+        private void WidthPicker_WidthPick(object sender, WidthPickEventArgs e)
+        {
+            int width = e.Width;
+            Workplace.SetFigureWidth(width);
+        }
+
+        private void ColorPicker_ColorPick(object sender, ColorPickEventArgs e)
+        {
+            var color = e.Color;
+            LineColorField.Background = color;
+            FillColorField.Background = color;
+            ColorPicker.Hide();
         }
     }
 }
