@@ -98,7 +98,9 @@
     </Compile>
     <Compile Include="Enums\Action.cs" />
     <Compile Include="Enums\DrawingMode.cs" />
+    <Compile Include="Enums\Mode.cs" />
     <Compile Include="Functionality\Serializator.cs" />
+    <Compile Include="Functionality\Drawer.cs" />
     <Compile Include="Functionality\WorkplaceShadow.cs" />
     <Compile Include="Functionality\WorkplaceCondition.cs" />
     <Compile Include="Enums\FigureType.cs" />
