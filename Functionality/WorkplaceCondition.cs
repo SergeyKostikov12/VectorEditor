@@ -4,15 +4,16 @@
     {
 
         public Mode Mode;
-        public Actions Action;
+        public Action Action;
         public DrawingMode DrawingMode;
+
         public bool MouseDown = false;
         public bool MouseDrag = false;
         public bool MouseUp = false;
 
         public void ResetCondition()
         {
-            Action = Actions.None;
+            Action = Action.None;
             DrawingMode = DrawingMode.None;
         }
         public bool IsDrawingLine()

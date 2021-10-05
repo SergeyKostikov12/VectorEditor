@@ -99,6 +99,7 @@
     <Compile Include="Enums\Action.cs" />
     <Compile Include="Enums\DrawingMode.cs" />
     <Compile Include="Enums\Mode.cs" />
+    <Compile Include="Functionality\ClickDispatcher.cs" />
     <Compile Include="Functionality\Serializator.cs" />
     <Compile Include="Functionality\Drawer.cs" />
     <Compile Include="Functionality\WorkplaceShadow.cs" />

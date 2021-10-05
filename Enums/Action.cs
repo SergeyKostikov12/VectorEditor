@@ -1,1 +1,8 @@
-﻿public enum Actions { DrawRect, DrawLine, DrawPolyline, MoveRect, RotateRect, ScaleRect, MovePoint, Ready, None }
+﻿public enum Action
+{
+    None,
+    AddPoint,
+    SelectFigure,
+    MoveMarker,
+    MoveWorkplace
+}
