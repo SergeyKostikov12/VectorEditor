@@ -12,9 +12,11 @@ namespace GraphicEditor.Functionality
         private MarkerPoint moveMarker;
         private MarkerPoint rotateMarker;
         private MarkerPoint scaleMarker;
+
         private Polyline rectangle;
 
         public MarkerPoint SelectedMarker { get; private set; }
+
         public RectangleFigure(Point firstPoint, Point secondPoint)
         {
             CreateRectangle(firstPoint, secondPoint);
@@ -42,164 +44,6 @@ namespace GraphicEditor.Functionality
             StrokeWidth = Convert.ToInt32(sLFigure.LineStrokeThinkness);
         }
 
-        public Point GetMoveMarker()
-        {
-            return moveMarker.Point;
-        }
-        public Point GetRotateMarker()
-        {
-            return rotateMarker.Point;
-        }
-        public Polyline GetRectangle()
-        {
-            return rectangle;
-        }
-        public override void MoveMarker(Point position)
-        {
-            if (SelectedMarker != null && SelectedMarker.Equals(moveMarker))
-            {
-                MoveRectangle(position);
-            }
-            else if (SelectedMarker != null && SelectedMarker.Equals(rotateMarker))
-            {
-                RotateRectangle(position);
-            }
-            else if (SelectedMarker != null && SelectedMarker.Equals(scaleMarker))
-            {
-                MoveScaleMarker(position);
-            }
-        }
-        public override void ShowOutline()
-        {
-            moveMarker.Show();
-            rotateMarker.Show();
-            scaleMarker.Show();
-        }
-        public override void HideOutline()
-        {
-            moveMarker.Hide();
-            rotateMarker.Hide();
-            scaleMarker.Hide();
-        }
-        public override void DeselectFigure()
-        {
-            HideOutline();
-            SelectedMarker = null;
-        }
-        public override bool SelectLine(Point point)
-        {
-            Point A = rectangle.Points[0];
-            Point B = rectangle.Points[1];
-            Point C = rectangle.Points[2];
-            Point D = rectangle.Points[3];
-            Point O = point;
-
-            if (O.ItIntersect(A, B, StrokeWidth) ||
-                O.ItIntersect(B, C, StrokeWidth) ||
-                O.ItIntersect(C, D, StrokeWidth) ||
-                O.ItIntersect(D, A, StrokeWidth))
-            {
-                return true;
-            }
-            else return false;
-        }
-        public override bool SelectMarker(Point point)
-        {
-            if (moveMarker.Point.ItInsideCircle(point, StrokeWidth))
-            {
-                SelectedMarker = moveMarker;
-                return true;
-            }
-            else if (rotateMarker.Point.ItInsideCircle(point, StrokeWidth))
-            {
-                SelectedMarker = rotateMarker;
-                return true;
-            }
-            else if (scaleMarker.Point.ItInsideCircle(point, StrokeWidth))
-            {
-                SelectedMarker = scaleMarker;
-                return true;
-            }
-            else
-            {
-                SelectedMarker = null;
-                return false;
-            }
-        }
-        public override void ExecuteRelizeMarker(Point position)
-        {
-        }
-        public override Polyline GetShape()
-        {
-            return rectangle;
-        }
-        public override Rectangle InsertPoint(Point position)
-        {
-            return null;
-        }
-        public override List<Rectangle> GetMarkers()
-        {
-            List<Rectangle> rects = new List<Rectangle>
-            {
-                moveMarker.Marker,
-                rotateMarker.Marker,
-                scaleMarker.Marker
-            };
-            return rects;
-        }
-
-        protected override int GetStrokeWidth()
-        {
-            return (int)rectangle.StrokeThickness;
-        }
-        protected override void SetStrokeWidth(int value)
-        {
-            rectangle.StrokeThickness = value;
-            RefreshMarkerPoints();
-        }
-        protected override SolidColorBrush GetFill()
-        {
-            return (SolidColorBrush)rectangle.Fill;
-        }
-        protected override SolidColorBrush GetLineColor()
-        {
-            SolidColorBrush brush = (SolidColorBrush)rectangle.Stroke;
-            return brush;
-        }
-        protected override void SetFill(SolidColorBrush brush)
-        {
-            rectangle.Fill = brush;
-        }
-        protected override void SetLineColor(SolidColorBrush colorBrush)
-        {
-            rectangle.Stroke = colorBrush;
-        }
-
-        private void DefineMarkers()
-        {
-            moveMarker.SetMarkerSize(StrokeWidth);
-            rotateMarker.SetMarkerSize(StrokeWidth);
-            scaleMarker = new MarkerPoint(rectangle.Points[0]);
-            scaleMarker.SetMarkerSize(StrokeWidth);
-        }
-        private void RefreshMarkerPoints()
-        {
-            moveMarker.SetMarkerSize(StrokeWidth);
-            rotateMarker.SetMarkerSize(StrokeWidth);
-            scaleMarker.SetMarkerSize(StrokeWidth);
-        }
-        private void MoveRectangle(Point position)
-        {
-            Point delta = moveMarker.Point.DeltaTo(position);
-            moveMarker.Move(position);
-            AnchorPoint = new Point(AnchorPoint.X + delta.X, AnchorPoint.Y + delta.Y);
-            rotateMarker.Move(new Point(rotateMarker.X + delta.X, rotateMarker.Y + delta.Y));
-            scaleMarker.Move(new Point(scaleMarker.X + delta.X, scaleMarker.Y + delta.Y));
-            for (int i = 0; i < rectangle.Points.Count; i++)
-            {
-                rectangle.Points[i] = new Point(rectangle.Points[i].X + delta.X, rectangle.Points[i].Y + delta.Y);
-            }
-        }
         private void MoveScaleMarker(Point position)
         {
             double dopusk = moveMarker.Point.AngleBetweenPoints(rotateMarker.Point, position);
@@ -262,6 +106,18 @@ namespace GraphicEditor.Functionality
             }
             scaleMarker.Move(rectangle.Points[0]);
         }
+        private void MoveRectangle(Point position)
+        {
+            Point delta = moveMarker.Point.DeltaTo(position);
+            moveMarker.Move(position);
+            AnchorPoint = new Point(AnchorPoint.X + delta.X, AnchorPoint.Y + delta.Y);
+            rotateMarker.Move(new Point(rotateMarker.X + delta.X, rotateMarker.Y + delta.Y));
+            scaleMarker.Move(new Point(scaleMarker.X + delta.X, scaleMarker.Y + delta.Y));
+            for (int i = 0; i < rectangle.Points.Count; i++)
+            {
+                rectangle.Points[i] = new Point(rectangle.Points[i].X + delta.X, rectangle.Points[i].Y + delta.Y);
+            }
+        }
         private void RotateRectangle(Point position)
         {
             RotateTransform rotate = new RotateTransform
@@ -281,6 +137,19 @@ namespace GraphicEditor.Functionality
             }
             rotateMarker.Move(tmpRP);
             scaleMarker.Move(TL);
+        }
+        private void DefineAnchorPoints(Point firstPoint, Point secondPoint)
+        {
+            double xMin = Math.Min(firstPoint.X, secondPoint.X);
+            double yMin = Math.Min(firstPoint.Y, secondPoint.Y);
+            AnchorPoint = new Point(xMin, yMin);
+        }
+        private void DefineMarkers()
+        {
+            moveMarker.SetMarkerSize(StrokeWidth);
+            rotateMarker.SetMarkerSize(StrokeWidth);
+            scaleMarker = new MarkerPoint(rectangle.Points[0]);
+            scaleMarker.SetMarkerSize(StrokeWidth);
         }
         private void CreateRectangle(Point firstPoint, Point secondPoint)
         {
@@ -307,11 +176,142 @@ namespace GraphicEditor.Functionality
             rectangle.StrokeEndLineCap = PenLineCap.Square;
             //StrokeWidth = 1;
         }
-        private void DefineAnchorPoints(Point firstPoint, Point secondPoint)
+        protected override SolidColorBrush GetLineColor()
         {
-            double xMin = Math.Min(firstPoint.X, secondPoint.X);
-            double yMin = Math.Min(firstPoint.Y, secondPoint.Y);
-            AnchorPoint = new Point(xMin, yMin);
+            SolidColorBrush brush = (SolidColorBrush)rectangle.Stroke;
+            return brush;
+        }
+        protected override void SetLineColor(SolidColorBrush colorBrush)
+        {
+            rectangle.Stroke = colorBrush;
+        }
+        protected override int GetStrokeWidth()
+        {
+            return (int)rectangle.StrokeThickness;
+        }
+        protected override void SetStrokeWidth(int value)
+        {
+            rectangle.StrokeThickness = value;
+            RefreshMarkerPoints();
+        }
+        private void RefreshMarkerPoints()
+        {
+            moveMarker.SetMarkerSize(StrokeWidth);
+            rotateMarker.SetMarkerSize(StrokeWidth);
+            scaleMarker.SetMarkerSize(StrokeWidth);
+        }
+        protected override SolidColorBrush GetFill()
+        {
+            return (SolidColorBrush)rectangle.Fill;
+        }
+        protected override void SetFill(SolidColorBrush brush)
+        {
+            rectangle.Fill = brush;
+        }
+        public override void MoveMarker(Point position)
+        {
+            if (SelectedMarker != null && SelectedMarker.Equals(moveMarker))
+            {
+                MoveRectangle(position);
+            }
+            else if (SelectedMarker != null && SelectedMarker.Equals(rotateMarker))
+            {
+                RotateRectangle(position);
+            }
+            else if (SelectedMarker != null && SelectedMarker.Equals(scaleMarker))
+            {
+                MoveScaleMarker(position);
+            }
+        }
+        public override void ShowOutline()
+        {
+            moveMarker.Show();
+            rotateMarker.Show();
+            scaleMarker.Show();
+        }
+        public override void HideOutline()
+        {
+            moveMarker.Hide();
+            rotateMarker.Hide();
+            scaleMarker.Hide();
+        }
+        public override bool IsSelectMarker(Point point)
+        {
+            if (moveMarker.Point.ItInsideCircle(point, StrokeWidth))
+            {
+                SelectedMarker = moveMarker;
+                return true;
+            }
+            else if (rotateMarker.Point.ItInsideCircle(point, StrokeWidth))
+            {
+                SelectedMarker = rotateMarker;
+                return true;
+            }
+            else if (scaleMarker.Point.ItInsideCircle(point, StrokeWidth))
+            {
+                SelectedMarker = scaleMarker;
+                return true;
+            }
+            else
+            {
+                SelectedMarker = null;
+                return false;
+            }
+        }
+        public override bool IsSelectLine(Point point)
+        {
+            Point A = rectangle.Points[0];
+            Point B = rectangle.Points[1];
+            Point C = rectangle.Points[2];
+            Point D = rectangle.Points[3];
+            Point O = point;
+
+            if (O.ItIntersect(A, B, StrokeWidth) ||
+                O.ItIntersect(B, C, StrokeWidth) ||
+                O.ItIntersect(C, D, StrokeWidth) ||
+                O.ItIntersect(D, A, StrokeWidth))
+            {
+                return true;
+            }
+            else return false;
+        }
+        public override void DeselectFigure()
+        {
+            HideOutline();
+            SelectedMarker = null;
+        }
+        public override void ExecuteRelize(Point position)
+        {
+        }
+        public override List<Rectangle> GetMarkers()
+        {
+            List<Rectangle> rects = new List<Rectangle>
+            {
+                moveMarker.Marker,
+                rotateMarker.Marker,
+                scaleMarker.Marker
+            };
+            return rects;
+        }
+        public override Polyline GetShape()
+        {
+            return rectangle;
+        }
+        public override Rectangle InsertPoint(Point position)
+        {
+            return null;
+        }
+        public Polyline GetRectangle()
+        {
+            return rectangle;
+        }
+        public Point GetMoveMarker()
+        {
+            return moveMarker.Point;
+        }
+        public Point GetRotateMarker()
+        {
+            return rotateMarker.Point;
         }
     }
 }

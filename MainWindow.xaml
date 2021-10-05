@@ -123,7 +123,8 @@
             </Grid>
         </GroupBox>
         <GroupBox Grid.Column="1" Header="Рабочая область" >
-            <subfolder:Workplace x:Name="Workplace"/>
+            <!--<subfolder:Workplace x:Name="Workplace"/>-->
+            <subfolder:WorkplaceExample x:Name="Workplace"/>
         </GroupBox>
     </Grid>
 </Window>

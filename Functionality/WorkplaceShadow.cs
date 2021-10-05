@@ -41,6 +41,11 @@ namespace GraphicEditor.Functionality
             workplace.Children.Add(shadowRect);
             workplace.Children.Add(shadowLine);
         }
+        internal void StartDrawRectShadow(Point LMB_ClickPosition)
+        {
+            firstPoint = LMB_ClickPosition;
+            shadowRect.Visibility = Visibility.Visible;
+        }
         internal void DrawLineShadow()
         {
             shadowLine.Visibility = Visibility.Visible;
@@ -72,11 +77,6 @@ namespace GraphicEditor.Functionality
 
             Canvas.SetLeft(shadowRect, xMin);
             Canvas.SetTop(shadowRect, yMin);
-        }
-        internal void StartDrawRectShadow(Point LMB_ClickPosition)
-        {
-            firstPoint = LMB_ClickPosition;
-            shadowRect.Visibility = Visibility.Visible;
         }
         internal void DrawLastPointShadowtLine(Point currentMousePos)
         {

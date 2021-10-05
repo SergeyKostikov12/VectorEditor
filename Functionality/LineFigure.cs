@@ -37,6 +37,81 @@ namespace GraphicEditor.Functionality
         }
 
 
+        private void CreatePolyline()
+        {
+            FigureType = FigureType.Line;
+            markers = new List<MarkerPoint>();
+            polyline = new Polyline
+            {
+                StrokeEndLineCap = PenLineCap.Round,
+                StrokeLineJoin = PenLineJoin.Round
+            };
+        }
+        private void CreatePolyline(Point firstPoint, Point secondPoint)
+        {
+            FigureType = FigureType.Line;
+            markers = new List<MarkerPoint>();
+            polyline = new Polyline
+            {
+                Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                StrokeEndLineCap = PenLineCap.Square,
+                StrokeLineJoin = PenLineJoin.Round
+            };
+            polyline.Points.Add(firstPoint);
+            polyline.Points.Add(secondPoint);
+        }
+        private void RefreshMarkerPoints()
+        {
+            for (int i = 0; i < markers.Count; i++)
+            {
+                markers[i].SetMarkerSize(StrokeWidth);
+                markers[i].Move(polyline.Points[i]);
+            }
+        }
+        private void DefinePolyline(Polyline line)
+        {
+            foreach (var point in line.Points)
+            {
+                polyline.Points.Add(point);
+            }
+        }
+        private void DefineMarkerPoints()
+        {
+            foreach (var point in polyline.Points)
+            {
+                markers.Add(new MarkerPoint(point));
+            }
+            polyline.StrokeThickness = StrokeWidth;
+            polyline.Visibility = Visibility.Visible;
+            polyline.Stroke = Brushes.Black;
+        }
+        protected override int GetStrokeWidth()
+        {
+            return (int)polyline.StrokeThickness;
+        }
+        protected override void SetStrokeWidth(int value)
+        {
+            polyline.StrokeThickness = value;
+            RefreshMarkerPoints();
+        }
+        protected override SolidColorBrush GetFill()
+        {
+            MessageBox.Show("Невозможно получить Кисть заливки!!!");
+            return null;
+        }
+        protected override void SetFill(SolidColorBrush brush)
+        {
+            MessageBox.Show("Невозможно залить Линию!!!");
+        }
+        protected override SolidColorBrush GetLineColor()
+        {
+            SolidColorBrush brush = (SolidColorBrush)polyline.Stroke;
+            return brush;
+        }
+        protected override void SetLineColor(SolidColorBrush colorBrush)
+        {
+            polyline.Stroke = colorBrush;
+        }
         public Polyline GetPolyline()
         {
             return polyline;
@@ -45,7 +120,6 @@ namespace GraphicEditor.Functionality
         {
             return markers;
         }
-
         public override void ShowOutline()
         {
             foreach (var marker in markers)
@@ -60,12 +134,7 @@ namespace GraphicEditor.Functionality
                 marker.Hide();
             }
         }
-        public override void DeselectFigure()
-        {
-            HideOutline();
-            selectedMarker = null;
-        }
-        public override bool SelectMarker(Point point)
+        public override bool IsSelectMarker(Point point)
         {
             foreach (var marker in markers)
             {
@@ -83,27 +152,6 @@ namespace GraphicEditor.Functionality
             }
             return false;
         }
-        public override bool SelectLine(Point point)
-        {
-            for (int i = 0; i < markers.Count - 1; i++)
-            {
-                if (point.AbsAngleBetweenPoints(markers[i].Point, markers[i + 1].Point) > 60)
-                {
-                    double A = point.Length(markers[i + 1].Point);
-                    double B = point.Length(markers[i].Point);
-                    double C = markers[i].Point.Length(markers[i + 1].Point);
-                    double p = (A + B + C) / 2;
-                    double S = Math.Sqrt(p * (p - A) * (p - B) * (p - C));
-                    double h = 2 * S / C;
-                    if (h <= 10 + StrokeWidth)
-                    {
-                        return true;
-                    }
-                }
-
-            }
-            return false;
-        }
         public override void MoveMarker(Point position)
         {
             for (int i = 0; i < markers.Count; i++)
@@ -115,7 +163,7 @@ namespace GraphicEditor.Functionality
                 }
             }
         }
-        public override void ExecuteRelizeMarker(Point position)
+        public override void ExecuteRelize(Point position)
         {
             if (polyline.Points.Count <= 2) return;
             if (selectedMarker == null) return;
@@ -167,19 +215,6 @@ namespace GraphicEditor.Functionality
             }
 
         }
-        public override List<Rectangle> GetMarkers()
-        {
-            List<Rectangle> rects = new List<Rectangle>();
-            foreach (var marker in markers)
-            {
-                rects.Add(marker.Marker);
-            }
-            return rects;
-        }
-        public override Polyline GetShape()
-        {
-            return polyline;
-        }
         public override Rectangle InsertPoint(Point position)
         {
             for (int i = 0; i <polyline.Points.Count-1; i++)
@@ -198,82 +233,44 @@ namespace GraphicEditor.Functionality
             }
             return null;
         }
+        public override bool IsSelectLine(Point point)
+        {
+            for (int i = 0; i < markers.Count - 1; i++)
+            {
+                if (point.AbsAngleBetweenPoints(markers[i].Point, markers[i + 1].Point) > 60)
+                {
+                    double A = point.Length(markers[i + 1].Point);
+                    double B = point.Length(markers[i].Point);
+                    double C = markers[i].Point.Length(markers[i + 1].Point);
+                    double p = (A + B + C) / 2;
+                    double S = Math.Sqrt(p * (p - A) * (p - B) * (p - C));
+                    double h = 2 * S / C;
+                    if (h <= 10 + StrokeWidth)
+                    {
+                        return true;
+                    }
+                }
 
-        protected override int GetStrokeWidth()
-        {
-            return (int)polyline.StrokeThickness;
-        }
-        protected override void SetStrokeWidth(int value)
-        {
-            polyline.StrokeThickness = value;
-            RefreshMarkerPoints();
-        }
-        protected override SolidColorBrush GetFill()
-        {
-            MessageBox.Show("Невозможно получить Кисть заливки!!!");
-            return null;
-        }
-        protected override SolidColorBrush GetLineColor()
-        {
-            SolidColorBrush brush = (SolidColorBrush)polyline.Stroke;
-            return brush;
-        }
-        protected override void SetFill(SolidColorBrush brush)
-        {
-            MessageBox.Show("Невозможно залить Линию!!!");
-        }
-        protected override void SetLineColor(SolidColorBrush colorBrush)
-        {
-            polyline.Stroke = colorBrush;
-        }
-
-        private void CreatePolyline()
-        {
-            FigureType = FigureType.Line;
-            markers = new List<MarkerPoint>();
-            polyline = new Polyline
-            {
-                StrokeEndLineCap = PenLineCap.Round,
-                StrokeLineJoin = PenLineJoin.Round
-            };
-        }
-        private void DefineMarkerPoints()
-        {
-            foreach (var point in polyline.Points)
-            {
-                markers.Add(new MarkerPoint(point));
             }
-            polyline.StrokeThickness = StrokeWidth;
-            polyline.Visibility = Visibility.Visible;
-            polyline.Stroke = Brushes.Black;
+            return false;
         }
-        private void RefreshMarkerPoints()
+        public override void DeselectFigure()
         {
-            for (int i = 0; i < markers.Count; i++)
+            HideOutline();
+            selectedMarker = null;
+        }
+        public override List<Rectangle> GetMarkers()
+        {
+            List<Rectangle> rects = new List<Rectangle>();
+            foreach (var marker in markers)
             {
-                markers[i].SetMarkerSize(StrokeWidth);
-                markers[i].Move(polyline.Points[i]);
+                rects.Add(marker.Marker);
             }
+            return rects;
         }
-        private void DefinePolyline(Polyline line)
+        public override Polyline GetShape()
         {
-            foreach (var point in line.Points)
-            {
-                polyline.Points.Add(point);
-            }
-        }
-        private void CreatePolyline(Point firstPoint, Point secondPoint)
-        {
-            FigureType = FigureType.Line;
-            markers = new List<MarkerPoint>();
-            polyline = new Polyline
-            {
-                Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
-                StrokeEndLineCap = PenLineCap.Square,
-                StrokeLineJoin = PenLineJoin.Round
-            };
-            polyline.Points.Add(firstPoint);
-            polyline.Points.Add(secondPoint);
+            return polyline;
         }
     }
 }

@@ -11,6 +11,7 @@ namespace GraphicEditor
         private Serializator Serializator = new Serializator();
         private ColorPicker ColorPicker = new ColorPicker();
         private WidthPicker WidthPicker = new WidthPicker();
+        private WorkplaceExample WorkplaceExample = new WorkplaceExample();
 
         public MainWindow()
         {
@@ -34,10 +35,14 @@ namespace GraphicEditor
         private void RectangleButtonPress(object sender, RoutedEventArgs e)
         {
             Workplace.ReadyDrawRectangle();
+
+            WorkplaceExample.ReadyDrawRectangle();
         }
         private void LineButtonPress(object sender, RoutedEventArgs e)
         {
             Workplace.ReadyDrawLine();
+
+            WorkplaceExample.ReadyDrawLine();
         }
         private void DeleteButtonPress(object sender, RoutedEventArgs e)
         {
