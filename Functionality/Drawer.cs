@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality
 {
@@ -21,34 +23,35 @@ namespace GraphicEditor.Functionality
 
     public class ShadowRect : IDraw
     {
-        public void StartDraw()
+        private Point firstPoint;
+        public void StartDraw(Point point)
+        {
+            firstPoint = point;
+        }
+
+        public void Draw(Point currentPosition)
         {
             throw new NotImplementedException();
         }
 
-        public void Draw()
+        public void EndDraw(Point endPoint)
         {
             throw new NotImplementedException();
         }
 
-        public void EndDraw()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddPoint()
+        public void AddPoint(Point position)
         {
             throw new NotImplementedException();
         }
     }
     public class ShadowLine : IDraw
     {
-        public void AddPoint()
+        public void StartDraw(Point point)
         {
             throw new NotImplementedException();
         }
 
-        public void Draw()
+        public void Draw(Point currentPosition)
         {
             throw new NotImplementedException();
         }
@@ -58,7 +61,12 @@ namespace GraphicEditor.Functionality
             throw new NotImplementedException();
         }
 
-        public void StartDraw()
+        public void EndDraw(Point endPoint)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddPoint(Point position)
         {
             throw new NotImplementedException();
         }
@@ -66,9 +74,10 @@ namespace GraphicEditor.Functionality
 
     interface IDraw
     {
-        void StartDraw();
-        void Draw();
-        void EndDraw();
-        void AddPoint();
+        void StartDraw(Point point);
+        void Draw(Point currentPosition);
+        void EndDraw(Point endPoint);
+        void AddPoint(Point position);
+        Shape GetShape()
     }
 }

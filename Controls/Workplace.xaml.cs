@@ -261,7 +261,7 @@ namespace GraphicEditor.Controls
                 case DrawingMode.LineMode:
                     break;
                 case DrawingMode.StartDrawRectangle:
-                    shadowX = new ShadowRect();//
+                    StartDrawRectangle();
                     break;
                 case DrawingMode.StartDrawLine:
                     shadowX = new ShadowRect();//
@@ -297,6 +297,11 @@ namespace GraphicEditor.Controls
                 default:
                     break;
             }
+        }
+
+        private void StartDrawRectangle()
+        {
+            shadowX = new ShadowRect(leftMouseButtonDownPos);
         }
 
         private void CreateRectangle(Point endPoint)
