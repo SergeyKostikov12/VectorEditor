@@ -33,11 +33,11 @@ namespace GraphicEditor
         }
         private void RectangleButtonPress(object sender, RoutedEventArgs e)
         {
-            //Workplace.ReadyDrawRectangle();
+            Workplace.ReadyDrawRectangle();
         }
         private void LineButtonPress(object sender, RoutedEventArgs e)
         {
-            //Workplace.ReadyDrawLine();
+            Workplace.ReadyDrawLine();
         }
         private void DeleteButtonPress(object sender, RoutedEventArgs e)
         {

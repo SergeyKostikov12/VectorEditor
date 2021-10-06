@@ -19,13 +19,13 @@ namespace GraphicEditor.Functionality
         public abstract void HideOutline(); 
         public abstract void DeselectFigure(); 
         public abstract bool SelectLine(Point point); 
-        public abstract bool SelectMarker(Point poin); 
+        public abstract void SelectMarker(Point poin); 
+        public abstract bool IsMarkerSelect();
         public abstract void MoveMarker(Point position); 
         public abstract void ExecuteRelizeMarker(Point position); 
         public abstract List<Rectangle> GetMarkers(); 
         public abstract Polyline GetShape();
         public abstract Rectangle InsertPoint(Point position);
-
         protected abstract int GetStrokeWidth();
         protected abstract void SetStrokeWidth(int value);
         protected abstract void SetFill(SolidColorBrush brush);

@@ -103,31 +103,36 @@ namespace GraphicEditor.Functionality
             }
             else return false;
         }
-        public override bool SelectMarker(Point point)
+        public override void SelectMarker(Point point)
         {
             if (moveMarker.Point.ItInsideCircle(point, StrokeWidth))
             {
                 SelectedMarker = moveMarker;
-                return true;
             }
             else if (rotateMarker.Point.ItInsideCircle(point, StrokeWidth))
             {
                 SelectedMarker = rotateMarker;
-                return true;
             }
             else if (scaleMarker.Point.ItInsideCircle(point, StrokeWidth))
             {
                 SelectedMarker = scaleMarker;
-                return true;
             }
             else
             {
                 SelectedMarker = null;
-                return false;
             }
+        }
+        public override bool IsMarkerSelect()
+        {
+            if (SelectedMarker != null)
+            {
+                return true;
+            }
+            return false;
         }
         public override void ExecuteRelizeMarker(Point position)
         {
+            SelectedMarker = null;
         }
         public override Polyline GetShape()
         {
@@ -205,7 +210,7 @@ namespace GraphicEditor.Functionality
             double dopusk = moveMarker.Point.AngleBetweenPoints(rotateMarker.Point, position);
             if (dopusk < 0 || dopusk > 90) return;
             Polyline tmp = new Polyline();
-            foreach(var point in rectangle.Points)
+            foreach (var point in rectangle.Points)
             {
                 tmp.Points.Add(new Point(point.X, point.Y));
             }
@@ -220,7 +225,7 @@ namespace GraphicEditor.Functionality
 
             tmp.Points[0] = position;
             tmp.Points[4] = position;
-           for (int i = 0; i<rectangle.Points.Count; i++)
+            for (int i = 0; i < rectangle.Points.Count; i++)
             {
                 Point O = rotate.Transform(tmp.Points[i]);
                 tmp.Points[i] = O;
@@ -232,14 +237,14 @@ namespace GraphicEditor.Functionality
             double height = tmp.Points[0].Length(tmp.Points[1]);
             double width = tmp.Points[0].Length(tmp.Points[3]);
             Point centre = new Point(tmp.Points[0].X + width / 2, tmp.Points[0].Y + height / 2);
-            
+
             Point offset = centre.DeltaTo(moveMarker.Point);
             TranslateTransform translate = new TranslateTransform
             {
                 X = offset.X,
                 Y = offset.Y
             };
-            for (int i = 0; i<tmp.Points.Count; i++)
+            for (int i = 0; i < tmp.Points.Count; i++)
             {
                 Point pt = translate.Transform(tmp.Points[i]);
                 tmp.Points[i] = pt;
@@ -256,7 +261,7 @@ namespace GraphicEditor.Functionality
                 tmp.Points[i] = O;
             }
             rotateMarker.Move(rotate.Transform(rotateMarker.Point));
-            for (int i = 0; i< rectangle.Points.Count; i++)
+            for (int i = 0; i < rectangle.Points.Count; i++)
             {
                 rectangle.Points[i] = tmp.Points[i];
             }
@@ -313,5 +318,6 @@ namespace GraphicEditor.Functionality
             double yMin = Math.Min(firstPoint.Y, secondPoint.Y);
             AnchorPoint = new Point(xMin, yMin);
         }
+
     }
 }

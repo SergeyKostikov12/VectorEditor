@@ -13,10 +13,12 @@ namespace GraphicEditor.Functionality
         private Polyline polyline;
         private MarkerPoint selectedMarker;
 
-        public LineFigure(Polyline line)
+        public LineFigure(Shape line)
         {
+            var newLine = (Polyline)line;
+            newLine.Points.RemoveAt(newLine.Points.Count - 1);
             CreatePolyline();
-            DefinePolyline(line);
+            DefinePolyline(newLine);
             DefineMarkerPoints();
         }
         public LineFigure(Point firstPoint, Point secondPoint)
@@ -65,7 +67,7 @@ namespace GraphicEditor.Functionality
             HideOutline();
             selectedMarker = null;
         }
-        public override bool SelectMarker(Point point)
+        public override void SelectMarker(Point point)
         {
             foreach (var marker in markers)
             {
@@ -74,12 +76,18 @@ namespace GraphicEditor.Functionality
                 {
                     selectedMarker = marker;
                     ShowOutline();
-                    return true;
                 }
                 else
                 {
                     selectedMarker = null;
                 }
+            }
+        }
+        public override bool IsMarkerSelect()
+        {
+            if (selectedMarker != null)
+            {
+                return true;
             }
             return false;
         }
@@ -275,5 +283,6 @@ namespace GraphicEditor.Functionality
             polyline.Points.Add(firstPoint);
             polyline.Points.Add(secondPoint);
         }
+
     }
 }

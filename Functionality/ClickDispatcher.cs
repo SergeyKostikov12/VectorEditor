@@ -48,7 +48,8 @@ namespace GraphicEditor.Functionality
 
         private void CalculateTime()
         {
-            if (timeDown - timeUp <= 500)
+            int n = timeUp - timeDown;
+            if ( n <= 150)
             {
                 isClick = true;
                 isLMB_Down = false;
@@ -61,6 +62,7 @@ namespace GraphicEditor.Functionality
             if (Mouse.LeftButton == MouseButtonState.Pressed || Mouse.RightButton == MouseButtonState.Pressed)
             {
                 isDrag = true;
+                CalculateResult();
             }
         }
         public void RMB_Down()
@@ -126,13 +128,22 @@ namespace GraphicEditor.Functionality
             }
 
             //Клик вне режима рисования
-            if (Condition.DrawingMode == DrawingMode.None && isClick)
+            if (Condition.DrawingMode == DrawingMode.None && Condition.IsFigureSelected == false && isClick)
             {
                 Condition.Action = Action.SelectFigure;
             }
+            else if(Condition.DrawingMode == DrawingMode.None && Condition.IsFigureSelected && isLMB_Down && !isDrag)
+            {
+                Condition.Action = Action.SelectMarker;
+            }
+            else if (Condition.DrawingMode == DrawingMode.None && isRMB_Down)
+            {
+                Condition.Action = Action.Deselect;
+            }
 
             //Перетаскивание
-            if (Condition.DrawingMode == DrawingMode.None && isLMB_Down && isDrag)
+
+            else if (Condition.DrawingMode == DrawingMode.None && isLMB_Down && isDrag)
             {
                 Condition.Action = Action.MoveMarker;
             }
@@ -140,6 +151,11 @@ namespace GraphicEditor.Functionality
             {
                 Condition.Action = Action.MoveWorkplace;
             }
+            else if(Condition.Action == Action.MoveMarker && isLMB_Up)
+            {
+                Condition.Action = Action.RelizeMarker;
+            }
         }
+
     }
 }

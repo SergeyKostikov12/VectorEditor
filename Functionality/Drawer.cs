@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality
@@ -19,56 +20,118 @@ namespace GraphicEditor.Functionality
         }
     }
 
-   
 
-    public class ShadowRect : IDraw
+
+    public class ShadowRectangle : IDraw
     {
         private Point firstPoint;
+        private Rectangle rectangle;
+        public ShadowRectangle()
+        {
+            rectangle = new Rectangle
+            {
+                Stroke = Brushes.Blue,
+                StrokeDashArray = new DoubleCollection() { 4, 4 },
+                StrokeThickness = 1,
+            };
+        }
         public void StartDraw(Point point)
         {
             firstPoint = point;
         }
 
-        public void Draw(Point currentPosition)
+        public void Draw(Point currentMousePos)
         {
-            throw new NotImplementedException();
+            double xTop = Math.Max(firstPoint.X, currentMousePos.X);
+            double yTop = Math.Max(firstPoint.Y, currentMousePos.Y);
+
+            double xMin = Math.Min(firstPoint.X, currentMousePos.X);
+            double yMin = Math.Min(firstPoint.Y, currentMousePos.Y);
+
+            rectangle.Height = yTop - yMin;
+            rectangle.Width = xTop - xMin;
+
+            Canvas.SetLeft(rectangle, xMin);
+            Canvas.SetTop(rectangle, yMin);
         }
 
         public void EndDraw(Point endPoint)
         {
-            throw new NotImplementedException();
         }
 
         public void AddPoint(Point position)
         {
-            throw new NotImplementedException();
+        }
+
+        public Shape GetShape()
+        {
+            return rectangle;
+        }
+
+        public void Show()
+        {
+            rectangle.Visibility = Visibility.Visible;
+        }
+
+        public void Hide()
+        {
+            rectangle.Visibility = Visibility.Hidden;
         }
     }
     public class ShadowLine : IDraw
     {
+        private Polyline polyline;
+        public ShadowLine()
+        {
+            polyline = new Polyline
+            {
+                Stroke = Brushes.Blue,
+                StrokeDashArray = new DoubleCollection() { 4, 4 },
+                StrokeThickness = 1,
+                Visibility = Visibility.Hidden
+            };
+        }
         public void StartDraw(Point point)
         {
-            throw new NotImplementedException();
+            polyline.Points.Add(point);
+            polyline.Visibility = Visibility.Visible;
         }
 
-        public void Draw(Point currentPosition)
+        public void Draw(Point currentMousePos)
         {
-            throw new NotImplementedException();
-        }
-
-        public void EndDraw()
-        {
-            throw new NotImplementedException();
+            int n = polyline.Points.Count - 1;
+            polyline.Points[n] = new Point(currentMousePos.X, currentMousePos.Y);
         }
 
         public void EndDraw(Point endPoint)
         {
-            throw new NotImplementedException();
+            if (polyline.Points.Count <= 2)
+            {
+                polyline.Points[polyline.Points.Count - 1] = new Point(endPoint.X, endPoint.Y);
+                return;
+            }
+            polyline.Points.RemoveAt(polyline.Points.Count - 1);
         }
 
-        public void AddPoint(Point position)
+        public void AddPoint(Point clickPosition)
         {
-            throw new NotImplementedException();
+            polyline.Points[polyline.Points.Count - 1] = clickPosition;
+            polyline.Points.Add(clickPosition);
+        }
+
+        public Shape GetShape()
+        {
+            return polyline;
+        }
+
+        public void Show()
+        {
+            polyline.Visibility = Visibility.Visible;
+        }
+
+        public void Hide()
+        {
+            polyline.Visibility = Visibility.Hidden;
         }
     }
 
@@ -78,6 +141,8 @@ namespace GraphicEditor.Functionality
         void Draw(Point currentPosition);
         void EndDraw(Point endPoint);
         void AddPoint(Point position);
-        Shape GetShape()
+        void Show();
+        void Hide();
+        Shape GetShape();
     }
 }

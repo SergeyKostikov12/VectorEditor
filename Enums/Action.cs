@@ -4,5 +4,8 @@
     AddPoint,
     SelectFigure,
     MoveMarker,
-    MoveWorkplace
+    MoveWorkplace,
+    RelizeMarker,
+    SelectMarker,
+    Deselect
 }

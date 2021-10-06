@@ -29,6 +29,8 @@ namespace GraphicEditor.Functionality
                 Visibility = Visibility.Hidden
             };
             shadowRect = rectangle;
+
+
             Polyline line = new Polyline
             {
                 Stroke = Brushes.Blue,
