@@ -26,6 +26,7 @@ namespace GraphicEditor.Functionality
         public abstract List<Rectangle> GetMarkers(); 
         public abstract Polyline GetShape();
         public abstract Rectangle InsertPoint(Point position);
+        public abstract void Collapse();
         protected abstract int GetStrokeWidth();
         protected abstract void SetStrokeWidth(int value);
         protected abstract void SetFill(SolidColorBrush brush);

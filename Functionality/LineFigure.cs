@@ -16,7 +16,6 @@ namespace GraphicEditor.Functionality
         public LineFigure(Shape line)
         {
             var newLine = (Polyline)line;
-            newLine.Points.RemoveAt(newLine.Points.Count - 1);
             CreatePolyline();
             DefinePolyline(newLine);
             DefineMarkerPoints();
@@ -76,6 +75,7 @@ namespace GraphicEditor.Functionality
                 {
                     selectedMarker = marker;
                     ShowOutline();
+                    return;
                 }
                 else
                 {
@@ -205,6 +205,14 @@ namespace GraphicEditor.Functionality
                 }
             }
             return null;
+        }
+        public override void Collapse()
+        {
+            polyline.Visibility = Visibility.Collapsed;
+            foreach (var marker in markers)
+            {
+                marker.Marker.Visibility = Visibility.Collapsed;
+            }
         }
 
         protected override int GetStrokeWidth()

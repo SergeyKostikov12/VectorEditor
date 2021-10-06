@@ -1,4 +1,5 @@
 ﻿using GraphicEditor.Functionality;
+using GraphicEditor.Functionality.Shadows;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,11 +11,10 @@ namespace GraphicEditor.Controls
 {
     public partial class Workplace : UserControl
     {
-        private WorkplaceCondition condition;
+        private WorkplaceCondition Condition;
         private ClickDispatcher ClickDispatcher;
         private Figure selectedFigure;
-        private List<Figure> allFigures = new List<Figure>();
-        private Point scrollPoint = new Point(0, 0);
+        private List<Figure> allFigures;
 
         private IDraw shadow;
 
@@ -22,15 +22,15 @@ namespace GraphicEditor.Controls
         private Point leftMouseButtonUpPos;
         private Point rightMouseButtonDownPos;
         private Point currentMousePos;
-
-        private int timeDown;
-        private int timeUp;
+        private Point scrollPoint;
 
         public Workplace()
         {
             InitializeComponent();
-            condition = new WorkplaceCondition();
-            ClickDispatcher = new ClickDispatcher(condition);
+            Condition = new WorkplaceCondition();
+            ClickDispatcher = new ClickDispatcher(Condition);
+            allFigures = new List<Figure>();
+            scrollPoint = new Point(0, 0);
         }
 
         public List<Figure> GetAllFigures()
@@ -45,19 +45,19 @@ namespace GraphicEditor.Controls
             DeselectFigure();
             allFigures = fig;
             AddToWorkplace(fig);
-            condition.ResetCondition();
+            Condition.ResetCondition();
         }
         public void ReadyDrawLine()
         {
-            condition.DrawingMode = DrawingMode.LineMode;
-            WorkPlaceCanvas.Cursor = Cursors.Cross;
             DeselectFigure();
+            Condition.DrawingMode = DrawingMode.LineMode;
+            WorkPlaceCanvas.Cursor = Cursors.Cross;
         }
         public void ReadyDrawRectangle()
         {
-            condition.DrawingMode = DrawingMode.RectangleMode;
-            WorkPlaceCanvas.Cursor = Cursors.Cross;
             DeselectFigure();
+            Condition.DrawingMode = DrawingMode.RectangleMode;
+            WorkPlaceCanvas.Cursor = Cursors.Cross;
         }
         public void DeleteFigure()
         {
@@ -118,6 +118,7 @@ namespace GraphicEditor.Controls
             rightMouseButtonDownPos = e.GetPosition(WorkPlaceCanvas);
             ClickDispatcher.RMB_Down();
             ExecuteMouseInput();
+            WorkPlaceCanvas.Cursor = Cursors.Arrow;
         }
         private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -134,7 +135,7 @@ namespace GraphicEditor.Controls
 
         private void ExecuteMouseInput()
         {
-            switch (condition.DrawingMode)
+            switch (Condition.DrawingMode)
             {
                 case DrawingMode.StartDrawRectangle:
                     StartDrawRectangle();
@@ -166,13 +167,13 @@ namespace GraphicEditor.Controls
                 default:
                     break;
             }
-            switch (condition.Action)
+            switch (Condition.Action)
             {
                 case Action.None:
                     break;
                 case Action.AddPoint:
                     shadow.AddPoint(leftMouseButtonUpPos);
-                    condition.Action = Action.None;
+                    Condition.Action = Action.None;
                     break;
                 case Action.SelectFigure:
                     SelectFigure();
@@ -195,11 +196,6 @@ namespace GraphicEditor.Controls
                 default:
                     break;
             }
-        }
-
-        private void SelectMarker()
-        {
-            selectedFigure.SelectMarker(leftMouseButtonDownPos);
         }
 
         private void StartDrawLine()
@@ -228,11 +224,11 @@ namespace GraphicEditor.Controls
             allFigures.Add(figure);
             shadow.Hide();
             WorkPlaceCanvas.Children.Remove(shadow.GetShape());
-            condition.ResetCondition();
+            Condition.ResetCondition();
+            WorkPlaceCanvas.Cursor = Cursors.Arrow;
         }
         private void CreatePolyline()
         {
-            //shadow.Points.RemoveAt(0);
             Figure figure = new LineFigure(shadow.GetShape());
             WorkPlaceCanvas.Children.Add(figure.GetShape());
             var markers = figure.GetMarkers();
@@ -243,7 +239,8 @@ namespace GraphicEditor.Controls
             allFigures.Add(figure);
             shadow.Hide();
             WorkPlaceCanvas.Children.Remove(shadow.GetShape());
-            condition.ResetCondition();
+            Condition.ResetCondition();
+            WorkPlaceCanvas.Cursor = Cursors.Arrow;
         }
         private void CreateSingleLine()
         {
@@ -257,7 +254,8 @@ namespace GraphicEditor.Controls
             allFigures.Add(figure);
             shadow.Hide();
             WorkPlaceCanvas.Children.Remove(shadow.GetShape());
-            condition.ResetCondition();
+            Condition.ResetCondition();
+            WorkPlaceCanvas.Cursor = Cursors.Arrow;
         }
         private void DragFigure(Point position)
         {
@@ -273,15 +271,19 @@ namespace GraphicEditor.Controls
             scrollPoint.Y = Scroll.VerticalOffset - rightMouseButtonDownPos.DeltaTo(currentMousePos).Y / 2;
             Scroll.ScrollToHorizontalOffset(scrollPoint.X);
             Scroll.ScrollToVerticalOffset(scrollPoint.Y);
+            Condition.ResetCondition();
         }
 
-
+        private void SelectMarker()
+        {
+            selectedFigure.SelectMarker(leftMouseButtonDownPos);
+        }
         private void SelectFigure()
         {
             if (selectedFigure != null)
             {
                 selectedFigure.SelectMarker(leftMouseButtonDownPos);
-                condition.IsFigureSelected = true;
+                Condition.IsFigureSelected = true;
 
                 if (selectedFigure.IsMarkerSelect())
                     return;
@@ -293,12 +295,12 @@ namespace GraphicEditor.Controls
                 {
                     SetSelectedFigure(figure);
                     figure.ShowOutline();
-                    condition.IsFigureSelected = true;
+                    Condition.IsFigureSelected = true;
                 }
                 else
                 {
                     figure.HideOutline();
-                    condition.IsFigureSelected = false;
+                    Condition.IsFigureSelected = false;
                 }
             }
         }
@@ -314,7 +316,7 @@ namespace GraphicEditor.Controls
             selectedFigure.HideOutline();
             selectedFigure.DeselectFigure();
             selectedFigure = null;
-            condition.ResetCondition();
+            Condition.ResetCondition();
         }
         private void ExecuteDoubleClick()
         {
@@ -326,7 +328,7 @@ namespace GraphicEditor.Controls
         {
             if (selectedFigure == null)
                 return;
-            condition.Action = Action.None;
+            Condition.Action = Action.None;
             selectedFigure.ExecuteRelizeMarker(leftMouseButtonUpPos);
         }
         private void AddToWorkplace(Rectangle rect)
@@ -350,6 +352,10 @@ namespace GraphicEditor.Controls
         }
         private void ClearWorkplace()
         {
+            foreach (var figure in allFigures)
+            {
+                figure.Collapse();
+            }
             WorkPlaceCanvas.Children.Clear();
             allFigures.Clear();
         }
@@ -361,13 +367,6 @@ namespace GraphicEditor.Controls
                 newlist.Add(item);
             }
             return newlist;
-        }
-
-
-        private bool AllowDistance(Point currentMousePos)
-        {
-            Point delta = leftMouseButtonDownPos.AbsDeltaTo(currentMousePos);
-            return delta.X > 5 || delta.Y > 5;
         }
     }
 }

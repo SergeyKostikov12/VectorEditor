@@ -152,6 +152,13 @@ namespace GraphicEditor.Functionality
             };
             return rects;
         }
+        public override void Collapse()
+        {
+            rectangle.Visibility = Visibility.Collapsed;
+            moveMarker.Marker.Visibility = Visibility.Collapsed;
+            rotateMarker.Marker.Visibility = Visibility.Collapsed;
+            scaleMarker.Marker.Visibility = Visibility.Collapsed;
+        }
 
         protected override int GetStrokeWidth()
         {

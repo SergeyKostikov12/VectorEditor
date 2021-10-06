@@ -24,7 +24,6 @@ namespace GraphicEditor
         {
             var figures = Serializator.Load();
             Workplace.LoadWorkplace(figures);
-
         }
         private void SaveButtonPress(object sender, RoutedEventArgs e)
         {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace GraphicEditor.Functionality
 {
@@ -59,10 +54,15 @@ namespace GraphicEditor.Functionality
 
         public void Move()
         {
-            if (Mouse.LeftButton == MouseButtonState.Pressed || Mouse.RightButton == MouseButtonState.Pressed)
+            if (Mouse.LeftButton == MouseButtonState.Pressed )
             {
                 isDrag = true;
                 CalculateResult();
+            }
+            if (Mouse.RightButton == MouseButtonState.Pressed)
+            {
+                Condition.ResetCondition();
+                Condition.Action = Action.MoveWorkplace;
             }
         }
         public void RMB_Down()
