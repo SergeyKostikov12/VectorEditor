@@ -1,15 +1,19 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality.Shadows
 {
-    public class ShadowLine : IDraw
+    public class ShadowLine : ShadowFigure
     {
-        private Polyline polyline;
+        public Polyline Polyline { get ; set ; }
+
+        public override event EndDrawFigureEventHandler EndDrawFigure;
+
         public ShadowLine()
         {
-            polyline = new Polyline
+            Polyline = new Polyline
             {
                 Stroke = Brushes.Blue,
                 StrokeDashArray = new DoubleCollection() { 4, 4 },
@@ -17,51 +21,64 @@ namespace GraphicEditor.Functionality.Shadows
                 Visibility = Visibility.Hidden
             };
         }
-        public void StartDraw(Point point)
-        {
-            polyline.Points.Add(point);
-            polyline.Visibility = Visibility.Visible;
-        }
 
-        public void Draw(Point currentMousePos)
+        public override void LeftMouseButtonDown(Point position)
         {
-            if (polyline.Points.Count == 1)
+            throw new System.NotImplementedException();
+        }
+        public override void LeftMouseButtonUp(Point position)
+        {
+            throw new System.NotImplementedException();
+        }
+        public override void RightMouseButtonDown(Point position)
+        {
+            throw new System.NotImplementedException();
+        }
+        public override void MouseMove(Point position)
+        {
+            throw new System.NotImplementedException();
+        }
+        public override void StartDraw(Point point)
+        {
+            Polyline.Points.Add(point);
+            Polyline.Visibility = Visibility.Visible;
+        }
+        public override void Draw(Point currentMousePos)
+        {
+            if (Polyline.Points.Count == 1)
             {
-                polyline.Points.Add(currentMousePos);
+                Polyline.Points.Add(currentMousePos);
             }
-            int n = polyline.Points.Count - 1;
-            polyline.Points[n] = new Point(currentMousePos.X, currentMousePos.Y);
+            int n = Polyline.Points.Count - 1;
+            Polyline.Points[n] = new Point(currentMousePos.X, currentMousePos.Y);
         }
-
-        public void EndDraw(Point endPoint)
+        public override void EndDraw(Point endPoint)
         {
-            if (polyline.Points.Count <= 2)
+            if (Polyline.Points.Count <= 2)
             {
-                polyline.Points[polyline.Points.Count - 1] = new Point(endPoint.X, endPoint.Y);
+                Polyline.Points[Polyline.Points.Count - 1] = new Point(endPoint.X, endPoint.Y);
                 return;
             }
-            polyline.Points.RemoveAt(polyline.Points.Count - 1);
+            Polyline.Points.RemoveAt(Polyline.Points.Count - 1);
+            EndDrawFigure?.Invoke(this);
+        }
+        public override void AddPoint(Point clickPosition)
+        {
+            Polyline.Points[Polyline.Points.Count - 1] = clickPosition;
+            Polyline.Points.Add(clickPosition);
+        }
+        public override Shape GetShape()
+        {
+            return Polyline;
+        }
+        public override void Show()
+        {
+            Polyline.Visibility = Visibility.Visible;
+        }
+        public override void Hide()
+        {
+            Polyline.Visibility = Visibility.Hidden;
         }
 
-        public void AddPoint(Point clickPosition)
-        {
-            polyline.Points[polyline.Points.Count - 1] = clickPosition;
-            polyline.Points.Add(clickPosition);
-        }
-
-        public Shape GetShape()
-        {
-            return polyline;
-        }
-
-        public void Show()
-        {
-            polyline.Visibility = Visibility.Visible;
-        }
-
-        public void Hide()
-        {
-            polyline.Visibility = Visibility.Hidden;
-        }
     }
 }

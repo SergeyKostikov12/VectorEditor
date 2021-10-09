@@ -86,7 +86,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ColorPickEventHandler.cs" />
+    <Compile Include="Events\ColorPickEventHandler.cs" />
     <Compile Include="Controls\ColorPicker.cs">
       <DependentUpon>ColorPicker.xaml</DependentUpon>
     </Compile>
@@ -100,7 +100,7 @@
     <Compile Include="Enums\DrawingMode.cs" />
     <Compile Include="Enums\Mode.cs" />
     <Compile Include="Functionality\ClickDispatcher.cs" />
-    <Compile Include="Functionality\IDraw.cs" />
+    <Compile Include="Functionality\ShadowFigure.cs" />
     <Compile Include="Functionality\Serializator.cs" />
     <Compile Include="Functionality\Shadows\ShadowLine.cs" />
     <Compile Include="Functionality\Shadows\ShadowRectangle.cs" />
@@ -112,7 +112,7 @@
     <Compile Include="Functionality\MarkerPoint.cs" />
     <Compile Include="Functionality\RectangleFigure.cs" />
     <Compile Include="SerializableFigure.cs" />
-    <Compile Include="WidthPickEventHandler.cs" />
+    <Compile Include="Events\WidthPickEventHandler.cs" />
     <Page Include="Controls\ColorPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

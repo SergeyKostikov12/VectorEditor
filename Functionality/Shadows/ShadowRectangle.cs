@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality.Shadows
 {
-    public class ShadowRectangle : IDraw
+    public class ShadowRectangle : ShadowFigure
     {
-        private Point firstPoint;
         private Rectangle rectangle;
+        private bool isDrawing;
+
+        public Point FirstPoint { get; set; }
+        public Point LastPoint { get; set; }
+
+        public override event EndDrawFigureEventHandler EndDrawFigure;
+
         public ShadowRectangle()
         {
             rectangle = new Rectangle
@@ -17,20 +24,45 @@ namespace GraphicEditor.Functionality.Shadows
                 Stroke = Brushes.Blue,
                 StrokeDashArray = new DoubleCollection() { 4, 4 },
                 StrokeThickness = 1,
+                Visibility = Visibility.Hidden
             };
         }
-        public void StartDraw(Point point)
+
+        public override void LeftMouseButtonDown(Point position)
         {
-            firstPoint = point;
+            if (!isDrawing)
+            {
+                isDrawing = true;
+            }
+            StartDraw(position);
         }
-
-        public void Draw(Point currentMousePos)
+        public override void LeftMouseButtonUp(Point position)
         {
-            double xTop = Math.Max(firstPoint.X, currentMousePos.X);
-            double yTop = Math.Max(firstPoint.Y, currentMousePos.Y);
+            isDrawing = false;
+            EndDraw(position);
+            Hide();
+        }
+        public override void RightMouseButtonDown(Point position)
+        {
+            isDrawing = false;
+            Hide();
+        }
+        public override void MouseMove(Point position)
+        {
+            Show();
+            Draw(position);
+        }
+        public override void StartDraw(Point point)
+        {
+            FirstPoint = point;
+        }
+        public override void Draw(Point currentMousePos)
+        {
+            double xTop = Math.Max(FirstPoint.X, currentMousePos.X);
+            double yTop = Math.Max(FirstPoint.Y, currentMousePos.Y);
 
-            double xMin = Math.Min(firstPoint.X, currentMousePos.X);
-            double yMin = Math.Min(firstPoint.Y, currentMousePos.Y);
+            double xMin = Math.Min(FirstPoint.X, currentMousePos.X);
+            double yMin = Math.Min(FirstPoint.Y, currentMousePos.Y);
 
             rectangle.Height = yTop - yMin;
             rectangle.Width = xTop - xMin;
@@ -38,30 +70,31 @@ namespace GraphicEditor.Functionality.Shadows
             Canvas.SetLeft(rectangle, xMin);
             Canvas.SetTop(rectangle, yMin);
         }
-
-        public void EndDraw(Point endPoint)
+        public override void EndDraw(Point endPoint)
+        {
+            LastPoint = endPoint;
+            EndDrawFigure?.Invoke(this);
+            return;
+        }
+        public override void AddPoint(Point position)
         {
             return;
         }
-
-        public void AddPoint(Point position)
-        {
-            return;
-        }
-
-        public Shape GetShape()
+        public override Shape GetShape()
         {
             return rectangle;
         }
-
-        public void Show()
+        public override void Show()
         {
-            rectangle.Visibility = Visibility.Visible;
+            if (isDrawing)
+            {
+                rectangle.Visibility = Visibility.Visible;
+            }
         }
-
-        public void Hide()
+        public override void Hide()
         {
             rectangle.Visibility = Visibility.Hidden;
         }
+
     }
 }

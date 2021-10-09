@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -12,6 +13,8 @@ namespace GraphicEditor.Functionality
         private List<MarkerPoint> markers;
         private Polyline polyline;
         private MarkerPoint selectedMarker;
+
+        public override event SelectFigureEventHandler SelectFigure;
 
         public LineFigure(Shape line)
         {
@@ -37,6 +40,27 @@ namespace GraphicEditor.Functionality
             };
         }
 
+
+        public override void LeftMouseButtonDown(Point position)
+        {
+            throw new NotImplementedException();
+        }
+        public override void LeftMouseButtonUp(Point position)
+        {
+            throw new NotImplementedException();
+        }
+        public override void RightMouseButtonDown(Point position)
+        {
+            throw new NotImplementedException();
+        }
+        public override void MouseMove(Point position)
+        {
+            throw new NotImplementedException();
+        }
+        public override void LeftMouseButtonClick(Point position)
+        {
+            throw new NotImplementedException();
+        }
 
         public Polyline GetPolyline()
         {
@@ -184,7 +208,7 @@ namespace GraphicEditor.Functionality
             }
             return rects;
         }
-        public override Polyline GetShape()
+        public override Polyline GetShapes()
         {
             return polyline;
         }

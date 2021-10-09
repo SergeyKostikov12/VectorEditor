@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -9,12 +10,15 @@ namespace GraphicEditor.Functionality
 {
     public class RectangleFigure : Figure
     {
+        public override event SelectFigureEventHandler SelectFigure;
+
         private MarkerPoint moveMarker;
         private MarkerPoint rotateMarker;
         private MarkerPoint scaleMarker;
         private Polyline rectangle;
+        private MarkerPoint SelectedMarker;
 
-        public MarkerPoint SelectedMarker { get; private set; }
+
         public RectangleFigure(Point firstPoint, Point secondPoint)
         {
             CreateRectangle(firstPoint, secondPoint);
@@ -42,6 +46,33 @@ namespace GraphicEditor.Functionality
             StrokeWidth = Convert.ToInt32(sLFigure.LineStrokeThinkness);
         }
 
+
+
+        public override void LeftMouseButtonDown(Point position)
+        {
+            throw new NotImplementedException();
+        }
+        public override void LeftMouseButtonUp(Point position)
+        {
+            throw new NotImplementedException();
+        }
+        public override void RightMouseButtonDown(Point position)
+        {
+            throw new NotImplementedException();
+        }
+        public override void MouseMove(Point position)
+        {
+            throw new NotImplementedException();
+        }
+        public override void LeftMouseButtonClick(Point position)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Для сериализации
+        /// </summary>
+        /// <returns></returns>
         public Point GetMoveMarker()
         {
             return moveMarker.Point;
@@ -54,6 +85,8 @@ namespace GraphicEditor.Functionality
         {
             return rectangle;
         }
+
+
         public override void MoveMarker(Point position)
         {
             if (SelectedMarker != null && SelectedMarker.Equals(moveMarker))
@@ -134,7 +167,7 @@ namespace GraphicEditor.Functionality
         {
             SelectedMarker = null;
         }
-        public override Polyline GetShape()
+        public override Polyline GetShapes()
         {
             return rectangle;
         }
@@ -325,6 +358,8 @@ namespace GraphicEditor.Functionality
             double yMin = Math.Min(firstPoint.Y, secondPoint.Y);
             AnchorPoint = new Point(xMin, yMin);
         }
+
+
 
     }
 }
