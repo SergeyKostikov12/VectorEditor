@@ -10,11 +10,14 @@ namespace GraphicEditor.Functionality
 {
     class LineFigure : Figure
     {
-        private List<MarkerPoint> markers;
+        public override event SelectFigureEventHandler SelectFigure;
+        public override event DeselectFigureEventHandler DeselectFigure;
+        public override event AddAdditionalElementEventHandler AddAdditionalElement;
+        
         private Polyline polyline;
         private MarkerPoint selectedMarker;
+        private List<MarkerPoint> markers;
 
-        public override event SelectFigureEventHandler SelectFigure;
 
         public LineFigure(Shape line)
         {
@@ -23,12 +26,7 @@ namespace GraphicEditor.Functionality
             DefinePolyline(newLine);
             DefineMarkerPoints();
         }
-        public LineFigure(Point firstPoint, Point secondPoint)
-        {
-            CreatePolyline(firstPoint, secondPoint);
-            DefineMarkerPoints();
-        }
-        public LineFigure (SerializableFigure sLFigure)//1
+        public LineFigure(SerializableFigure sLFigure)
         {
             CreatePolyline();
             DefinePolyline(sLFigure.Polyline.ParsePolylineFromArray());
@@ -40,28 +38,42 @@ namespace GraphicEditor.Functionality
             };
         }
 
-
+        /// <summary>
+        /// События
+        /// </summary>
+        /// <param></param>
         public override void LeftMouseButtonDown(Point position)
         {
-            throw new NotImplementedException();
+            if (!IsSelected)
+            {
+                SelectLine(position);
+                return;
+            }
+            SelectMarker(position);
         }
         public override void LeftMouseButtonUp(Point position)
         {
-            throw new NotImplementedException();
+            ExecuteRelizeMarker(position);
         }
         public override void RightMouseButtonDown(Point position)
         {
-            throw new NotImplementedException();
+            Deselect();
         }
         public override void MouseMove(Point position)
         {
-            throw new NotImplementedException();
+            if (Mouse.LeftButton != MouseButtonState.Pressed)
+                return;
+            MoveMarker(position);
         }
         public override void LeftMouseButtonClick(Point position)
         {
-            throw new NotImplementedException();
+            InsertPoint(position);
         }
 
+        /// <summary>
+        /// Для сериализации
+        /// </summary>
+        /// <returns></returns>
         public Polyline GetPolyline()
         {
             return polyline;
@@ -71,12 +83,20 @@ namespace GraphicEditor.Functionality
             return markers;
         }
 
-        public override void ShowOutline()
+
+        /// <summary>
+        /// Публичные методы
+        /// </summary>
+        /// <returns></returns>
+        public override List<Shape> GetShapes()
         {
+            List<Shape> shapes = new List<Shape>();
             foreach (var marker in markers)
             {
-                marker.Show();
+                shapes.Add(marker.Marker);
             }
+            shapes.Add(polyline);
+            return shapes;
         }
         public override void HideOutline()
         {
@@ -85,12 +105,52 @@ namespace GraphicEditor.Functionality
                 marker.Hide();
             }
         }
-        public override void DeselectFigure()
+        public override void Deselect()
         {
             HideOutline();
             selectedMarker = null;
+            IsSelected = false;
+            DeselectFigure?.Invoke(this);
         }
-        public override void SelectMarker(Point point)
+        public override void Collapse()
+        {
+            polyline.Visibility = Visibility.Collapsed;
+            foreach (var marker in markers)
+            {
+                marker.Marker.Visibility = Visibility.Collapsed;
+            }
+        }
+
+
+        /// <summary>
+        /// Приватные методы
+        /// </summary>
+        /// 
+        protected override void SelectLine(Point point)
+        {
+            for (int i = 0; i < markers.Count - 1; i++)
+            {
+                if (point.AbsAngleBetweenPoints(markers[i].Point, markers[i + 1].Point) > 60)
+                {
+                    double A = point.Length(markers[i + 1].Point);
+                    double B = point.Length(markers[i].Point);
+                    double C = markers[i].Point.Length(markers[i + 1].Point);
+                    double p = (A + B + C) / 2;
+                    double S = Math.Sqrt(p * (p - A) * (p - B) * (p - C));
+                    double h = 2 * S / C;
+                    if (h <= 10 + StrokeWidth)
+                    {
+                        ShowOutline();
+                        IsSelected = true;
+                        SelectFigure?.Invoke(this);
+                        return;
+                    }
+                }
+
+            }
+            Deselect();
+        }
+        protected override void SelectMarker(Point point)
         {
             foreach (var marker in markers)
             {
@@ -107,60 +167,27 @@ namespace GraphicEditor.Functionality
                 }
             }
         }
-        public override bool IsMarkerSelect()
+        protected override void ShowOutline()
         {
-            if (selectedMarker != null)
+            foreach (var marker in markers)
             {
-                return true;
-            }
-            return false;
-        }
-        public override bool SelectLine(Point point)
-        {
-            for (int i = 0; i < markers.Count - 1; i++)
-            {
-                if (point.AbsAngleBetweenPoints(markers[i].Point, markers[i + 1].Point) > 60)
-                {
-                    double A = point.Length(markers[i + 1].Point);
-                    double B = point.Length(markers[i].Point);
-                    double C = markers[i].Point.Length(markers[i + 1].Point);
-                    double p = (A + B + C) / 2;
-                    double S = Math.Sqrt(p * (p - A) * (p - B) * (p - C));
-                    double h = 2 * S / C;
-                    if (h <= 10 + StrokeWidth)
-                    {
-                        return true;
-                    }
-                }
-
-            }
-            return false;
-        }
-        public override void MoveMarker(Point position)
-        {
-            for (int i = 0; i < markers.Count; i++)
-            {
-                if (markers[i].Equals(selectedMarker))
-                {
-                    markers[i].Move(position);
-                    polyline.Points[i] = position;
-                }
+                marker.Show();
             }
         }
-        public override void ExecuteRelizeMarker(Point position)
+        protected override void ExecuteRelizeMarker(Point position)
         {
             if (polyline.Points.Count <= 2) return;
             if (selectedMarker == null) return;
             int n = 0;
             for (int i = 0; i < markers.Count; i++)
-			{
+            {
                 if (!markers[i].Equals(selectedMarker)) continue;
                 n = i;
                 break;
-			}
-            if (n == 0 || n == markers.Count-1)
+            }
+            if (n == 0 || n == markers.Count - 1)
             {
-                if (n==0)
+                if (n == 0)
                 {
                     if (selectedMarker.Point.ItInsideCircle(polyline.Points[1], StrokeWidth))
                     {
@@ -170,74 +197,50 @@ namespace GraphicEditor.Functionality
                         selectedMarker = null;
                     }
                 }
-                if (n == polyline.Points.Count-1)
+                if (n == polyline.Points.Count - 1)
                 {
-                    if(selectedMarker.Point.ItInsideCircle(polyline.Points[polyline.Points.Count-2], StrokeWidth))
+                    if (selectedMarker.Point.ItInsideCircle(polyline.Points[polyline.Points.Count - 2], StrokeWidth))
                     {
                         selectedMarker.Hide();
                         markers.Remove(selectedMarker);
-                        polyline.Points.RemoveAt(polyline.Points.Count-1);
-                        selectedMarker = null;                    }
+                        polyline.Points.RemoveAt(polyline.Points.Count - 1);
+                        selectedMarker = null;
+                    }
                 }
             }
             else
             {
-                if(selectedMarker.Point.ItInsideCircle(markers[n-1].Point, StrokeWidth))
+                if (selectedMarker.Point.ItInsideCircle(markers[n - 1].Point, StrokeWidth))
                 {
                     selectedMarker.Hide();
                     markers.Remove(selectedMarker);
                     polyline.Points.RemoveAt(n);
-                    selectedMarker = null; 
+                    selectedMarker = null;
                 }
-                else if(selectedMarker.Point.ItInsideCircle(markers[n+1].Point, StrokeWidth))
+                else if (selectedMarker.Point.ItInsideCircle(markers[n + 1].Point, StrokeWidth))
                 {
                     selectedMarker.Hide();
                     markers.Remove(selectedMarker);
                     polyline.Points.RemoveAt(n);
-                    selectedMarker = null; 
+                    selectedMarker = null;
                 }
             }
 
         }
-        public override List<Rectangle> GetMarkers()
+        protected override void MoveMarker(Point position)
         {
-            List<Rectangle> rects = new List<Rectangle>();
-            foreach (var marker in markers)
+            if (selectedMarker == null)
+                return;
+            for (int i = 0; i < markers.Count; i++)
             {
-                rects.Add(marker.Marker);
-            }
-            return rects;
-        }
-        public override Polyline GetShapes()
-        {
-            return polyline;
-        }
-        public override Rectangle InsertPoint(Point position)
-        {
-            for (int i = 0; i <polyline.Points.Count-1; i++)
-            {
-                Point A = polyline.Points[i];
-                Point B = polyline.Points[i + 1];
-                if(position.ItIntersect(A,B, StrokeWidth))
+                if (markers[i].Equals(selectedMarker))
                 {
-                    polyline.Points.Insert(i+1, position);
-                    MarkerPoint marker = new MarkerPoint(position);
-                    marker.SetMarkerSize(StrokeWidth);
-                    markers.Insert(i+1, marker);
-                    marker.Show();
-                    return marker.Marker;
+                    markers[i].Move(position);
+                    polyline.Points[i] = position;
                 }
             }
-            return null;
         }
-        public override void Collapse()
-        {
-            polyline.Visibility = Visibility.Collapsed;
-            foreach (var marker in markers)
-            {
-                marker.Marker.Visibility = Visibility.Collapsed;
-            }
-        }
+
 
         protected override int GetStrokeWidth()
         {
@@ -258,15 +261,34 @@ namespace GraphicEditor.Functionality
             SolidColorBrush brush = (SolidColorBrush)polyline.Stroke;
             return brush;
         }
-        protected override void SetFill(SolidColorBrush brush)
-        {
-            MessageBox.Show("Невозможно залить Линию!!!");
-        }
         protected override void SetLineColor(SolidColorBrush colorBrush)
         {
             polyline.Stroke = colorBrush;
         }
+        protected override void SetFill(SolidColorBrush brush)
+        {
+            MessageBox.Show("Невозможно залить Линию!!!");
+        }
 
+        private void InsertPoint(Point position)
+        {
+            for (int i = 0; i < polyline.Points.Count - 1; i++)
+            {
+                Point A = polyline.Points[i];
+                Point B = polyline.Points[i + 1];
+                if (position.ItIntersect(A, B, StrokeWidth))
+                {
+                    polyline.Points.Insert(i + 1, position);
+                    MarkerPoint marker = new MarkerPoint(position);
+                    marker.SetMarkerSize(StrokeWidth);
+                    markers.Insert(i + 1, marker);
+                    marker.Show();
+                    AddAdditionalElement?.Invoke(marker.Marker);
+                    return;
+                }
+            }
+            return;
+        }
         private void CreatePolyline()
         {
             FigureType = FigureType.Line;
@@ -302,19 +324,5 @@ namespace GraphicEditor.Functionality
                 polyline.Points.Add(point);
             }
         }
-        private void CreatePolyline(Point firstPoint, Point secondPoint)
-        {
-            FigureType = FigureType.Line;
-            markers = new List<MarkerPoint>();
-            polyline = new Polyline
-            {
-                Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
-                StrokeEndLineCap = PenLineCap.Square,
-                StrokeLineJoin = PenLineJoin.Round
-            };
-            polyline.Points.Add(firstPoint);
-            polyline.Points.Add(secondPoint);
-        }
-
     }
 }

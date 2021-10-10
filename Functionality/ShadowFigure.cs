@@ -9,7 +9,7 @@ namespace GraphicEditor.Functionality
     {
         public delegate void EndDrawFigureEventHandler(object sender);
 
-        public abstract event EndDrawFigureEventHandler EndDrawFigure;
+        public abstract event EndDrawFigureEventHandler EndDrawShadodw;
         public abstract void StartDraw(Point point);
         public abstract void Draw(Point currentPosition);
         public abstract void EndDraw(Point endPoint);

@@ -5,13 +5,14 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality.Shadows
 {
-    public class ShadowLine : ShadowFigure
+    public class LineShadow : ShadowFigure
     {
-        public Polyline Polyline { get ; set ; }
+        public Polyline Polyline { get; set; }
+        public override event EndDrawFigureEventHandler EndDrawShadodw;
 
-        public override event EndDrawFigureEventHandler EndDrawFigure;
-
-        public ShadowLine()
+        private bool isStarted;
+        private bool isSingleLine;
+        public LineShadow()
         {
             Polyline = new Polyline
             {
@@ -24,27 +25,48 @@ namespace GraphicEditor.Functionality.Shadows
 
         public override void LeftMouseButtonDown(Point position)
         {
-            throw new System.NotImplementedException();
+            if (!isStarted)
+            {
+                StartDraw(position);
+            }
         }
         public override void LeftMouseButtonUp(Point position)
         {
-            throw new System.NotImplementedException();
+            if (isSingleLine)
+            {
+                EndDraw(position);
+                Hide();
+            }
+            else AddPoint(position);
         }
         public override void RightMouseButtonDown(Point position)
         {
-            throw new System.NotImplementedException();
+            if (!isStarted) 
+                return;
+            EndDraw(position);
         }
         public override void MouseMove(Point position)
         {
-            throw new System.NotImplementedException();
+            if (Mouse.LeftButton == MouseButtonState.Pressed && isStarted)
+            {
+                if (Polyline.Points.Count == 1)
+                {
+                    isSingleLine = true;
+                }
+            }
+            Draw(position);
         }
+
         public override void StartDraw(Point point)
         {
             Polyline.Points.Add(point);
             Polyline.Visibility = Visibility.Visible;
+            isStarted = true;
         }
         public override void Draw(Point currentMousePos)
         {
+            if (!isStarted)
+                return;
             if (Polyline.Points.Count == 1)
             {
                 Polyline.Points.Add(currentMousePos);
@@ -57,10 +79,15 @@ namespace GraphicEditor.Functionality.Shadows
             if (Polyline.Points.Count <= 2)
             {
                 Polyline.Points[Polyline.Points.Count - 1] = new Point(endPoint.X, endPoint.Y);
-                return;
+                EndDrawShadodw?.Invoke(this);
+                Reset();
             }
-            Polyline.Points.RemoveAt(Polyline.Points.Count - 1);
-            EndDrawFigure?.Invoke(this);
+            else
+            {
+                Polyline.Points.RemoveAt(Polyline.Points.Count - 1);
+                EndDrawShadodw?.Invoke(this);
+                Reset();
+            }
         }
         public override void AddPoint(Point clickPosition)
         {
@@ -80,5 +107,12 @@ namespace GraphicEditor.Functionality.Shadows
             Polyline.Visibility = Visibility.Hidden;
         }
 
+        private void Reset()
+        {
+            Polyline.Points.Clear();
+            isStarted = false;
+            isSingleLine = false;
+            Hide();
+        }
     }
 }

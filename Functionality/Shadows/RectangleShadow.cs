@@ -7,7 +7,7 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality.Shadows
 {
-    public class ShadowRectangle : ShadowFigure
+    public class RectangleShadow : ShadowFigure
     {
         private Rectangle rectangle;
         private bool isDrawing;
@@ -15,9 +15,9 @@ namespace GraphicEditor.Functionality.Shadows
         public Point FirstPoint { get; set; }
         public Point LastPoint { get; set; }
 
-        public override event EndDrawFigureEventHandler EndDrawFigure;
+        public override event EndDrawFigureEventHandler EndDrawShadodw;
 
-        public ShadowRectangle()
+        public RectangleShadow()
         {
             rectangle = new Rectangle
             {
@@ -73,7 +73,7 @@ namespace GraphicEditor.Functionality.Shadows
         public override void EndDraw(Point endPoint)
         {
             LastPoint = endPoint;
-            EndDrawFigure?.Invoke(this);
+            EndDrawShadodw?.Invoke(this);
             return;
         }
         public override void AddPoint(Point position)

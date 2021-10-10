@@ -8,7 +8,7 @@ namespace GraphicEditor
 {
     public partial class MainWindow : Window
     {
-        private Serializator Serializator = new Serializator();
+        private Storage Serializator = new Storage();
         private ColorPicker ColorPicker = new ColorPicker();
         private WidthPicker WidthPicker = new WidthPicker();
 

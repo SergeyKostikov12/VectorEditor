@@ -11,7 +11,14 @@ namespace GraphicEditor.Functionality
     public abstract class Figure
     {
         public delegate void SelectFigureEventHandler(Figure sender);
+        public delegate void DeselectFigureEventHandler(Figure sender);
+        public delegate void AddAdditionalElementEventHandler(Shape element);
+
         public abstract event SelectFigureEventHandler SelectFigure;
+        public abstract event DeselectFigureEventHandler DeselectFigure;
+        public abstract event AddAdditionalElementEventHandler AddAdditionalElement;
+
+        public bool IsSelected;
         public FigureType FigureType { get; protected set; }
         public Point AnchorPoint { get; set; }
         public int StrokeWidth { get => GetStrokeWidth(); set => SetStrokeWidth(value); }
@@ -25,23 +32,27 @@ namespace GraphicEditor.Functionality
         public abstract void LeftMouseButtonClick(Point position);
 
 
-        public abstract void ShowOutline();
+        public abstract List<Shape> GetShapes(); 
         public abstract void HideOutline(); 
-        public abstract void DeselectFigure(); 
-        public abstract bool SelectLine(Point point); 
-        public abstract void SelectMarker(Point poin); 
-        public abstract bool IsMarkerSelect();
-        public abstract void MoveMarker(Point position); 
-        public abstract void ExecuteRelizeMarker(Point position); 
-        public abstract List<Rectangle> GetMarkers(); 
-        public abstract Polyline GetShapes(); //TODO: Сделать возврат списка Shape
-        public abstract Rectangle InsertPoint(Point position);
+        public abstract void Deselect(); 
         public abstract void Collapse();
+
+
+        protected abstract void ExecuteRelizeMarker(Point position); 
+        protected abstract void SelectLine(Point point); 
+        protected abstract void ShowOutline();
+        protected abstract void SelectMarker(Point poin);
+        protected abstract void MoveMarker(Point position); 
         protected abstract int GetStrokeWidth();
         protected abstract void SetStrokeWidth(int value);
         protected abstract void SetFill(SolidColorBrush brush);
         protected abstract void SetLineColor(SolidColorBrush colorBrush);
         protected abstract SolidColorBrush GetFill();
         protected abstract SolidColorBrush GetLineColor();
+
+
+        //public abstract bool IsMarkerSelect();
+        //public abstract List<Rectangle> GetMarkers(); 
+        //public abstract Rectangle InsertPoint(Point position);
     }
 }
