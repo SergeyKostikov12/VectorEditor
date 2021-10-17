@@ -28,7 +28,7 @@ namespace GraphicEditor.Functionality
             double w = (rectangle.Points[3].X - rectangle.Points[0].X) / 2;
             double h = (rectangle.Points[1].Y - rectangle.Points[0].Y) / 2;
             moveMarker = new MarkerPoint(new Point(AnchorPoint.X + w, AnchorPoint.Y + h));
-            rotateMarker = new MarkerPoint(new Point(moveMarker.X - 50, moveMarker.Y));
+            rotateMarker = new MarkerPoint(new Point(moveMarker.Point.X - 50, moveMarker.Point.Y));
             DefineMarkers();
             rectangle.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
             rectangle.StrokeEndLineCap = PenLineCap.Square;
@@ -192,7 +192,7 @@ namespace GraphicEditor.Functionality
         }
 
 
-        protected override void ShowOutline()
+        public override void ShowOutline()
         {
             moveMarker.Show();
             rotateMarker.Show();
@@ -229,7 +229,7 @@ namespace GraphicEditor.Functionality
         private void Select()
         {
             IsSelected = true;
-            ShowOutline();
+            //ShowOutline();
             SelectFigure?.Invoke(this);
         }
         private void CreateRectangle(Point firstPoint, Point secondPoint)
@@ -281,8 +281,8 @@ namespace GraphicEditor.Functionality
             Point delta = moveMarker.Point.DeltaTo(position);
             moveMarker.Move(position);
             AnchorPoint = new Point(AnchorPoint.X + delta.X, AnchorPoint.Y + delta.Y);
-            rotateMarker.Move(new Point(rotateMarker.X + delta.X, rotateMarker.Y + delta.Y));
-            scaleMarker.Move(new Point(scaleMarker.X + delta.X, scaleMarker.Y + delta.Y));
+            rotateMarker.Move(new Point(rotateMarker.Point.X + delta.X, rotateMarker.Point.Y + delta.Y));
+            scaleMarker.Move(new Point(scaleMarker.Point.X + delta.X, scaleMarker.Point.Y + delta.Y));
             for (int i = 0; i < rectangle.Points.Count; i++)
             {
                 rectangle.Points[i] = new Point(rectangle.Points[i].X + delta.X, rectangle.Points[i].Y + delta.Y);
@@ -354,11 +354,11 @@ namespace GraphicEditor.Functionality
         {
             RotateTransform rotate = new RotateTransform
             {
-                CenterX = moveMarker.X,
-                CenterY = moveMarker.Y
+                CenterX = moveMarker.Point.X,
+                CenterY = moveMarker.Point.Y
             };
-            Vector CA = new Vector(moveMarker.X - rotateMarker.X, moveMarker.Y - rotateMarker.Y);
-            Vector CB = new Vector(moveMarker.X - position.X, moveMarker.Y - position.Y);
+            Vector CA = new Vector(moveMarker.Point.X - rotateMarker.Point.X, moveMarker.Point.Y - rotateMarker.Point.Y);
+            Vector CB = new Vector(moveMarker.Point.X - position.X, moveMarker.Point.Y - position.Y);
             double angle = Vector.AngleBetween(CA, CB) * Math.PI / 180;
             rotate.Angle = angle;
             Point tmpRP = rotate.Transform(rotateMarker.Point);

@@ -40,7 +40,7 @@ namespace GraphicEditor.Functionality
 
         protected abstract void ExecuteRelizeMarker(Point position); 
         protected abstract void SelectLine(Point point); 
-        protected abstract void ShowOutline();
+        public abstract void ShowOutline();
         protected abstract void SelectMarker(Point poin);
         protected abstract void MoveMarker(Point position); 
         protected abstract int GetStrokeWidth();

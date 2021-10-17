@@ -5,20 +5,14 @@ using System.Windows.Shapes;
 
 public class MarkerPoint
 {
-    private double x;
-    private double y;
     private Point point;
     private int markerSize;
 
-    public double X { get => x; set => SetX(value); }
-    public double Y { get => y; set => SetY(value); }
     public Point Point { get => point; set => SetPoint(value); }
     public Rectangle Marker { get; }
 
     public MarkerPoint(Point pt)
     {
-        x = pt.X;
-        y = pt.Y;
         point = pt;
         markerSize = 1;
         Marker = new Rectangle
@@ -46,21 +40,9 @@ public class MarkerPoint
         RefreshAnchorPoint();
     }
 
-    private void SetX(double xValue)
-    {
-        point.X = xValue;
-        x = xValue;
-    }
-    private void SetY(double yValue)
-    {
-        point.Y = yValue;
-        y = yValue;
-    }
     private void SetPoint(Point newPoint)
     {
         point = newPoint;
-        x = point.X;
-        y = point.Y;
     }
     public void SetMarkerSize(int size)
     {
@@ -73,7 +55,7 @@ public class MarkerPoint
     }
     private void RefreshAnchorPoint()
     {
-        Point pt = new Point(X - Marker.Width/2, Y - Marker.Height/2);
+        Point pt = new Point(Point.X - Marker.Width/2, Point.Y - Marker.Height/2);
         Canvas.SetLeft(Marker, pt.X);
         Canvas.SetTop(Marker, pt.Y);
     }

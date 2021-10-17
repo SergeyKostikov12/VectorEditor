@@ -5,7 +5,7 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality.Shadows
 {
-    public class LineShadow : ShadowFigure
+    public class LineShadow : Shadow, IDrawing
     {
         public Polyline Polyline { get; set; }
         public override event EndDrawFigureEventHandler EndDrawShadodw;
@@ -57,13 +57,13 @@ namespace GraphicEditor.Functionality.Shadows
             Draw(position);
         }
 
-        public override void StartDraw(Point point)
+        public void StartDraw(Point point)
         {
             Polyline.Points.Add(point);
-            Polyline.Visibility = Visibility.Visible;
             isStarted = true;
+            Show();
         }
-        public override void Draw(Point currentMousePos)
+        public void Draw(Point currentMousePos)
         {
             if (!isStarted)
                 return;
@@ -74,45 +74,50 @@ namespace GraphicEditor.Functionality.Shadows
             int n = Polyline.Points.Count - 1;
             Polyline.Points[n] = new Point(currentMousePos.X, currentMousePos.Y);
         }
-        public override void EndDraw(Point endPoint)
+        public void EndDraw(Point endPoint)
         {
             if (Polyline.Points.Count <= 2)
             {
                 Polyline.Points[Polyline.Points.Count - 1] = new Point(endPoint.X, endPoint.Y);
-                EndDrawShadodw?.Invoke(this);
+                EndDrawShadodw?.Invoke(GetCreatedFigure());
                 Reset();
             }
             else
             {
                 Polyline.Points.RemoveAt(Polyline.Points.Count - 1);
-                EndDrawShadodw?.Invoke(this);
+                EndDrawShadodw?.Invoke(GetCreatedFigure());
                 Reset();
             }
-        }
-        public override void AddPoint(Point clickPosition)
-        {
-            Polyline.Points[Polyline.Points.Count - 1] = clickPosition;
-            Polyline.Points.Add(clickPosition);
         }
         public override Shape GetShape()
         {
             return Polyline;
         }
-        public override void Show()
+        public void Show()
         {
             Polyline.Visibility = Visibility.Visible;
         }
-        public override void Hide()
+        public void Hide()
         {
             Polyline.Visibility = Visibility.Hidden;
         }
 
+        private void AddPoint(Point clickPosition)
+        {
+            Polyline.Points[Polyline.Points.Count - 1] = clickPosition;
+            Polyline.Points.Add(clickPosition);
+        }
         private void Reset()
         {
             Polyline.Points.Clear();
             isStarted = false;
             isSingleLine = false;
             Hide();
+        }
+        public override Figure GetCreatedFigure()
+        {
+            Figure figure = new LineFigure(Polyline);
+            return figure;
         }
     }
 }

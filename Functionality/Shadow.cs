@@ -5,21 +5,29 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality
 {
-    public abstract class ShadowFigure
+    public abstract class Shadow 
     {
-        public delegate void EndDrawFigureEventHandler(object sender);
-
+        public delegate void EndDrawFigureEventHandler(Figure figure);
         public abstract event EndDrawFigureEventHandler EndDrawShadodw;
-        public abstract void StartDraw(Point point);
-        public abstract void Draw(Point currentPosition);
-        public abstract void EndDraw(Point endPoint);
-        public abstract void AddPoint(Point position);
-        public abstract void Show();
-        public abstract void Hide();
+
         public abstract Shape GetShape();
+        public abstract Figure GetCreatedFigure();
+
         public abstract void LeftMouseButtonDown(Point position);
         public abstract void LeftMouseButtonUp(Point position);
         public abstract void RightMouseButtonDown(Point position);
         public abstract void MouseMove(Point position);
+
+        public static Shadow Create(DrawingMode drawingMode)
+        {
+            if (drawingMode == DrawingMode.LineMode)
+            {
+                return new LineShadow();
+            }
+            else 
+            {
+                return new RectangleShadow();
+            }
+        }
     }
 }

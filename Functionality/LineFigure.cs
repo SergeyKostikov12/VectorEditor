@@ -140,7 +140,7 @@ namespace GraphicEditor.Functionality
                     double h = 2 * S / C;
                     if (h <= 10 + StrokeWidth)
                     {
-                        ShowOutline();
+                        //ShowOutline();
                         IsSelected = true;
                         SelectFigure?.Invoke(this);
                         return;
@@ -158,7 +158,7 @@ namespace GraphicEditor.Functionality
                 if (result)
                 {
                     selectedMarker = marker;
-                    ShowOutline();
+                    //ShowOutline();
                     return;
                 }
                 else
@@ -167,7 +167,7 @@ namespace GraphicEditor.Functionality
                 }
             }
         }
-        protected override void ShowOutline()
+        public override void ShowOutline()
         {
             foreach (var marker in markers)
             {

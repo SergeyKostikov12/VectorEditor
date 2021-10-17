@@ -97,7 +97,8 @@
       <DependentUpon>Workplace.xaml</DependentUpon>
     </Compile>
     <Compile Include="Enums\DrawingMode.cs" />
-    <Compile Include="Functionality\ShadowFigure.cs" />
+    <Compile Include="Functionality\IDrawing.cs" />
+    <Compile Include="Functionality\Shadow.cs" />
     <Compile Include="Functionality\Storage.cs" />
     <Compile Include="Functionality\Shadows\LineShadow.cs" />
     <Compile Include="Functionality\Shadows\RectangleShadow.cs" />

@@ -16,18 +16,16 @@ namespace GraphicEditor.Controls
         private delegate void LeftMouseButtonUpEventHandler(Point position);
         private delegate void RightMouseButtonDownEventHandler(Point position);
         private delegate void LeftMouseButtonClickEventHandler(Point position);
-        private delegate void MouseMoveEventHandler(Point position);
 
         private event LeftMouseButtonDownEventHandler LeftDown;
         private event LeftMouseButtonUpEventHandler LeftUp;
         private event RightMouseButtonDownEventHandler RightDown;
         private event LeftMouseButtonClickEventHandler LeftClick;
-        private event MouseMoveEventHandler MouseMoveEvent;
 
-        private ShadowFigure shadow;
+        private Shadow shadow;
         private Figure selectedFigure;
-        private List<Figure> allFigures;
         private DrawingMode drawingMode;
+        private List<Figure> allFigures = new List<Figure>();
 
         private Point rightMouseButtonDownPos = new Point(0, 0);
         private Point currentMousePos = new Point(0, 0);
@@ -36,22 +34,20 @@ namespace GraphicEditor.Controls
         public Workplace()
         {
             InitializeComponent();
-            allFigures = new List<Figure>();
         }
 
         public List<Figure> GetAllFigures()
         {
             return allFigures;
         }
-        public void LoadWorkplace(List<Figure> figures)
+        public void LoadWorkplace(List<Figure> figures) 
         {
-            List<Figure> fig = CloneList(figures);
-            if (fig.Count == 0) return;
+            if (figures.Count == 0) return;
             ClearWorkplace();
             DeselectFigure();
-            allFigures = fig;
-            AddToWorkplace(fig);
-            SetFigureListEventSubscription(fig);
+            allFigures = figures;
+            AddToWorkplace(figures);
+            SetFigureListEventSubscription(figures);
         }
 
 
@@ -60,18 +56,14 @@ namespace GraphicEditor.Controls
             DeselectFigure();
             WorkPlaceCanvas.Cursor = Cursors.Cross;
             drawingMode = DrawingMode.LineMode;
-            shadow = new LineShadow();
-            AddToWorkplace(shadow.GetShape());
-            SetShadowEventSubscription();
+            CreateShadow();
         }
         public void ReadyDrawRectangle()
         {
             DeselectFigure();
             WorkPlaceCanvas.Cursor = Cursors.Cross;
             drawingMode = DrawingMode.RectangleMode;
-            shadow = new RectangleShadow();
-            AddToWorkplace(shadow.GetShape());
-            SetShadowEventSubscription();
+            CreateShadow();
         }
         public void SetFigureLineColor(SolidColorBrush lineColor)
         {
@@ -115,13 +107,16 @@ namespace GraphicEditor.Controls
                 LeftClick?.Invoke(e.GetPosition(WorkPlaceCanvas));
                 return;
             }
-            if (shadow == null && drawingMode == DrawingMode.RectangleMode)
+
+            if (shadow == null && drawingMode != DrawingMode.None)
             {
-                ReadyDrawRectangle();
+                CreateShadow();
             }
-            else if(shadow == null && drawingMode == DrawingMode.LineMode)
+
+            if(shadow != null)
             {
-                ReadyDrawLine();
+                shadow.LeftMouseButtonDown(e.GetPosition(WorkPlaceCanvas));
+                return;
             }
             LeftDown?.Invoke(e.GetPosition(WorkPlaceCanvas));
         }
@@ -130,11 +125,24 @@ namespace GraphicEditor.Controls
             rightMouseButtonDownPos = e.GetPosition(WorkPlaceCanvas);
             WorkPlaceCanvas.Cursor = Cursors.Arrow;
             drawingMode = DrawingMode.None;
+
+            if(shadow != null)
+            {
+                shadow.RightMouseButtonDown(e.GetPosition(WorkPlaceCanvas));
+                return;
+            }
+
             RightDown?.Invoke(e.GetPosition(WorkPlaceCanvas));
             RemoveShadow();
         }
         private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if(shadow != null)
+            {
+                shadow.LeftMouseButtonUp(e.GetPosition(WorkPlaceCanvas));
+                return;
+            }
+
             LeftUp?.Invoke(e.GetPosition(WorkPlaceCanvas));
         }
         private void WorkPlace_MouseMove(object sender, MouseEventArgs e)
@@ -145,37 +153,38 @@ namespace GraphicEditor.Controls
                 MoveWorkPlace();
                 return;
             }
-            MouseMoveEvent?.Invoke(e.GetPosition(WorkPlaceCanvas));
+            if(shadow != null)
+            {
+                shadow.MouseMove(e.GetPosition(WorkPlaceCanvas));
+                return;
+            }
+            selectedFigure?.MouseMove(e.GetPosition(WorkPlaceCanvas));
         }
 
-        private void Shadow_EndDrawShadow(object sender)
+        private void CreateShadow()
         {
-            Figure figure;
-            if (sender is RectangleShadow)
-            {
-                var tmp = (RectangleShadow)shadow;
-                figure = new RectangleFigure(tmp.FirstPoint, tmp.LastPoint);
-            }
-            else if (sender is LineShadow)
-            {
-                var tmp = (LineShadow)sender;
-                figure = new LineFigure(tmp.Polyline);
-            }
-            else return;
+            shadow = Shadow.Create(drawingMode);
+            AddToWorkplace(shadow.GetShape());
+            SetShadowEventSubscription();
+        }
+        private void Shadow_EndDrawShadow(Figure figure)
+        {
+            Figure fig = figure;
             RemoveShadow();
-            allFigures.Add(figure);
-            SetFigureEventSubscription(figure);
-            AddToWorkplace(figure.GetShapes());
+            allFigures.Add(fig);
+            SetFigureEventSubscription(fig);
+            AddToWorkplace(fig.GetShapes());
         }
         private void Figure_SelectFigure(Figure sender)
         {
             if (selectedFigure == null || sender == selectedFigure)
             {
                 selectedFigure = sender;
+                sender.ShowOutline();
                 return;
             }
-            selectedFigure = null;
             sender.Deselect();
+            selectedFigure = null;
         }
         private void Figure_AddAdditionalElement(Shape element)
         {
@@ -184,10 +193,6 @@ namespace GraphicEditor.Controls
 
         private void SetShadowEventSubscription()
         {
-            LeftDown += shadow.LeftMouseButtonDown;
-            LeftUp += shadow.LeftMouseButtonUp;
-            RightDown += shadow.RightMouseButtonDown;
-            MouseMoveEvent += shadow.MouseMove;
             shadow.EndDrawShadodw += Shadow_EndDrawShadow;
         }
         private void SetFigureListEventSubscription(List<Figure> figures)
@@ -202,7 +207,6 @@ namespace GraphicEditor.Controls
             LeftDown += figure.LeftMouseButtonDown;
             LeftUp += figure.LeftMouseButtonUp;
             RightDown += figure.RightMouseButtonDown;
-            MouseMoveEvent += figure.MouseMove;
             LeftClick += figure.LeftMouseButtonClick;
             figure.SelectFigure += Figure_SelectFigure;
             figure.AddAdditionalElement += Figure_AddAdditionalElement;
@@ -233,10 +237,6 @@ namespace GraphicEditor.Controls
             if (shadow == null)
                 return;
             WorkPlaceCanvas.Children.Remove(shadow?.GetShape());
-            LeftDown -= shadow.LeftMouseButtonDown;
-            LeftUp -= shadow.LeftMouseButtonUp;
-            RightDown -= shadow.RightMouseButtonDown;
-            MouseMoveEvent -= shadow.MouseMove;
             shadow.EndDrawShadodw -= Shadow_EndDrawShadow;
             shadow = null;
         }
@@ -246,7 +246,6 @@ namespace GraphicEditor.Controls
             scrollPoint.Y = Scroll.VerticalOffset - rightMouseButtonDownPos.DeltaTo(currentMousePos).Y / 2;
             Scroll.ScrollToHorizontalOffset(scrollPoint.X);
             Scroll.ScrollToVerticalOffset(scrollPoint.Y);
-            //Condition.ResetCondition();
         }
         private void ClearWorkplace()
         {
@@ -257,15 +256,7 @@ namespace GraphicEditor.Controls
             WorkPlaceCanvas.Children.Clear();
             allFigures.Clear();
         }
-        private List<Figure> CloneList(List<Figure> oldList)
-        {
-            List<Figure> newlist = new List<Figure>();
-            foreach (var item in oldList)
-            {
-                newlist.Add(item);
-            }
-            return newlist;
-        }
+        
         private void DeselectFigure()
         {
             if (selectedFigure == null)
@@ -274,7 +265,6 @@ namespace GraphicEditor.Controls
             selectedFigure.HideOutline();
             selectedFigure.Deselect();
             selectedFigure = null;
-            //Condition.ResetCondition();
         }
         private void RemoveFromWorkplace()
         {

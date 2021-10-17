@@ -7,7 +7,7 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality.Shadows
 {
-    public class RectangleShadow : ShadowFigure
+    public class RectangleShadow : Shadow, IDrawing
     {
         private Rectangle rectangle;
         private bool isDrawing;
@@ -49,14 +49,16 @@ namespace GraphicEditor.Functionality.Shadows
         }
         public override void MouseMove(Point position)
         {
-            Show();
+            if (!isDrawing)
+                return;
             Draw(position);
         }
-        public override void StartDraw(Point point)
+        public void StartDraw(Point point)
         {
             FirstPoint = point;
+            Show();
         }
-        public override void Draw(Point currentMousePos)
+        public void Draw(Point currentMousePos)
         {
             double xTop = Math.Max(FirstPoint.X, currentMousePos.X);
             double yTop = Math.Max(FirstPoint.Y, currentMousePos.Y);
@@ -70,13 +72,13 @@ namespace GraphicEditor.Functionality.Shadows
             Canvas.SetLeft(rectangle, xMin);
             Canvas.SetTop(rectangle, yMin);
         }
-        public override void EndDraw(Point endPoint)
+        public void EndDraw(Point endPoint)
         {
             LastPoint = endPoint;
-            EndDrawShadodw?.Invoke(this);
+            EndDrawShadodw?.Invoke(GetCreatedFigure());
             return;
         }
-        public override void AddPoint(Point position)
+        public void AddPoint(Point position)
         {
             return;
         }
@@ -84,17 +86,22 @@ namespace GraphicEditor.Functionality.Shadows
         {
             return rectangle;
         }
-        public override void Show()
+        public void Show()
         {
             if (isDrawing)
             {
                 rectangle.Visibility = Visibility.Visible;
             }
         }
-        public override void Hide()
+        public void Hide()
         {
             rectangle.Visibility = Visibility.Hidden;
         }
 
+        public override Figure GetCreatedFigure()
+        {
+            Figure figure = new RectangleFigure(FirstPoint, LastPoint);
+            return figure;
+        }
     }
 }
