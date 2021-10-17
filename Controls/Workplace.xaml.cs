@@ -50,7 +50,6 @@ namespace GraphicEditor.Controls
             SetFigureListEventSubscription(figures);
         }
 
-
         public void ReadyDrawLine()
         {
             DeselectFigure();
