@@ -56,6 +56,15 @@ namespace GraphicEditor.Functionality.Shadows
             }
             Draw(position);
         }
+        public override Shape GetShape()
+        {
+            return Polyline;
+        }
+        public override Figure GetCreatedFigure()
+        {
+            Figure figure = new LineFigure(Polyline);
+            return figure;
+        }
 
         public void StartDraw(Point point)
         {
@@ -89,10 +98,6 @@ namespace GraphicEditor.Functionality.Shadows
                 Reset();
             }
         }
-        public override Shape GetShape()
-        {
-            return Polyline;
-        }
         public void Show()
         {
             Polyline.Visibility = Visibility.Visible;
@@ -113,11 +118,6 @@ namespace GraphicEditor.Functionality.Shadows
             isStarted = false;
             isSingleLine = false;
             Hide();
-        }
-        public override Figure GetCreatedFigure()
-        {
-            Figure figure = new LineFigure(Polyline);
-            return figure;
         }
     }
 }

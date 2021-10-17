@@ -53,6 +53,16 @@ namespace GraphicEditor.Functionality.Shadows
                 return;
             Draw(position);
         }
+        public override Figure GetCreatedFigure()
+        {
+            Figure figure = new RectangleFigure(FirstPoint, LastPoint);
+            return figure;
+        }
+        public override Shape GetShape()
+        {
+            return rectangle;
+        }
+
         public void StartDraw(Point point)
         {
             FirstPoint = point;
@@ -78,14 +88,6 @@ namespace GraphicEditor.Functionality.Shadows
             EndDrawShadodw?.Invoke(GetCreatedFigure());
             return;
         }
-        public void AddPoint(Point position)
-        {
-            return;
-        }
-        public override Shape GetShape()
-        {
-            return rectangle;
-        }
         public void Show()
         {
             if (isDrawing)
@@ -98,10 +100,6 @@ namespace GraphicEditor.Functionality.Shadows
             rectangle.Visibility = Visibility.Hidden;
         }
 
-        public override Figure GetCreatedFigure()
-        {
-            Figure figure = new RectangleFigure(FirstPoint, LastPoint);
-            return figure;
-        }
+
     }
 }
