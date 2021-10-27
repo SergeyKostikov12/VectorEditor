@@ -11,7 +11,7 @@
     <Grid  HorizontalAlignment="Left">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="810"/>
+            <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Column="0" Header="Панель управления" Width="Auto" Height="Auto">
             <Grid Margin="3,10,0,0" Width="195">

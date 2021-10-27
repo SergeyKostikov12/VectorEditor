@@ -26,10 +26,9 @@ namespace GraphicEditor.Functionality
         }
         public void Save(List<Figure> allFigures)
         {
-            figures = allFigures;
             if(!OpenFileDialog()) 
                 return;
-
+            figures = allFigures;
             CreateSaveList();
             Serialize();
         }
