@@ -8,7 +8,7 @@ namespace GraphicEditor
 {
     public partial class MainWindow : Window
     {
-        private Storage Serializator = new Storage();
+        private Storage Serializator;
         private ColorPicker ColorPicker = new ColorPicker();
         private WidthPicker WidthPicker = new WidthPicker();
 
@@ -22,13 +22,17 @@ namespace GraphicEditor
 
         private void LoadButtonPress(object sender, RoutedEventArgs e)
         {
+            Serializator = new Storage();
             var figures = Serializator.Load();
             Workplace.LoadWorkplace(figures);
+            Serializator = null;
         }
         private void SaveButtonPress(object sender, RoutedEventArgs e)
         {
+            Serializator = new Storage();
             var figures = Workplace.GetAllFigures();
             Serializator.Save(figures);
+            Serializator = null;
         }
         private void RectangleButtonPress(object sender, RoutedEventArgs e)
         {
@@ -50,11 +54,11 @@ namespace GraphicEditor
         }
         private void LineColorButtonPress(object sender, RoutedEventArgs e)
         {
-            Workplace.SetFigureLineColor((SolidColorBrush)LineColorField.Background);
+            Workplace.SetFigureLineColor((SolidColorBrush)ColorField.Background);
         }
         private void FillButtonPress(object sender, RoutedEventArgs e)
         {
-            Workplace.SetFigureFillColor((SolidColorBrush)FillColorField.Background);
+            Workplace.SetFigureFillColor((SolidColorBrush)ColorField.Background);
         }
         private void ColorButtonPress(object sender, RoutedEventArgs e)
         {
@@ -71,8 +75,7 @@ namespace GraphicEditor
         private void ColorPicker_ColorPick(object sender, ColorPickEventArgs e)
         {
             var color = e.Color;
-            LineColorField.Background = color;
-            FillColorField.Background = color;
+            ColorField.Background = color;
             ColorPicker.Hide();
         }
     }

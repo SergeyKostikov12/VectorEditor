@@ -99,21 +99,15 @@
                     <Button x:Name="FillBtn" Grid.Column="0" Grid.Row=" 2" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center" Click="FillButtonPress">
                         <Image Source="Icons/fill.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Grid Grid.Row="1" Grid.Column="1">
+                    <Grid Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="1">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Label Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Margin="0,0,0,10">Цвет линии</Label>
-                        <Button x:Name="LineColorField" Background="Black" Grid.Row="1" Click="ColorButtonPress"  BorderThickness="0" BorderBrush="Black"/>
-                    </Grid>
-                    <Grid Grid.Row="2" Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Label Grid.Column="0" Grid.Row="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Top">Цвет заливки</Label>
-                        <Button x:Name="FillColorField" Background="Black" Grid.Row="0"  Click="ColorButtonPress"  BorderBrush="Black" BorderThickness="0"/>
+                        <Label Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" >Цвет линии</Label>
+                        <Label Grid.Column="0" Grid.Row="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Top">Цвет заливки</Label>
+                        <Button x:Name="ColorField" Background="Black" Grid.Row="1" Click="ColorButtonPress"  BorderThickness="0" BorderBrush="Black"/>
                     </Grid>
                     <Label Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center">Толщина линии</Label>
                 </Grid>

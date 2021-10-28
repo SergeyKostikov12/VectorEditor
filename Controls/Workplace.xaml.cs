@@ -12,12 +12,10 @@ namespace GraphicEditor.Controls
 {
     public partial class Workplace : UserControl
     {
-        private delegate void LeftMouseButtonDownEventHandler(Point position);
         private delegate void LeftMouseButtonUpEventHandler(Point position);
         private delegate void RightMouseButtonDownEventHandler(Point position);
         private delegate void LeftMouseButtonClickEventHandler(Point position);
 
-        private event LeftMouseButtonDownEventHandler LeftDown;
         private event LeftMouseButtonUpEventHandler LeftUp;
         private event RightMouseButtonDownEventHandler RightDown;
         private event LeftMouseButtonClickEventHandler LeftClick;
@@ -101,9 +99,11 @@ namespace GraphicEditor.Controls
 
         private void WorkPlace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            var position = e.GetPosition(WorkPlaceCanvas);
+
             if (e.ClickCount == 2)
             {
-                LeftClick?.Invoke(e.GetPosition(WorkPlaceCanvas));
+                LeftClick?.Invoke(position);
                 return;
             }
 
@@ -114,10 +114,21 @@ namespace GraphicEditor.Controls
 
             if(shadow != null)
             {
-                shadow.LeftMouseButtonDown(e.GetPosition(WorkPlaceCanvas));
+                shadow.LeftMouseButtonDown(position);
                 return;
             }
-            LeftDown?.Invoke(e.GetPosition(WorkPlaceCanvas));
+            if (selectedFigure != null)
+            {
+                selectedFigure.LeftMouseButtonDown(position);
+                return;
+            }
+
+            foreach (var figure in allFigures)
+            {
+                figure.LeftMouseButtonDown(position);
+                if (selectedFigure != null && figure == selectedFigure)
+                    return;
+            }
         }
         private void WorkPlace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -132,6 +143,7 @@ namespace GraphicEditor.Controls
             }
 
             RightDown?.Invoke(e.GetPosition(WorkPlaceCanvas));
+            selectedFigure = null;
             RemoveShadow();
         }
         private void WorkPlace_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -176,15 +188,28 @@ namespace GraphicEditor.Controls
         }
         private void Figure_SelectFigure(Figure sender)
         {
-            if (selectedFigure == null || sender == selectedFigure)
+            if (selectedFigure == null)
             {
                 selectedFigure = sender;
                 sender.ShowOutline();
+                UpZPosition(sender);
                 return;
             }
             sender.Deselect();
             selectedFigure = null;
         }
+
+        private void UpZPosition(Figure sender)
+        {
+            allFigures.MoveToLast(sender);
+            var shapes = sender.GetShapes();
+            foreach (var shape in shapes)
+            {
+                WorkPlaceCanvas.Children.Remove(shape);
+                WorkPlaceCanvas.Children.Add(shape);
+            }
+        }
+
         private void Figure_AddAdditionalElement(Shape element)
         {
             AddToWorkplace(element);
@@ -203,7 +228,6 @@ namespace GraphicEditor.Controls
         }
         private void SetFigureEventSubscription(Figure figure)
         {
-            LeftDown += figure.LeftMouseButtonDown;
             LeftUp += figure.LeftMouseButtonUp;
             RightDown += figure.RightMouseButtonDown;
             LeftClick += figure.LeftMouseButtonClick;
@@ -261,7 +285,6 @@ namespace GraphicEditor.Controls
             if (selectedFigure == null)
                 return;
 
-            selectedFigure.HideOutline();
             selectedFigure.Deselect();
             selectedFigure = null;
         }

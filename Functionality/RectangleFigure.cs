@@ -49,9 +49,14 @@ namespace GraphicEditor.Functionality
         }
         public override void LeftMouseButtonDown(Point position)
         {
-            SelectMarker(position);
-            if (SelectedMarker == null)
+            if (!IsSelected)
+            {
                 SelectLine(position);
+                return;
+            }
+
+            if (IsSelected)
+                SelectMarker(position);
         }
         public override void LeftMouseButtonUp(Point position)
         {
@@ -172,22 +177,22 @@ namespace GraphicEditor.Functionality
             if (moveMarker.Point.ItInsideCircle(point, StrokeWidth))
             {
                 SelectedMarker = moveMarker;
-                Select();
+                //Select();
             }
             else if (rotateMarker.Point.ItInsideCircle(point, StrokeWidth))
             {
                 SelectedMarker = rotateMarker;
-                Select();
+                //Select();
             }
             else if (scaleMarker.Point.ItInsideCircle(point, StrokeWidth))
             {
                 SelectedMarker = scaleMarker;
-                Select();
+                //Select();
             }
             else
             {
                 SelectedMarker = null;
-                Deselect();
+                //Deselect();
             }
         }
 

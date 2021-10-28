@@ -7,6 +7,11 @@ namespace GraphicEditor.Controls
 {
     public partial class ColorPicker : UserControl
     {
+        private string[] colors = new string[] 
+        { "#FF1493", "#C71585", "#FF0000", "#B22222", "#8B0000", "#FF6347", "#FF4500", 
+            "#FFD700", "#FFFF00", "#00FF00", "#00FA9A", "#006400", "#20B2AA", "#0000FF", 
+            "#191970", "#FFFFFF", "#808080", "#696969", "#778899", "#2F4F4F", "#000000" };
+
         public event ColorPickEventHandler ColorPick;
         public ColorPicker()
         {
@@ -17,10 +22,6 @@ namespace GraphicEditor.Controls
 
         private void FillTable()
         {
-            var values = typeof(Brushes).GetProperties().
-                  Select(p => new { p.Name, Brush = p.GetValue(null) as Brush }).
-                  ToArray();
-
             Grid grid = new Grid();
             grid.Margin = new Thickness(0, 0, 10, 5);
 
@@ -33,7 +34,10 @@ namespace GraphicEditor.Controls
                     RowDefinition rd = new RowDefinition();
                     rd.Height = GridLength.Auto;
                     grid.RowDefinitions.Add(rd);
-                    Button btn = CreateButton(values[x].Brush);
+
+                    var color = (Color)ColorConverter.ConvertFromString(colors[x]);
+                    SolidColorBrush solidColor = new SolidColorBrush(color);
+                    Button btn = CreateButton(solidColor);
                     Grid.SetColumn(btn, c);
                     Grid.SetRow(btn, r);
                     grid.Children.Add(btn);

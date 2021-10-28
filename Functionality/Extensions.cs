@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
@@ -94,5 +95,11 @@ public static class Extensions
     public static void Hide(this Control control)
     {
         control.Visibility = Visibility.Hidden;
+    }
+    public static void MoveToLast<T>(this List<T> list, T element)
+    {
+        var elem = element;
+        list.Remove(element);
+        list.Add(elem);
     }
 }
