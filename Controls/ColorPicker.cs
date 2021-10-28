@@ -17,7 +17,7 @@ namespace GraphicEditor.Controls
         {
             InitializeComponent();
             FillTable();
-            this.Visibility = Visibility.Hidden;
+            Visibility = Visibility.Hidden;
         }
 
         private void FillTable()
