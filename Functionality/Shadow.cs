@@ -5,7 +5,7 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality
 {
-    public abstract class Shadow 
+    public abstract class Shadow
     {
         public delegate void EndDrawFigureEventHandler(Figure figure);
         public abstract event EndDrawFigureEventHandler EndDrawShadodw;

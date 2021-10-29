@@ -37,6 +37,20 @@ namespace GraphicEditor.Functionality
         public abstract void Deselect(); 
         public abstract void Collapse();
 
+        public static Figure Create(SerializableFigure serializable)
+        {
+            var type = (FigureType)serializable.FigureTypeNumber;
+
+            if (type == FigureType.Rectangle)
+            {
+                return new RectangleFigure(serializable);
+            }
+            else 
+            {
+                return new LineFigure(serializable);
+            }
+        }
+
 
         protected abstract void ExecuteRelizeMarker(Point position); 
         protected abstract void SelectLine(Point point); 

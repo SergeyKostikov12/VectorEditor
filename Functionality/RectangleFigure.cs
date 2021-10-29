@@ -47,6 +47,8 @@ namespace GraphicEditor.Functionality
             DefineMarkers();
             StrokeWidth = Convert.ToInt32(sLFigure.LineStrokeThinkness);
         }
+
+
         public override void LeftMouseButtonDown(Point position)
         {
             if (!IsSelected)

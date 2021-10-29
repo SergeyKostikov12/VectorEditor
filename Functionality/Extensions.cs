@@ -102,4 +102,8 @@ public static class Extensions
         list.Remove(element);
         list.Add(elem);
     }
+    public static Point MidPoint(this Point pt, Point toPoint)
+    {
+        return new Point((pt.X + toPoint.X) / 2, (pt.Y + toPoint.Y) / 2);
+    }
 }

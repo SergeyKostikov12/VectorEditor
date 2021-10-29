@@ -26,7 +26,7 @@ namespace GraphicEditor.Functionality
         }
         public void Save(List<Figure> allFigures)
         {
-            if(!OpenFileDialog()) 
+            if (!OpenFileDialog())
                 return;
             figures = allFigures;
             CreateSaveList();
@@ -40,17 +40,17 @@ namespace GraphicEditor.Functionality
             openFileDialog.Filter = "Vector Files(*.vec)|*.vec|All files (*.*)|*.*";
             openFileDialog.RestoreDirectory = true;
             Nullable<bool> result = openFileDialog.ShowDialog();
-            if (result == false) 
-                return ;
+            if (result == false)
+                return;
 
-            if ((myStream = openFileDialog.OpenFile()) == null) 
-                return ;
+            if ((myStream = openFileDialog.OpenFile()) == null)
+                return;
 
             stream = myStream;
         }
         private void CreateSerializableFiguresList()
         {
-            if (stream == null) 
+            if (stream == null)
                 return;
             try
             {
@@ -68,23 +68,21 @@ namespace GraphicEditor.Functionality
         }
         private void CreateFiguresFromSerializableList()
         {
-            for (int i = 0; i < figuresList.Figures.Count; i++)
+            try
             {
-                if ((FigureType)figuresList.Figures[i].FigureTypeNumber == FigureType.Rectangle)
+                for (int i = 0; i < figuresList.Figures.Count; i++)
                 {
-                    Figure figure = new RectangleFigure(figuresList.Figures[i]);
-                    figures.Add(figure);
-                }
-                else if ((FigureType)figuresList.Figures[i].FigureTypeNumber == FigureType.Line)
-                {
-                    Figure figure = new LineFigure(figuresList.Figures[i]);
-                    figures.Add(figure);
+                    figures.Add(Figure.Create(figuresList.Figures[i]));
                 }
             }
+            catch
+            {
+                MessageBox.Show("Невозможно загрузить файл!!");
+            }
+
         }
         private void Serialize()
         {
-
             XmlSerializer formatter = new XmlSerializer(figuresList.GetType());
             using (FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate))
             {
@@ -94,13 +92,12 @@ namespace GraphicEditor.Functionality
         }
         private bool OpenFileDialog()
         {
-
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.FileName = "";
             saveFileDialog.DefaultExt = ".vec";
             saveFileDialog.Filter = "Vector documents (.vec)|*.vec";
             Nullable<bool> result = saveFileDialog.ShowDialog();
-            if (result == false) 
+            if (result == false)
                 return false;
 
             if (saveFileDialog.FileName.Length != 0)
