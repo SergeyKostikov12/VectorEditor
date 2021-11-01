@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GraphicEditor.Events;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -10,12 +11,13 @@ namespace GraphicEditor.Functionality
 {
     public abstract class Figure
     {
-        public delegate void SelectFigureEventHandler(Figure sender);
-        public delegate void DeselectFigureEventHandler(Figure sender);
+        //public delegate void SelectFigureEventHandler(Figure sender);
+        //public delegate void DeselectFigureEventHandler(Figure sender);
         public delegate void AddAdditionalElementEventHandler(Shape element);
 
-        public abstract event SelectFigureEventHandler SelectFigure;
-        public abstract event DeselectFigureEventHandler DeselectFigure;
+        //public abstract event SelectFigureEventHandler SelectFigure;
+        public abstract event FigureSelectEventHandler SelectFigure;
+        public abstract event FigureDeselectEventHandler DeselectFigure;
         public abstract event AddAdditionalElementEventHandler AddAdditionalElement;
 
         public bool IsSelected;

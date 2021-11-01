@@ -17,8 +17,15 @@ namespace GraphicEditor
             InitializeComponent();
             ColorPicker.ColorPick += ColorPicker_ColorPick;
             WidthPicker.WidthPick += WidthPicker_WidthPick;
+            Workplace.FigureSelect += WidthPicker.WidthPicker_Select;
+            Workplace.FigureDeselect += Workplace_FigureDeselect;
         }
 
+        private void Workplace_FigureDeselect(Figure figure)
+        {
+            ColorPicker.Hide();
+            WidthPicker.Hide();
+        }
 
         private void LoadButtonPress(object sender, RoutedEventArgs e)
         {
@@ -37,12 +44,10 @@ namespace GraphicEditor
         private void RectangleButtonPress(object sender, RoutedEventArgs e)
         {
             Workplace.ReadyDrawFigure(DrawingMode.RectangleMode);
-            //Workplace.ReadyDrawRectangle();
         }
         private void LineButtonPress(object sender, RoutedEventArgs e)
         {
             Workplace.ReadyDrawFigure(DrawingMode.LineMode);
-            //Workplace.ReadyDrawLine();
         }
         private void DeleteButtonPress(object sender, RoutedEventArgs e)
         {

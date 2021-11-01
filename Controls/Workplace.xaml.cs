@@ -1,4 +1,5 @@
-﻿using GraphicEditor.Functionality;
+﻿using GraphicEditor.Events;
+using GraphicEditor.Functionality;
 using GraphicEditor.Functionality.Shadows;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,9 @@ namespace GraphicEditor.Controls
 {
     public partial class Workplace : UserControl
     {
+        public event FigureSelectEventHandler FigureSelect;
+        public event FigureDeselectEventHandler FigureDeselect;
+
         private delegate void LeftMouseButtonUpEventHandler(Point position);
         private delegate void RightMouseButtonDownEventHandler(Point position);
         private delegate void LeftMouseButtonClickEventHandler(Point position);
@@ -192,11 +196,12 @@ namespace GraphicEditor.Controls
             SetFigureEventSubscription(figure);
             AddToWorkplace(figure.GetShapes());
         }
-        private void Figure_SelectFigure(Figure sender)
+        private void Figure_SelectFigure(Figure sender, FigureSelectEventArgs e)
         {
             if (selectedFigure == null)
             {
                 selectedFigure = sender;
+                FigureSelect?.Invoke(sender, e);
                 sender.ShowOutline();
                 UpZPosition(sender);
                 return;
@@ -213,7 +218,7 @@ namespace GraphicEditor.Controls
         {
             Point[] points = new Point[2] { previosPosition, currentMousePos };
             int precision = 10;
-            for (int i = 0; i<precision; i++)
+            for (int i = 0; i < precision; i++)
             {
                 Point[] p = DivideArray(points);
                 points = p;
@@ -264,8 +269,15 @@ namespace GraphicEditor.Controls
             RightDown += figure.RightMouseButtonDown;
             LeftClick += figure.LeftMouseButtonClick;
             figure.SelectFigure += Figure_SelectFigure;
+            figure.DeselectFigure += Figure_DeselectFigure;
             figure.AddAdditionalElement += Figure_AddAdditionalElement;
         }
+
+        private void Figure_DeselectFigure(Figure figure)
+        {
+            FigureDeselect?.Invoke(figure);
+        }
+
         private void AddToWorkplace(Shape shape)
         {
             if (shape == null)

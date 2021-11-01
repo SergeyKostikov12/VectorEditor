@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GraphicEditor.Events;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,8 +11,9 @@ namespace GraphicEditor.Functionality
 {
     public class RectangleFigure : Figure
     {
-        public override event SelectFigureEventHandler SelectFigure;
-        public override event DeselectFigureEventHandler DeselectFigure;
+        //public override event SelectFigureEventHandler SelectFigure;
+        public override event FigureSelectEventHandler SelectFigure;
+        public override event FigureDeselectEventHandler DeselectFigure;
         public override event AddAdditionalElementEventHandler AddAdditionalElement;
 
         private MarkerPoint moveMarker;
@@ -237,7 +239,7 @@ namespace GraphicEditor.Functionality
         {
             IsSelected = true;
             //ShowOutline();
-            SelectFigure?.Invoke(this);
+            SelectFigure?.Invoke(this, new FigureSelectEventArgs(StrokeWidth));
         }
         private void CreateRectangle(Point firstPoint, Point secondPoint)
         {

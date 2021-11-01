@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GraphicEditor.Events;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,13 +11,15 @@ namespace GraphicEditor.Functionality
 {
     class LineFigure : Figure
     {
-        public override event SelectFigureEventHandler SelectFigure;
-        public override event DeselectFigureEventHandler DeselectFigure;
+        //public override event SelectFigureEventHandler SelectFigure;
+        public override event FigureSelectEventHandler SelectFigure;
+        public override event FigureDeselectEventHandler DeselectFigure;
         public override event AddAdditionalElementEventHandler AddAdditionalElement;
-        
+
         private Polyline polyline;
         private MarkerPoint selectedMarker;
         private List<MarkerPoint> markers;
+        private Point firstPosition;
 
 
         public LineFigure(Shape line)
@@ -44,6 +47,7 @@ namespace GraphicEditor.Functionality
         /// <param></param>
         public override void LeftMouseButtonDown(Point position)
         {
+            firstPosition = new Point(position.X, position.Y);
             if (!IsSelected)
             {
                 SelectLine(position);
@@ -61,9 +65,17 @@ namespace GraphicEditor.Functionality
         }
         public override void MouseMove(Point position)
         {
-            if (Mouse.LeftButton != MouseButtonState.Pressed)
-                return;
-            MoveMarker(position);
+            //if (Mouse.LeftButton != MouseButtonState.Pressed)
+            //    return;
+            if (selectedMarker != null)
+            {
+                MoveMarker(position);
+            }
+            else if(IsPointNearLine(firstPosition))
+            {
+                MoveLine(position);
+                firstPosition = position;
+            }
         }
         public override void LeftMouseButtonClick(Point position)
         {
@@ -91,11 +103,11 @@ namespace GraphicEditor.Functionality
         public override List<Shape> GetShapes()
         {
             List<Shape> shapes = new List<Shape>();
+            shapes.Add(polyline);
             foreach (var marker in markers)
             {
                 shapes.Add(marker.Marker);
             }
-            shapes.Add(polyline);
             return shapes;
         }
         public override void HideOutline()
@@ -128,25 +140,11 @@ namespace GraphicEditor.Functionality
         /// 
         protected override void SelectLine(Point point)
         {
-            for (int i = 0; i < markers.Count - 1; i++)
+            if(IsPointNearLine(point))
             {
-                if (point.AbsAngleBetweenPoints(markers[i].Point, markers[i + 1].Point) > 60)
-                {
-                    double A = point.Length(markers[i + 1].Point);
-                    double B = point.Length(markers[i].Point);
-                    double C = markers[i].Point.Length(markers[i + 1].Point);
-                    double p = (A + B + C) / 2;
-                    double S = Math.Sqrt(p * (p - A) * (p - B) * (p - C));
-                    double h = 2 * S / C;
-                    if (h <= 10 + StrokeWidth)
-                    {
-                        //ShowOutline();
-                        IsSelected = true;
-                        SelectFigure?.Invoke(this);
-                        return;
-                    }
-                }
-
+                IsSelected = true;
+                SelectFigure?.Invoke(this, new FigureSelectEventArgs(StrokeWidth));
+                return;
             }
             Deselect();
         }
@@ -270,6 +268,39 @@ namespace GraphicEditor.Functionality
             MessageBox.Show("Невозможно залить Линию!!!");
         }
 
+        private void MoveLine(Point position)
+        {
+            var delta = firstPosition.DeltaTo(position);
+            foreach (var marker in markers)
+            {
+                var pt = new Point(marker.Point.X + delta.X, marker.Point.Y + delta.Y);
+                marker.Move(pt);
+            }
+            for(int i = 0; i<polyline.Points.Count; i++)
+            {
+                polyline.Points[i] = new Point(polyline.Points[i].X + delta.X, polyline.Points[i].Y + delta.Y);
+            }
+        }
+        private bool IsPointNearLine(Point point)
+        {
+            for (int i = 0; i < markers.Count - 1; i++)
+            {
+                if (point.AbsAngleBetweenPoints(markers[i].Point, markers[i + 1].Point) > 60)
+                {
+                    double A = point.Length(markers[i + 1].Point);
+                    double B = point.Length(markers[i].Point);
+                    double C = markers[i].Point.Length(markers[i + 1].Point);
+                    double p = (A + B + C) / 2;
+                    double S = Math.Sqrt(p * (p - A) * (p - B) * (p - C));
+                    double h = 2 * S / C;
+                    if (h <= 10 + StrokeWidth)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
         private void InsertPoint(Point position)
         {
             for (int i = 0; i < polyline.Points.Count - 1; i++)

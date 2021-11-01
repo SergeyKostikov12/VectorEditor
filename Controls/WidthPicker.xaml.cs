@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using GraphicEditor.Events;
 
 namespace GraphicEditor.Controls
 {
@@ -10,6 +11,13 @@ namespace GraphicEditor.Controls
         public WidthPicker()
         {
             InitializeComponent();
+            
+        }
+
+        public void WidthPicker_Select(object sender, FigureSelectEventArgs e)
+        {
+            Text.Content = e.Width;
+            WidthSlider.Value = e.Width;
         }
 
         private void WidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
