@@ -33,12 +33,13 @@ namespace GraphicEditor.Functionality
         {
             CreatePolyline();
             DefinePolyline(sLFigure.Polyline.ParsePolylineFromArray());
-            DefineMarkerPoints();
             polyline.StrokeThickness = Convert.ToInt32(sLFigure.LineStrokeThinkness);
+            DefineMarkerPoints();
             LineColor = new SolidColorBrush
             {
                 Color = (Color)ColorConverter.ConvertFromString(sLFigure.LineColor)
             };
+            SetStrokeWidth((int)polyline.StrokeThickness);
         }
 
         /// <summary>
