@@ -18,11 +18,9 @@ namespace GraphicEditor.Controls
 
         private delegate void LeftMouseButtonUpEventHandler(Point position);
         private delegate void RightMouseButtonDownEventHandler(Point position);
-        private delegate void LeftMouseButtonClickEventHandler(Point position);
 
         private event LeftMouseButtonUpEventHandler LeftUp;
         private event RightMouseButtonDownEventHandler RightDown;
-        private event LeftMouseButtonClickEventHandler LeftClick;
 
         private Shadow shadow;
         private Figure selectedFigure;
@@ -101,7 +99,7 @@ namespace GraphicEditor.Controls
 
             if (e.ClickCount == 2)
             {
-                LeftClick?.Invoke(position);
+                selectedFigure?.LeftMouseButtonClick(position);
                 return;
             }
 
@@ -267,7 +265,6 @@ namespace GraphicEditor.Controls
         {
             LeftUp += figure.LeftMouseButtonUp;
             RightDown += figure.RightMouseButtonDown;
-            LeftClick += figure.LeftMouseButtonClick;
             figure.SelectFigure += Figure_SelectFigure;
             figure.DeselectFigure += Figure_DeselectFigure;
             figure.AddAdditionalElement += Figure_AddAdditionalElement;
