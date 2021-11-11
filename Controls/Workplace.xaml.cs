@@ -1,7 +1,5 @@
 ﻿using GraphicEditor.Events;
 using GraphicEditor.Functionality;
-using GraphicEditor.Functionality.Shadows;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,6 +29,7 @@ namespace GraphicEditor.Controls
         private Point currentMousePos = new Point(0, 0);
         private Point previosMousePosition = new Point(0, 0);
         private Point scrollPoint = new Point(0, 0);
+
         public Workplace()
         {
             InitializeComponent();
@@ -51,7 +50,7 @@ namespace GraphicEditor.Controls
             SetFigureListEventSubscription(figures);
         }
 
-        internal void ReadyDrawFigure(DrawingMode mode)
+        public void ReadyDrawFigure(DrawingMode mode)
         {
             WorkPlaceCanvas.Cursor = Cursors.Cross;
             drawingMode = mode;
@@ -187,13 +186,21 @@ namespace GraphicEditor.Controls
             AddToWorkplace(shadow.GetShape());
             SetShadowEventSubscription();
         }
-        private void Shadow_EndDrawShadow(Figure figure)
+        private void Shadow_EndDrawShadow(Shadow shadow)
         {
             RemoveShadow();
+            Figure figure = Figure.Create(shadow);
             allFigures.Add(figure);
             SetFigureEventSubscription(figure);
             AddToWorkplace(figure.GetShapes());
         }
+        //private void Shadow_EndDrawShadow(Figure figure)
+        //{
+        //    RemoveShadow();
+        //    allFigures.Add(figure);
+        //    SetFigureEventSubscription(figure);
+        //    AddToWorkplace(figure.GetShapes());
+        //}
         private void Figure_SelectFigure(Figure sender, FigureSelectEventArgs e)
         {
             if (selectedFigure == null)

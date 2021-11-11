@@ -11,7 +11,6 @@ namespace GraphicEditor.Functionality
 {
     public class RectangleFigure : Figure
     {
-        //public override event SelectFigureEventHandler SelectFigure;
         public override event FigureSelectEventHandler SelectFigure;
         public override event FigureDeselectEventHandler DeselectFigure;
         public override event AddAdditionalElementEventHandler AddAdditionalElement;
@@ -23,10 +22,15 @@ namespace GraphicEditor.Functionality
         private MarkerPoint SelectedMarker;
 
 
-        public RectangleFigure(Point firstPoint, Point secondPoint)
+        //public RectangleFigure(Point firstPoint, Point secondPoint)
+        //{
+        //}
+        public RectangleFigure(Shape shape)
         {
-            CreateRectangle(firstPoint, secondPoint);
-            DefineAnchorPoints(firstPoint, secondPoint);
+            Polyline line = (Polyline)shape;
+            rectangle = new Polyline();
+            CreateRectangle(line);
+            DefineAnchorPoints(line);
             double w = (rectangle.Points[3].X - rectangle.Points[0].X) / 2;
             double h = (rectangle.Points[1].Y - rectangle.Points[0].Y) / 2;
             moveMarker = new MarkerPoint(new Point(AnchorPoint.X + w, AnchorPoint.Y + h));
@@ -34,6 +38,7 @@ namespace GraphicEditor.Functionality
             DefineMarkers();
             rectangle.Fill = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
             rectangle.StrokeEndLineCap = PenLineCap.Square;
+
         }
         public RectangleFigure(SerializableFigure sLFigure)
         {
@@ -53,13 +58,13 @@ namespace GraphicEditor.Functionality
 
         public override void LeftMouseButtonDown(Point position)
         {
-            if (!IsSelected)
+            if (!isSelected)
             {
                 SelectLine(position);
                 return;
             }
 
-            if (IsSelected)
+            if (isSelected)
                 SelectMarker(position);
         }
         public override void LeftMouseButtonUp(Point position)
@@ -122,7 +127,7 @@ namespace GraphicEditor.Functionality
         {
             HideOutline();
             SelectedMarker = null;
-            IsSelected = false;
+            isSelected = false;
             DeselectFigure?.Invoke(this);
         }
         public override void HideOutline()
@@ -130,6 +135,12 @@ namespace GraphicEditor.Functionality
             moveMarker.Hide();
             rotateMarker.Hide();
             scaleMarker.Hide();
+        }
+        public override void ShowOutline()
+        {
+            moveMarker.Show();
+            rotateMarker.Show();
+            scaleMarker.Show();
         }
 
         /// <summary>
@@ -181,32 +192,21 @@ namespace GraphicEditor.Functionality
             if (moveMarker.Point.ItInsideCircle(point, StrokeWidth))
             {
                 SelectedMarker = moveMarker;
-                //Select();
             }
             else if (rotateMarker.Point.ItInsideCircle(point, StrokeWidth))
             {
                 SelectedMarker = rotateMarker;
-                //Select();
             }
             else if (scaleMarker.Point.ItInsideCircle(point, StrokeWidth))
             {
                 SelectedMarker = scaleMarker;
-                //Select();
             }
             else
             {
                 SelectedMarker = null;
-                //Deselect();
             }
         }
 
-
-        public override void ShowOutline()
-        {
-            moveMarker.Show();
-            rotateMarker.Show();
-            scaleMarker.Show();
-        }
         protected override int GetStrokeWidth()
         {
             return (int)rectangle.StrokeThickness;
@@ -237,39 +237,32 @@ namespace GraphicEditor.Functionality
 
         private void Select()
         {
-            IsSelected = true;
-            //ShowOutline();
+            isSelected = true;
             SelectFigure?.Invoke(this, new FigureSelectEventArgs(StrokeWidth));
         }
-        private void CreateRectangle(Point firstPoint, Point secondPoint)
+        private void CreateRectangle(Polyline line)
         {
             FigureType = FigureType.Rectangle;
-            double xTop = Math.Max(firstPoint.X, secondPoint.X);
-            double yTop = Math.Max(firstPoint.Y, secondPoint.Y);
-            double xMin = Math.Min(firstPoint.X, secondPoint.X);
-            double yMin = Math.Min(firstPoint.Y, secondPoint.Y);
-
-            AnchorPoint = new Point(xMin, yMin);
-            Point point1 = new Point(xMin, yTop);
-            Point point2 = new Point(xTop, yTop);
-            Point point3 = new Point(xTop, yMin);
-            Polyline line = new Polyline();
-            line.Points.Add(AnchorPoint);
-            line.Points.Add(point1);
-            line.Points.Add(point2);
-            line.Points.Add(point3);
-            line.Points.Add(AnchorPoint);
-            rectangle = line;
+            foreach (var point in line.Points)
+            {
+                var pt = new Point(point.X, point.Y);
+                rectangle.Points.Add(pt);
+            }
             rectangle.Visibility = Visibility.Visible;
             rectangle.Stroke = Brushes.Black;
             rectangle.StrokeThickness = 1;
             rectangle.StrokeEndLineCap = PenLineCap.Square;
-            //StrokeWidth = 1;
         }
-        private void DefineAnchorPoints(Point firstPoint, Point secondPoint)
+        private void DefineAnchorPoints(Polyline line)
         {
-            double xMin = Math.Min(firstPoint.X, secondPoint.X);
-            double yMin = Math.Min(firstPoint.Y, secondPoint.Y);
+            double xMin = line.Points[0].X;
+            double yMin = line.Points[0].Y;
+            foreach (var point in line.Points)
+            {
+                xMin = Math.Min(xMin, point.X);
+                yMin = Math.Min(yMin, point.Y);
+            }
+
             AnchorPoint = new Point(xMin, yMin);
         }
         private void DefineMarkers()

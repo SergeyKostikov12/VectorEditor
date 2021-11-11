@@ -5,11 +5,11 @@ using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality.Shadows
 {
-    public class LineShadow : Shadow, IDrawing
+    public class LineShadow : Shadow
     {
-        public Polyline Polyline { get; set; }
         public override event EndDrawFigureEventHandler EndDrawShadodw;
 
+        private Polyline Polyline { get; set; }
         private bool isStarted;
         private bool isSingleLine;
         public LineShadow()
@@ -41,7 +41,7 @@ namespace GraphicEditor.Functionality.Shadows
         }
         public override void RightMouseButtonDown(Point position)
         {
-            if (!isStarted) 
+            if (!isStarted)
                 return;
             EndDraw(position);
         }
@@ -60,11 +60,11 @@ namespace GraphicEditor.Functionality.Shadows
         {
             return Polyline;
         }
-        public override Figure GetCreatedFigure()
-        {
-            Figure figure = new LineFigure(Polyline);
-            return figure;
-        }
+        //public override Figure GetCreatedFigure()
+        //{
+        //    Figure figure = new LineFigure(Polyline);
+        //    return figure;
+        //}
 
         public void StartDraw(Point point)
         {
@@ -88,13 +88,15 @@ namespace GraphicEditor.Functionality.Shadows
             if (Polyline.Points.Count <= 2)
             {
                 Polyline.Points[Polyline.Points.Count - 1] = new Point(endPoint.X, endPoint.Y);
-                EndDrawShadodw?.Invoke(GetCreatedFigure());
+                EndDrawShadodw?.Invoke(this);
+                //EndDrawShadodw?.Invoke(GetCreatedFigure());
                 Reset();
             }
             else
             {
                 Polyline.Points.RemoveAt(Polyline.Points.Count - 1);
-                EndDrawShadodw?.Invoke(GetCreatedFigure());
+                EndDrawShadodw?.Invoke(this);
+                //EndDrawShadodw?.Invoke(GetCreatedFigure());
                 Reset();
             }
         }

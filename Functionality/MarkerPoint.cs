@@ -39,11 +39,6 @@ public class MarkerPoint
         SetPoint(newPosition);
         RefreshAnchorPoint();
     }
-
-    private void SetPoint(Point newPoint)
-    {
-        point = newPoint;
-    }
     public void SetMarkerSize(int size)
     {
         Marker.Height -= markerSize;
@@ -52,6 +47,11 @@ public class MarkerPoint
         Marker.Height += markerSize;
         Marker.Width += markerSize;
         RefreshAnchorPoint();
+    }
+
+    private void SetPoint(Point newPoint)
+    {
+        point = newPoint;
     }
     private void RefreshAnchorPoint()
     {

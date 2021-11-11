@@ -1,14 +1,12 @@
 ﻿using GraphicEditor.Controls;
 using GraphicEditor.Functionality;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace GraphicEditor
 {
     public partial class MainWindow : Window
     {
-        private Storage Serializator;
         private ColorPicker ColorPicker = new ColorPicker();
         private WidthPicker WidthPicker = new WidthPicker();
 
@@ -29,17 +27,15 @@ namespace GraphicEditor
 
         private void LoadButtonPress(object sender, RoutedEventArgs e)
         {
-            Serializator = new Storage();
-            var figures = Serializator.Load();
+            Storage serializator = new Storage();
+            var figures = serializator.Load();
             Workplace.LoadWorkplace(figures);
-            Serializator = null;
         }
         private void SaveButtonPress(object sender, RoutedEventArgs e)
         {
-            Serializator = new Storage();
+            Storage serializator = new Storage();
             var figures = Workplace.GetAllFigures();
-            Serializator.Save(figures);
-            Serializator = null;
+            serializator.Save(figures);
         }
         private void RectangleButtonPress(object sender, RoutedEventArgs e)
         {

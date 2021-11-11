@@ -11,7 +11,6 @@ namespace GraphicEditor.Functionality
 {
     class LineFigure : Figure
     {
-        //public override event SelectFigureEventHandler SelectFigure;
         public override event FigureSelectEventHandler SelectFigure;
         public override event FigureDeselectEventHandler DeselectFigure;
         public override event AddAdditionalElementEventHandler AddAdditionalElement;
@@ -49,7 +48,7 @@ namespace GraphicEditor.Functionality
         public override void LeftMouseButtonDown(Point position)
         {
             firstPosition = new Point(position.X, position.Y);
-            if (!IsSelected)
+            if (!isSelected)
             {
                 SelectLine(position);
                 return;
@@ -122,7 +121,7 @@ namespace GraphicEditor.Functionality
         {
             HideOutline();
             selectedMarker = null;
-            IsSelected = false;
+            isSelected = false;
             DeselectFigure?.Invoke(this);
         }
         public override void Collapse()
@@ -131,6 +130,13 @@ namespace GraphicEditor.Functionality
             foreach (var marker in markers)
             {
                 marker.Marker.Visibility = Visibility.Collapsed;
+            }
+        }
+        public override void ShowOutline()
+        {
+            foreach (var marker in markers)
+            {
+                marker.Show();
             }
         }
 
@@ -143,7 +149,7 @@ namespace GraphicEditor.Functionality
         {
             if(IsPointNearLine(point))
             {
-                IsSelected = true;
+                isSelected = true;
                 SelectFigure?.Invoke(this, new FigureSelectEventArgs(StrokeWidth));
                 return;
             }
@@ -164,13 +170,6 @@ namespace GraphicEditor.Functionality
                 {
                     selectedMarker = null;
                 }
-            }
-        }
-        public override void ShowOutline()
-        {
-            foreach (var marker in markers)
-            {
-                marker.Show();
             }
         }
         protected override void ExecuteRelizeMarker(Point position)

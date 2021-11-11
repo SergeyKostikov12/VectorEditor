@@ -7,11 +7,13 @@ namespace GraphicEditor.Functionality
 {
     public abstract class Shadow
     {
-        public delegate void EndDrawFigureEventHandler(Figure figure);
+        public delegate void EndDrawFigureEventHandler(Shadow shadow);
+
+        //public delegate void EndDrawFigureEventHandler(Figure figure);
         public abstract event EndDrawFigureEventHandler EndDrawShadodw;
 
         public abstract Shape GetShape();
-        public abstract Figure GetCreatedFigure();
+        //public abstract Figure GetCreatedFigure();
 
         public abstract void LeftMouseButtonDown(Point position);
         public abstract void LeftMouseButtonUp(Point position);

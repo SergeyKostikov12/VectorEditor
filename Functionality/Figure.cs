@@ -1,4 +1,5 @@
 ﻿using GraphicEditor.Events;
+using GraphicEditor.Functionality.Shadows;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
@@ -11,21 +12,19 @@ namespace GraphicEditor.Functionality
 {
     public abstract class Figure
     {
-        //public delegate void SelectFigureEventHandler(Figure sender);
-        //public delegate void DeselectFigureEventHandler(Figure sender);
         public delegate void AddAdditionalElementEventHandler(Shape element);
 
-        //public abstract event SelectFigureEventHandler SelectFigure;
         public abstract event FigureSelectEventHandler SelectFigure;
         public abstract event FigureDeselectEventHandler DeselectFigure;
         public abstract event AddAdditionalElementEventHandler AddAdditionalElement;
 
-        public bool IsSelected;
         public FigureType FigureType { get; protected set; }
-        public Point AnchorPoint { get; set; }
         public int StrokeWidth { get => GetStrokeWidth(); set => SetStrokeWidth(value); }
         public SolidColorBrush LineColor { get => GetLineColor(); set => SetLineColor(value); }
         public SolidColorBrush Fill { get => GetFill(); set => SetFill(value); }
+
+        protected Point AnchorPoint { get; set; }
+        protected bool isSelected;
 
         public abstract void LeftMouseButtonDown(Point position);
         public abstract void LeftMouseButtonUp(Point position);
@@ -36,6 +35,7 @@ namespace GraphicEditor.Functionality
 
         public abstract List<Shape> GetShapes(); 
         public abstract void HideOutline(); 
+        public abstract void ShowOutline();
         public abstract void Deselect(); 
         public abstract void Collapse();
 
@@ -52,11 +52,21 @@ namespace GraphicEditor.Functionality
                 return new LineFigure(serializable);
             }
         }
+        public static Figure Create(Shadow shadow)
+        {
+            if (shadow is RectangleShadow)
+            {
+                return new RectangleFigure(shadow.GetShape());
+            }
+            else
+            {
+                return new LineFigure(shadow.GetShape());
+            }
+        }
 
 
         protected abstract void ExecuteRelizeMarker(Point position); 
         protected abstract void SelectLine(Point point); 
-        public abstract void ShowOutline();
         protected abstract void SelectMarker(Point poin);
         protected abstract void MoveMarker(Point position); 
         protected abstract int GetStrokeWidth();
@@ -65,10 +75,5 @@ namespace GraphicEditor.Functionality
         protected abstract void SetLineColor(SolidColorBrush colorBrush);
         protected abstract SolidColorBrush GetFill();
         protected abstract SolidColorBrush GetLineColor();
-
-
-        //public abstract bool IsMarkerSelect();
-        //public abstract List<Rectangle> GetMarkers(); 
-        //public abstract Rectangle InsertPoint(Point position);
     }
 }

@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace GraphicEditor.Functionality.Shadows
 {
-    public class RectangleShadow : Shadow, IDrawing
+    public class RectangleShadow : Shadow
     {
-        private Rectangle rectangle;
+        private Shape rectangle;
         private bool isDrawing;
+        private int request;
+
 
         public Point FirstPoint { get; set; }
         public Point LastPoint { get; set; }
@@ -53,13 +54,12 @@ namespace GraphicEditor.Functionality.Shadows
                 return;
             Draw(position);
         }
-        public override Figure GetCreatedFigure()
-        {
-            Figure figure = new RectangleFigure(FirstPoint, LastPoint);
-            return figure;
-        }
         public override Shape GetShape()
         {
+            request++;
+            if (request == 3)
+                ConvertToShape();
+
             return rectangle;
         }
 
@@ -85,7 +85,7 @@ namespace GraphicEditor.Functionality.Shadows
         public void EndDraw(Point endPoint)
         {
             LastPoint = endPoint;
-            EndDrawShadodw?.Invoke(GetCreatedFigure());
+            EndDrawShadodw?.Invoke(this);
             return;
         }
         public void Show()
@@ -100,6 +100,26 @@ namespace GraphicEditor.Functionality.Shadows
             rectangle.Visibility = Visibility.Hidden;
         }
 
+        private void ConvertToShape()
+        {
+            double xTop = Math.Max(FirstPoint.X, LastPoint.X);
+            double yTop = Math.Max(FirstPoint.Y, LastPoint.Y);
+            double xMin = Math.Min(FirstPoint.X, LastPoint.X);
+            double yMin = Math.Min(FirstPoint.Y, LastPoint.Y);
 
+            Point AnchorPoint = new Point(xMin, yMin);
+            Point point1 = new Point(xMin, yTop);
+            Point point2 = new Point(xTop, yTop);
+            Point point3 = new Point(xTop, yMin);
+
+            Polyline line = new Polyline();
+            line.Points.Add(AnchorPoint);
+            line.Points.Add(point1);
+            line.Points.Add(point2);
+            line.Points.Add(point3);
+            line.Points.Add(AnchorPoint);
+
+            rectangle = line;
+        }
     }
 }
