@@ -15,8 +15,13 @@ namespace GraphicEditor
             InitializeComponent();
             ColorPicker.ColorPick += ColorPicker_ColorPick;
             WidthPicker.WidthPick += WidthPicker_WidthPick;
-            Workplace.FigureSelect += WidthPicker.WidthPicker_Select;
+            Workplace.FigureSelect += Workplace_FigureSelect;
             Workplace.FigureDeselect += Workplace_FigureDeselect;
+        }
+
+        private void Workplace_FigureSelect(Figure sender, Events.FigureSelectEventArgs e)
+        {
+            WidthPicker.SetWidth(e.Width);
         }
 
         private void Workplace_FigureDeselect(Figure figure)

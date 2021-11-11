@@ -14,10 +14,10 @@ namespace GraphicEditor.Controls
             
         }
 
-        public void WidthPicker_Select(object sender, FigureSelectEventArgs e)
+        public void SetWidth(int width)
         {
-            Text.Content = e.Width;
-            WidthSlider.Value = e.Width;
+            Text.Content = width;
+            WidthSlider.Value = width;
         }
 
         private void WidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
